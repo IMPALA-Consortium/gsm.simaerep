@@ -13,7 +13,7 @@ Depends:
     R (>= 4.0.0),
 Imports:
     gsm (>= 2.2.0),
-    simaerep (>= 0.6.1),
+    simaerep (>= 0.6.0),
     dplyr,
     tidyr,
     tidyr

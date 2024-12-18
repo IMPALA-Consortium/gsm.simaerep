@@ -14,7 +14,9 @@ This is a [{simaerep}](https://github.com/openpharma/simaerep/)
 extension for the [{gsm}](https://github.com/Gilead-BioStats/gsm)
 package.
 
-It contains the following `gsm`-style functions as detailed
+This is in development the MVP will contain the following:
+
+`gsm`-style functions as detailed
 [here](https://gilead-biostats.github.io/gsm/articles/DataModel.html):
 
 - Input_CumCount() patient-level cumulative count from source data
@@ -23,7 +25,7 @@ It contains the following `gsm`-style functions as detailed
 - Analyze_Simaerep() will execute `simaerep`
 - Flag_Simaerep() will flag based on `simaerep` statistics
 
-Also included is the required module configuration file:
+required module configuration file:
 
 - `inst/workflow/4_modules/gsm.simaerep.yaml`
 
@@ -34,6 +36,8 @@ You can install the development version of gsm.simaerep from
 
 ``` r
 # install.packages("pak")
+pak::pak("Gilead-BioStats/clindata")
+pak::pak("Gilead-BioStats/gsm")
 pak::pak("IMPALA-Consortium/gsm.simaerep")
 ```
 
