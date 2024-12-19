@@ -104,8 +104,8 @@ Input_CumCount <- function(
   stopifnot(
     strNumeratorDateCol %in% colnames(dfNumerator),
     strDenominatorDateCol %in% colnames(dfDenominator),
-    lubridate::is.Date(dfNumerator[[strNumeratorDateCol]]),
-    lubridate::is.Date(dfDenominator[[strDenominatorDateCol]]),
+    lubridate::is.instant(dfNumerator[[strNumeratorDateCol]]),
+    lubridate::is.instant(dfDenominator[[strDenominatorDateCol]]),
     any(!is.na(dfNumerator[[strNumeratorDateCol]])),
     any(!is.na(dfDenominator[[strDenominatorDateCol]])
     )
@@ -130,25 +130,6 @@ Input_CumCount <- function(
     dfDenominator <- dfDenominator %>%
       mutate(EventID = row_number())
   }
-
-  # if `strGroupLevel` is null, use `strGroupCol`
-  if (is.null(strGroupLevel)) {
-    strGroupLevel <- strGroupCol
-  }
-  
-  # Rename SubjectID in dfSubjects
-  dfSubjects <- dfSubjects %>%
-    select(
-      "SubjectID" = !!strSubjectCol,
-      "GroupID" = !!strGroupCol
-    ) %>%
-    mutate(
-      "GroupLevel" = strGroupLevel
-    )
-
-  # Check that every Subject has only one GroupID
-
-  stopifnot(! any(duplicated(dfSubjects$SubjectID)))
 
   # Filter dfNumerator and dfDenominator to only include events with ID and Date
   # and select distinct SubjectID, EventID, and Date. Create a new column for EventType
@@ -177,34 +158,24 @@ Input_CumCount <- function(
       !is.na(.data$SubjectID)
     )
 
+  dfNumerator <- AddGroupCol(dfNumerator, dfSubjects, strSubjectCol, strGroupCol, strGroupLevel)
+  dfDenominator <- AddGroupCol(dfDenominator, dfSubjects, strSubjectCol, strGroupCol, strGroupLevel)
+
   if (strOrphanedMethod == "assign") {
-    stopifnot(
-      strGroupCol %in% colnames(dfNumerator)
-    )
 
-    dfNumerator <- dfNumerator %>%
-      rename(
-        "GroupID" = !!strGroupCol
-      )
-
-    dfNumerator <- AssignOrphans(dfNumerator, dfDenominator, dfSubjects)
+    dfNumerator <- AssignOrphans(dfNumerator, dfDenominator)
     
   }
   
   dfNumerator <- dfNumerator %>%
       filter(!is.na(.data$SubjectID))
 
-  dfEvent <- union_all(
-      dfNumerator %>% distinct(.data$SubjectID, .data$EventID, .data$Date, .data$EventType),
-      dfDenominator %>% distinct(.data$SubjectID, .data$EventID, .data$Date, .data$EventType)
-    ) %>%
-    # add GroupID, filter subjects without GroupID
-    inner_join(
-      dfSubjects %>% select(c("SubjectID", "GroupID", "GroupLevel")),
-      by = "SubjectID"
+  dfEvents <- union_all(
+      dfNumerator %>% distinct(.data$SubjectID, .data$GroupID, .data$GroupLevel, .data$EventID, .data$Date, .data$EventType),
+      dfDenominator %>% distinct(.data$SubjectID, .data$GroupID, .data$GroupLevel,.data$EventID, .data$Date, .data$EventType)
     )
 
-  dfCumCount <- dfEvent %>%
+  dfCumCount <- dfEvents %>%
     mutate(
       # truncate Date to Date and add two hours to numerator date so numerator events are
       # placed after denominator events so that numerator events are always linked to same
@@ -220,16 +191,64 @@ Input_CumCount <- function(
     ) %>%
     group_by(.data$GroupID, .data$GroupLevel, .data$SubjectID, .data$Denominator) %>%
     summarize(
-      "Numerator" = max(.data$Numerator)
+      MaxNumerator = max(.data$Numerator),
+      MinNumerator = min(.data$Numerator)
+    ) %>%
+    group_by(.data$GroupID, .data$GroupLevel, .data$SubjectID) %>%
+    mutate(
+      # assign Numerator after last Denominator to last Denominator
+      Numerator = ifelse(Denominator == max(Denominator), MaxNumerator, MinNumerator)
     ) %>%
     ungroup() %>%
+    filter(.data$Denominator > 0) %>%
     select(c("SubjectID", "GroupID", "GroupLevel", "Numerator", "Denominator"))
 
   return(dfCumCount)
 }
 
+#' Handle all dfSubjects operations, only if GroupID is not yet in Numerator or Denominator frames.
+#' Will also filter all events with no GroupID
 #'@keywords internal
-AssignOrphans <- function(dfNumerator, dfDenominator, dfSubjects) {
+AddGroupCol <- function(df, dfSubjects, strSubjectCol, strGroupCol, strGroupLevel) {
+
+  # if `strGroupLevel` is null, use `strGroupCol`
+  if (is.null(strGroupLevel)) {
+    strGroupLevel <- strGroupCol
+  }
+  
+  if (! strGroupCol %in% colnames(df)) {
+
+    stopifnot(! any(duplicated(dfSubjects[[strSubjectCol]])))
+
+    # Rename SubjectID in dfSubjects
+    dfSubjects <- dfSubjects %>%
+      rename(
+        "SubjectID" = !!strSubjectCol
+      )
+
+    df <- df %>%
+      inner_join(
+        dfSubjects %>%
+          select(all_of(c("SubjectID", strGroupCol))),
+        by = "SubjectID"
+      )
+  }
+
+ df <- df %>%
+    rename(
+      "GroupID" = {{ strGroupCol }}
+    ) %>%
+    mutate(
+      GroupLevel = strGroupLevel
+    ) %>%
+    filter(! is.na(.data$GroupID))
+
+ return(df)
+
+}
+
+#'@keywords internal
+AssignOrphans <- function(dfNumerator, dfDenominator) {
 
   if (! any(is.na(dfNumerator$SubjectID))) {
     LogMessage(
@@ -241,14 +260,15 @@ AssignOrphans <- function(dfNumerator, dfDenominator, dfSubjects) {
   }
 
   dfEventMinMax <- bind_rows(dfNumerator, dfDenominator) %>%
-    group_by(.data$SubjectID) %>%
-    summarise(
+    group_by(.data$GroupID, .data$SubjectID) %>%
+    summarize(
       "MinDate" = min(.data$Date, na.rm = TRUE),
       "MaxDate" = max(.data$Date, na.rm = TRUE)
     ) %>%
+    ungroup() %>%
     # add 30 days tolerance to MaxDate
     mutate(
-      "MaxDateSite" = .data$MaxDateSite + 30
+      "MaxDate" = .data$MaxDate + 30
     ) %>%
     select("SubjectID", "GroupID", "MinDate", "MaxDate")
 
@@ -264,11 +284,11 @@ AssignOrphans <- function(dfNumerator, dfDenominator, dfSubjects) {
       dfEventMinMax,
       by = join_by(
         "GroupID",
-         between(x$DATE, y$MinDate, y$MaxDate)
+         between(x$Date, y$MinDate, y$MaxDate)
       )
     ) %>%
     # select a random patient for event
-    window_order(rnorm(nrow(.data))) %>%
+    arrange(runif(n())) %>%
     group_by(.data$EventID) %>%
     filter(row_number() == 1) %>%
     ungroup() %>%

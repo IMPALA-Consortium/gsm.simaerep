@@ -16,7 +16,9 @@ Imports:
     simaerep (>= 0.6.0),
     dplyr,
     tidyr,
-    tidyr
+    tidyr,
+    lubridate,
+    dbplyr
 Suggests: 
     knitr,
     rmarkdown,

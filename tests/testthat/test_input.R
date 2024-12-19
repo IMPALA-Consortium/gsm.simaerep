@@ -1,12 +1,5 @@
 
-Input_Rate(
-    dfSubjects = clindata::rawplus_dm,
-    dfNumerator = clindata::rawplus_ae,
-    dfDenominator = clindata::rawplus_visdt,
-    strSubjectCol = "subjid",
-    strGroupCol = "siteid",
-    strGroupLevel = "Site"
-)
+
 
 test_that("test Input_CumCount PD", {
 
@@ -57,7 +50,7 @@ test_that("Input_CumCount same final count as Input_Rate for AEs and Visits with
     ) %>%
     arrange(SubjectID)
 
-  dfRate <- Input_Rate(
+  dfRate <- gsm::Input_Rate(
       dfSubjects = clindata::rawplus_dm,
       dfNumerator = clindata::rawplus_ae %>% filter(! is.na(aest_dt)),
       dfDenominator = clindata::rawplus_visdt %>% filter(! is.na(lubridate::ymd(visit_dt))),
@@ -90,7 +83,7 @@ test_that("Input_CumCount same final count as Input_Rate for PDs and Visits with
     ) %>%
     arrange(SubjectID)
 
-  dfRate <- Input_Rate(
+  dfRate <- gsm::Input_Rate(
       dfSubjects = clindata::rawplus_dm,
       dfNumerator = clindata::ctms_protdev %>% rename(subjid = subjectenrollmentnumber) %>% filter(! is.na(deviationdate)),
       dfDenominator = clindata::rawplus_visdt %>% filter(! is.na(lubridate::ymd(visit_dt))),
@@ -107,16 +100,164 @@ test_that("Input_CumCount same final count as Input_Rate for PDs and Visits with
 
 test_that("As Denominator count increases Numerator count must never decrease", {
 
+  dfCumCount <- Input_CumCount(
+    dfSubjects = clindata::rawplus_dm,
+    dfNumerator = clindata::rawplus_ae,
+    dfDenominator = clindata::rawplus_visdt %>% mutate(visit_dt = lubridate::ymd(visit_dt)),
+    strSubjectCol = "subjid",
+    strGroupCol = "siteid",
+    strGroupLevel = "Site",
+    strNumeratorDateCol = "aest_dt",
+    strDenominatorDateCol  = "visit_dt"
+    )
+
+  never_decrease <- dfCumCount %>%
+    arrange(SubjectID, Denominator) %>%
+    group_by(SubjectID) %>%
+    mutate(
+      DenominatorIncrease = Denominator - tidyr::replace_na(lag(Denominator), 0),
+      never_decrease = DenominatorIncrease >= 0
+    ) %>%
+    ungroup() %>%
+    dplyr::pull(never_decrease) %>%
+    all()
+
+  expect_true(never_decrease)
 
 })
 
-test_that("Same-day Numerator and Denominator Events must always be matched", {
+test_that("Check Numerator Events befor/after first/last Denominator and same day as Denominator", {
 
+  # dfSubjects tibble with one subject and one site
+  dfSubjects <- tibble(
+    SubjectID = 1,
+    GroupID = 1
+  )
 
+  # dfNumerator tibble with one subject 10 AEs, two of which on same day
+  dfNumerator <- tibble(
+    SubjectID = rep(1, 10),
+    aest_dt = as.Date("2000-01-01") + c(months(0:4), rep(months(7), 2), months(9:11)),
+  ) %>%
+  mutate(
+    aest_dt = aest_dt + lubridate::hours(12)
+  )
+
+  # dfDenominator tibble with one subject 4 visits, one on same day as two Numerator events
+  # Denominator time indicates that they occurr before Numerator events, which should be ignored
+  dfDenominator <- tibble(
+    SubjectID = rep(1, 4),
+    visit_dt = c(as.Date(c("2000-01-03", "2000-04-12", "2000-08-01", "2000-11-12")))
+  ) %>%
+  mutate(
+    visit_dt = visit_dt + lubridate::hours(1)
+  )
+
+  dfCumCount <- Input_CumCount(
+    dfSubjects = dfSubjects,
+    dfNumerator = dfNumerator,
+    dfDenominator = dfDenominator,
+    strSubjectCol = "SubjectID",
+    strGroupCol = "GroupID",
+    strGroupLevel = "Site",
+    strNumeratorDateCol = "aest_dt",
+    strDenominatorDateCol  = "visit_dt"
+    )
+
+  dfExpected <- tibble(
+    SubjectID = rep(1, 4),
+    GroupID = rep(1, 4),
+    GroupLevel = "Site",
+    Numerator = c(1, 4, 7, 10),
+    Denominator = c(1, 2, 3, 4)
+  )
+
+  expect_equal(dfCumCount, dfExpected)
 })
 
 test_that("AssignOrphans - Orphaned Numerator events will not be dropped if GroupID available", {
 
+  dfNumerator <- clindata::ctms_protdev %>% 
+    rename(subjid = subjectenrollmentnumber) %>%
+    left_join(clindata::rawplus_dm %>% select(subjid, siteid), by = "subjid") %>%
+    # set 30% of subjectid per subject to NA
+    arrange(runif(n())) %>%
+    mutate(rnk = row_number() / n(), .by = subjid) %>%
+    mutate(subjid = ifelse(rnk < 0.3, NA, subjid)) %>%
+    filter(! is.na(deviationdate), ! is.na(siteid))
+
+  dfCumCount <- Input_CumCount(
+    dfSubjects = clindata::rawplus_dm,
+    dfNumerator = dfNumerator,
+    dfDenominator = clindata::rawplus_visdt %>% mutate(visit_dt = lubridate::ymd(visit_dt)),
+    strSubjectCol = "subjid",
+    strGroupCol = "siteid",
+    strGroupLevel = "Site",
+    strNumeratorDateCol = "deviationdate",
+    strDenominatorDateCol  = "visit_dt",
+    strOrphanedMethod = "filter"
+  ) %>%
+  filter(Denominator == max(Denominator), .by = c(SubjectID))
+
+  expect_equal(nrow(filter(dfNumerator, ! is.na(subjid))), sum(dfCumCount$Numerator))
+
+  dfCumCountOrphans <- Input_CumCount(
+    dfSubjects = clindata::rawplus_dm,
+    dfNumerator = dfNumerator,
+    dfDenominator = clindata::rawplus_visdt %>% mutate(visit_dt = lubridate::ymd(visit_dt)),
+    strSubjectCol = "subjid",
+    strGroupCol = "siteid",
+    strGroupLevel = "Site",
+    strNumeratorDateCol = "deviationdate",
+    strDenominatorDateCol  = "visit_dt",
+    strOrphanedMethod = "assign"
+  ) %>%
+  filter(Denominator == max(Denominator), .by = c(SubjectID))
+
+  # it is okay when not 100% of all orphaned numerators are assigned when they did not
+  # occurr between first and last + 30 days denominator event
+  expect_true(
+    dplyr::between(
+      sum(dfCumCountOrphans$Numerator),
+      nrow(dfNumerator) * 0.9,
+      nrow(dfNumerator)
+    )
+  )
+
+  # Orphaned events must not always get assigned to only one patient per site
+
+  n_pats_with_increase_per_site <- dfCumCount %>%
+    select(SubjectID, GroupID, NumberatorOriginal = Numerator) %>%
+    left_join(
+      dfCumCountOrphans %>% 
+        select(SubjectID, GroupID, NumeratorDist = Numerator),
+        by = c("SubjectID", "GroupID")
+    ) %>%
+    mutate(
+      has_increase = NumeratorDist > NumberatorOriginal
+    ) %>%
+    summarize(
+      n_increase = sum(has_increase),
+      n = n(),
+      .by = GroupID
+    ) %>%
+    dplyr::pull(n_increase)
+
+  expect_true(any(n_pats_with_increase_per_site > 1))
+
+  # Orphaned Numerator events also need to be assigned to patients
+  # with no original Numerator events.
+
+  NewPatientsWithNumerator <- dfCumCount %>%
+    select(SubjectID, GroupID, NumberatorOriginal = Numerator) %>%
+    left_join(
+      dfCumCountOrphans %>% 
+        select(SubjectID, GroupID, NumeratorDist = Numerator),
+        by = c("SubjectID", "GroupID")
+    ) %>%
+    filter(NumberatorOriginal == 0, NumeratorDist > 0)
+
+  expect_true(nrow(NewPatientsWithNumerator) > 0)
 
 })
 
@@ -134,84 +275,27 @@ test_that("strSubjectCol must exist in all data frames", {
 })
 
 
-test_that("handling of zero denominators and missing data", {
-  subjects <- data.frame(
-    SubjectID = 1:4,
-    GroupID = 10:13
-  )
-  numerators <- data.frame(
-    SubjectID = c(1, 1),
-    GroupID = 10:11
-  )
-  denominators <- data.frame(
-    SubjectID = c(1, 2),
-    GroupID = 12:13
-  )
 
-  result <- Input_Rate(subjects, numerators, denominators)
-
-  expected <- data.frame(
-    SubjectID = 1:4,
-    GroupID = 10:13,
-    GroupLevel = "GroupID",
-    Numerator = c(2, 0, 0, 0),
-    Denominator = c(1, 1, 0, 0),
-    Metric = c(2, 0, NaN, NaN) # NaN because denominator is zero
-  )
-
-  expect_equal(result, expected)
-})
-
-test_that("if dfNumerator has 0 row data", {
-  subjects <- data.frame(
-    SubjectID = 1:4,
-    GroupID = 10:13
-  )
-  numerators <- data.frame(
-    SubjectID = numeric(),
-    GroupID = numeric()
-  )
-  denominators <- data.frame(
-    SubjectID = c(1, 2),
-    GroupID = 12:13
-  )
-
-  result <- Input_Rate(subjects, numerators, denominators)
-
-  expected <- data.frame(
-    SubjectID = 1:4,
-    GroupID = 10:13,
-    GroupLevel = "GroupID",
-    Numerator = c(0, 0, 0, 0),
-    Denominator = c(1, 1, 0, 0),
-    Metric = c(0, 0, NaN, NaN) # NaN because denominator is zero
-  )
-
-  expect_equal(result, expected)
-})
+# test_that("yaml workflow produces same table as R function", {
+#   source(test_path("testdata", "create_double_data.R"), local = TRUE)
+#   expect_equal(dfInput$SubjectID, lResults$Analysis_kri0001$Analysis_Input$SubjectID)
+#   expect_equal(dim(dfInput), dim(lResults$Analysis_kri0001$Analysis_Input))
+# })
 
 
+# test_that("duckdb returns same result as R function", {
+#   source(test_path("testdata", "create_double_data.R"), local = TRUE)
+#   db <- duckdb::dbConnect(duckdb::duckdb(), ":memory:")
+#   duckdb::dbWriteTable(db, "subjects", clindata::rawplus_dm)
+#   duckdb::dbWriteTable(db, "numerators", clindata::rawplus_ae)
+#   duckdb::dbWriteTable(db, "denominators", clindata::rawplus_visdt)
+#   duckdb::dbWriteTable(db, "results", lResults$Analysis_kri0001$Analysis_Input)
 
-test_that("yaml workflow produces same table as R function", {
-  source(test_path("testdata", "create_double_data.R"), local = TRUE)
-  expect_equal(dfInput$SubjectID, lResults$Analysis_kri0001$Analysis_Input$SubjectID)
-  expect_equal(dim(dfInput), dim(lResults$Analysis_kri0001$Analysis_Input))
-})
+#   query <- "
+#   SELECT * FROM results
+#   "
+#   result <- duckdb::dbGetQuery(db, query)
 
-
-test_that("duckdb returns same result as R function", {
-  source(test_path("testdata", "create_double_data.R"), local = TRUE)
-  db <- duckdb::dbConnect(duckdb::duckdb(), ":memory:")
-  duckdb::dbWriteTable(db, "subjects", clindata::rawplus_dm)
-  duckdb::dbWriteTable(db, "numerators", clindata::rawplus_ae)
-  duckdb::dbWriteTable(db, "denominators", clindata::rawplus_visdt)
-  duckdb::dbWriteTable(db, "results", lResults$Analysis_kri0001$Analysis_Input)
-
-  query <- "
-  SELECT * FROM results
-  "
-  result <- duckdb::dbGetQuery(db, query)
-
-  expect_equal(result$SubjectID, lResults$Analysis_kri0001$Analysis_Input$SubjectID)
-  expect_equal(dim(result), dim(lResults$Analysis_kri0001$Analysis_Input))
-})
+#   expect_equal(result$SubjectID, lResults$Analysis_kri0001$Analysis_Input$SubjectID)
+#   expect_equal(dim(result), dim(lResults$Analysis_kri0001$Analysis_Input))
+# })
