@@ -33,3 +33,6 @@ Suggests:
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 URL: https://impala-consortium.github.io/gsm.simaerep/
+Remotes:
+    clindata=Gilead-BioStats/clindata,
+    gsm=Gilead-BioStats/gsm
