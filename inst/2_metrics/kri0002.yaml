@@ -1,0 +1,42 @@
+meta:
+  Type: Analysis
+  ID: kri0002
+  GroupLevel: Site
+  Abbreviation: PD
+  Metric: Protocol Deviation Rate
+  Numerator: Protocol Deviation
+  Denominator: Visit
+  Model: bootstrap
+  Score: probability
+  AnalysisType: score
+  Threshold: 1, 5, 95, 99
+  nMinDenominator: 1
+spec:
+  Mapped_PD:
+    subjid:
+      type: character
+    deviationdate:
+      type: Date
+  Mapped_SUBJ:
+    subjid:
+      type: character
+    siteid:
+      type: character
+  Mapped_VISIT:
+    subjid:
+      type: character
+    visit_dt:
+      type: Date
+steps:
+  - output: Analysis_Input
+    name: Input_CumCount
+    params:
+      dfSubjects: Mapped_SUBJ
+      dfNumerator: Mapped_PD
+      dfDenominator: Mapped_VISIT
+      strSubjectCol: subjid
+      strGroupCol: siteid
+      strGroupLevel: Site
+      strNumeratorDateCol: deviationdate
+      strDenominatorDateCol: visit_dt
+      strOrphanedMethod: filter

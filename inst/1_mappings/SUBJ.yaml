@@ -1,0 +1,29 @@
+meta:
+  Type: Mapped
+  ID: SUBJ
+  Description: Subject Data Mapping 
+  Priority: 1
+spec: 
+  Raw_SUBJ:
+    studyid:
+      type: character
+    invid:
+      type: character
+    country:
+      type: character
+    subjid:
+      type: character
+    subject_nsv:
+      type: character
+    enrollyn:
+      type: character
+    timeonstudy:
+      type: integer
+    siteid:
+      type: character
+steps:
+  - output: Mapped_SUBJ
+    name: =
+    params:
+      lhs: Mapped_SUBJ
+      rhs: Raw_SUBJ
