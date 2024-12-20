@@ -1,0 +1,17 @@
+meta:
+  Type: Mapped
+  ID: VISIT
+  Description: Subject Visit Data Mapping 
+  Priority: 1
+spec: 
+ Raw_VISIT:
+    subjid:
+      type: character
+    visit_dt:
+      type: character
+steps:
+  - output: Mapped_VISIT
+    name: RunQuery
+    params:
+      df: Raw_VISIT
+      strQuery: "SELECT subjid, TRY_CAST(visit_dt AS Date) AS visit_dt FROM df"

@@ -43,18 +43,16 @@
 #'
 #' @examples
 #' # Run for AE KRI
-#' dfInput <- Input_Rate(
-#'   dfSubjects = clindata::rawplus_dm,
-#'   dfNumerator = clindata::rawplus_ae,
-#'   dfDenominator = clindata::rawplus_visdt,
-#'   strSubjectCol = "subjid",
-#'   strGroupCol = "siteid",
-#'   strGroupLevel = "Site",
-#'   strNumeratorCol = ,
-#'   strDenominatorCol,
-#'   strNumeratorDateCol,
-#'   strDenominatorDateCol
-#' )
+#' Input_CumCount(
+#'     dfSubjects = clindata::rawplus_dm,
+#'     dfNumerator = clindata::rawplus_ae,
+#'     dfDenominator = clindata::rawplus_visdt %>% dplyr::mutate(visit_dt = lubridate::ymd(visit_dt)),
+#'     strSubjectCol = "subjid",
+#'     strGroupCol = "siteid",
+#'     strGroupLevel = "Site",
+#'     strNumeratorDateCol = "aest_dt",
+#'     strDenominatorDateCol  = "visit_dt"
+#'   )
 #'
 #' @export
 #' @keywords internal
@@ -197,7 +195,7 @@ Input_CumCount <- function(
     group_by(.data$GroupID, .data$GroupLevel, .data$SubjectID) %>%
     mutate(
       # assign Numerator after last Denominator to last Denominator
-      Numerator = ifelse(Denominator == max(Denominator), MaxNumerator, MinNumerator)
+      Numerator = ifelse(.data$Denominator == max(.data$Denominator), .data$MaxNumerator, .data$MinNumerator)
     ) %>%
     ungroup() %>%
     filter(.data$Denominator > 0) %>%
@@ -277,16 +275,9 @@ AssignOrphans <- function(dfNumerator, dfDenominator) {
     select(- "SubjectID")
 
   dfOrphansAssigned <- dfOrphans %>%
-    # inner join with dfEventMinMax will filter all events
-    # outside of of patient active period and cross join
-    # all available patients
-    inner_join(
-      dfEventMinMax,
-      by = join_by(
-        "GroupID",
-         between(x$Date, y$MinDate, y$MaxDate)
-      )
-    ) %>%
+    # join in all subjects from group to event and filter only eligible subjects
+    left_join(dfEventMinMax, by = "GroupID", relationship = "many-to-many") %>%
+    filter(between(.data$Date, .data$MinDate, .data$MaxDate)) %>%
     # select a random patient for event
     arrange(runif(n())) %>%
     group_by(.data$EventID) %>%

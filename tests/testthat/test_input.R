@@ -276,11 +276,7 @@ test_that("strSubjectCol must exist in all data frames", {
 
 
 
-# test_that("yaml workflow produces same table as R function", {
-#   source(test_path("testdata", "create_double_data.R"), local = TRUE)
-#   expect_equal(dfInput$SubjectID, lResults$Analysis_kri0001$Analysis_Input$SubjectID)
-#   expect_equal(dim(dfInput), dim(lResults$Analysis_kri0001$Analysis_Input))
-# })
+
 
 
 # test_that("duckdb returns same result as R function", {
