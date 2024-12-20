@@ -277,21 +277,114 @@ test_that("strSubjectCol must exist in all data frames", {
 
 
 
+test_that("Input_CumCount used with lazy_tbl returns same results as with data.frame", {
 
+  dfInputAE <- Input_CumCount(
+    dfSubjects = clindata::rawplus_dm,
+    dfNumerator = clindata::rawplus_ae,
+    dfDenominator = clindata::rawplus_visdt %>% mutate(visit_dt = lubridate::ymd(visit_dt)),
+    strSubjectCol = "subjid",
+    strGroupCol = "siteid",
+    strGroupLevel = "Site",
+    strNumeratorDateCol = "aest_dt",
+    strDenominatorDateCol  = "visit_dt"
+  )
 
-# test_that("duckdb returns same result as R function", {
-#   source(test_path("testdata", "create_double_data.R"), local = TRUE)
-#   db <- duckdb::dbConnect(duckdb::duckdb(), ":memory:")
-#   duckdb::dbWriteTable(db, "subjects", clindata::rawplus_dm)
-#   duckdb::dbWriteTable(db, "numerators", clindata::rawplus_ae)
-#   duckdb::dbWriteTable(db, "denominators", clindata::rawplus_visdt)
-#   duckdb::dbWriteTable(db, "results", lResults$Analysis_kri0001$Analysis_Input)
+  dfInputPD <- Input_CumCount(
+    dfSubjects = clindata::rawplus_dm,
+    dfNumerator = clindata::ctms_protdev %>% rename(subjid = subjectenrollmentnumber),
+    dfDenominator = clindata::rawplus_visdt %>% mutate(visit_dt = lubridate::ymd(visit_dt)),
+    strSubjectCol = "subjid",
+    strGroupCol = "siteid",
+    strGroupLevel = "Site",
+    strNumeratorDateCol = "deviationdate",
+    strDenominatorDateCol  = "visit_dt"
+  )  
 
-#   query <- "
-#   SELECT * FROM results
-#   "
-#   result <- duckdb::dbGetQuery(db, query)
+  db <- duckdb::dbConnect(duckdb::duckdb(), ":memory:")
 
-#   expect_equal(result$SubjectID, lResults$Analysis_kri0001$Analysis_Input$SubjectID)
-#   expect_equal(dim(result), dim(lResults$Analysis_kri0001$Analysis_Input))
-# })
+  duckdb::dbWriteTable(db, "dm", clindata::rawplus_dm)
+  duckdb::dbWriteTable(db, "ae", clindata::rawplus_ae)
+  duckdb::dbWriteTable(db, "visit", clindata::rawplus_visdt)
+  duckdb::dbWriteTable(db, "pd", clindata::ctms_protdev)
+
+  dfInputAE_duckdb <- Input_CumCount(
+    dfSubjects = dplyr::tbl(db, "dm"),
+    dfNumerator = dplyr::tbl(db, "ae"),
+    dfDenominator = dplyr::tbl(db, "visit") %>% mutate(visit_dt = sql("TRY_CAST(visit_dt AS DATE)")),
+    strSubjectCol = "subjid",
+    strGroupCol = "siteid",
+    strGroupLevel = "Site",
+    strNumeratorDateCol = "aest_dt",
+    strDenominatorDateCol  = "visit_dt"
+  ) %>%
+  dplyr::collect() %>%
+  arrange(GroupID, SubjectID, Denominator)
+
+  expect_equal(dfInputAE, dfInputAE_duckdb)
+
+  dfInputPD_duckdb <- Input_CumCount(
+    dfSubjects = dplyr::tbl(db, "dm"),
+    dfNumerator = dplyr::tbl(db, "pd") %>% rename(subjid = subjectenrollmentnumber),
+    dfDenominator = dplyr::tbl(db, "visit") %>% mutate(visit_dt = sql("TRY_CAST(visit_dt AS DATE)")),
+    strSubjectCol = "subjid",
+    strGroupCol = "siteid",
+    strGroupLevel = "Site",
+    strNumeratorDateCol = "deviationdate",
+    strDenominatorDateCol  = "visit_dt"
+  ) %>%
+  dplyr::collect() %>%
+  arrange(GroupID, SubjectID, Denominator)
+
+  expect_equal(dfInputPD, dfInputPD_duckdb)
+
+  DBI::dbDisconnect(db)
+
+})
+
+test_that("AssignOrphans used with lazy_tbl ", {
+
+  dfNumerator <- clindata::ctms_protdev %>% 
+    rename(subjid = subjectenrollmentnumber) %>%
+    left_join(clindata::rawplus_dm %>% select(subjid, siteid), by = "subjid") %>%
+    # set 30% of subjectid per subject to NA
+    arrange(runif(n())) %>%
+    mutate(rnk = row_number() / n(), .by = subjid) %>%
+    mutate(subjid = ifelse(rnk < 0.3, NA, subjid)) %>%
+    filter(! is.na(deviationdate), ! is.na(siteid))
+
+  db <- duckdb::dbConnect(duckdb::duckdb(), ":memory:")
+
+  duckdb::dbWriteTable(db, "dm", clindata::rawplus_dm)
+  duckdb::dbWriteTable(db, "visit", clindata::rawplus_visdt)
+  duckdb::dbWriteTable(db, "pd", dfNumerator)
+
+  dfCumCountOrphans_duckdb <- Input_CumCount(
+    dfSubjects = dplyr::tbl(db, "dm"),
+    dfNumerator = dplyr::tbl(db, "pd"),
+    dfDenominator = dplyr::tbl(db, "visit") %>% mutate(visit_dt = sql("TRY_CAST(visit_dt AS DATE)")),
+    strSubjectCol = "subjid",
+    strGroupCol = "siteid",
+    strGroupLevel = "Site",
+    strNumeratorDateCol = "deviationdate",
+    strDenominatorDateCol  = "visit_dt",
+    strOrphanedMethod = "assign"
+  ) %>%
+  filter(Denominator == max(Denominator), .by = c(SubjectID)) %>%
+  dplyr::collect() %>%
+  arrange(GroupID, SubjectID, Denominator)
+
+  # it is okay when not 100% of all orphaned numerators are assigned when they did not
+  # occurr between first and last + 30 days denominator event
+  expect_true(
+    dplyr::between(
+      sum(dfCumCountOrphans_duckdb$Numerator),
+      nrow(dfNumerator) * 0.9,
+      nrow(dfNumerator)
+    )
+  )
+
+  DBI::dbDisconnect(db)
+
+})
+

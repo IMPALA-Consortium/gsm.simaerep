@@ -88,11 +88,12 @@ Input_CumCount <- function(
   stopifnot(
     strSubjectCol %in% colnames(dfSubjects),
     strSubjectCol %in% colnames(dfNumerator),
-    strSubjectCol %in% colnames(dfDenominator),
-    any(!is.na(dfSubjects[[strSubjectCol]])),
-    any(!is.na(dfNumerator[[strSubjectCol]])),
-    any(!is.na(dfDenominator[[strSubjectCol]]))
+    strSubjectCol %in% colnames(dfDenominator)
   )
+
+  CheckNotAllNA(dfSubjects, strSubjectCol)
+  CheckNotAllNA(dfNumerator, strSubjectCol)
+  CheckNotAllNA(dfDenominator, strSubjectCol)
 
   # check that "strGroupCol" is in dfSubjects
   stopifnot(strGroupCol %in% colnames(dfSubjects))
@@ -101,13 +102,13 @@ Input_CumCount <- function(
   # and have date type and must not be all NULL.
   stopifnot(
     strNumeratorDateCol %in% colnames(dfNumerator),
-    strDenominatorDateCol %in% colnames(dfDenominator),
-    lubridate::is.instant(dfNumerator[[strNumeratorDateCol]]),
-    lubridate::is.instant(dfDenominator[[strDenominatorDateCol]]),
-    any(!is.na(dfNumerator[[strNumeratorDateCol]])),
-    any(!is.na(dfDenominator[[strDenominatorDateCol]])
-    )
+    strDenominatorDateCol %in% colnames(dfDenominator)
   )
+
+  CheckNotAllNA(dfNumerator, strNumeratorDateCol)
+  CheckNotAllNA(dfDenominator, strDenominatorDateCol)
+  CheckDataType(dfNumerator, strNumeratorDateCol, lubridate::is.instant)
+  CheckDataType(dfDenominator, strDenominatorDateCol, lubridate::is.instant)
 
   # If supplied strNumeratorCol and strDenominatorCol must be in dfNumerator and dfDenominator
   # and renamed to NumeratorID and DenominatorID. If not supplied use row_number() as default.
@@ -175,17 +176,19 @@ Input_CumCount <- function(
 
   dfCumCount <- dfEvents %>%
     mutate(
-      # truncate Date to Date and add two hours to numerator date so numerator events are
-      # placed after denominator events so that numerator events are always linked to same
-      # day denominator events.
+      # control numerator/denominator order.
       Date = as.Date(.data$Date),
-      Data = .data$Date + lubridate::hours(2)
+      Date = ifelse(
+        .data$EventType == "Numerator",
+        .data$Date + lubridate::hours(1),
+        .data$Date + lubridate::hours(2)
+      )
     ) %>%
-    arrange(.data$SubjectID, .data$Date) %>%
+    SortDf(.data$SubjectID, .data$Date) %>%
     group_by(.data$SubjectID) %>%
     mutate(
-      "Numerator" = cumsum(.data$EventType == "Numerator"),
-      "Denominator" = cumsum(.data$EventType == "Denominator")
+      "Numerator" = cumsum(ifelse(.data$EventType == "Numerator", 1, 0)),
+      "Denominator" = cumsum(ifelse(.data$EventType == "Denominator", 1, 0))
     ) %>%
     group_by(.data$GroupID, .data$GroupLevel, .data$SubjectID, .data$Denominator) %>%
     summarize(
@@ -248,16 +251,16 @@ AddGroupCol <- function(df, dfSubjects, strSubjectCol, strGroupCol, strGroupLeve
 #'@keywords internal
 AssignOrphans <- function(dfNumerator, dfDenominator) {
 
-  if (! any(is.na(dfNumerator$SubjectID))) {
-    LogMessage(
-      level = "info",
-      message = "No orphaned numerator events found"
-    )
-
+  if (! AnyNA(dfNumerator, "SubjectID")) {
     return(dfNumerator)
   }
 
-  dfEventMinMax <- bind_rows(dfNumerator, dfDenominator) %>%
+  cols <- intersect(colnames(dfNumerator), colnames(dfDenominator))
+
+  dfEventMinMax <- union_all(
+    select(dfNumerator, all_of(cols)),
+    select(dfDenominator, all_of(cols))
+    ) %>%
     group_by(.data$GroupID, .data$SubjectID) %>%
     summarize(
       "MinDate" = min(.data$Date, na.rm = TRUE),
@@ -266,7 +269,7 @@ AssignOrphans <- function(dfNumerator, dfDenominator) {
     ungroup() %>%
     # add 30 days tolerance to MaxDate
     mutate(
-      "MaxDate" = .data$MaxDate + 30
+      "MaxDate" = .data$MaxDate + lubridate::days(30)
     ) %>%
     select("SubjectID", "GroupID", "MinDate", "MaxDate")
 
@@ -279,7 +282,9 @@ AssignOrphans <- function(dfNumerator, dfDenominator) {
     left_join(dfEventMinMax, by = "GroupID", relationship = "many-to-many") %>%
     filter(between(.data$Date, .data$MinDate, .data$MaxDate)) %>%
     # select a random patient for event
-    arrange(runif(n())) %>%
+    mutate(rwn = runif(n())) %>%
+    SortDf(.data$rwn) %>%
+    select(- "rwn") %>%
     group_by(.data$EventID) %>%
     filter(row_number() == 1) %>%
     ungroup() %>%
@@ -294,4 +299,63 @@ AssignOrphans <- function(dfNumerator, dfDenominator) {
 
   return(dfNumerator)
 
+}
+
+AnyNA <- function(df, col) {
+  if (inherits(df, "data.frame")) {
+    return(any(is.na(df[[col]])))
+  } else if(inherits(df, "tbl_lazy")) {
+    return(GetTblNA(df, col) > 0)
+  } else {
+    stop("df must be a data frame or a tbl_lazy object")
+  }
+}
+
+CheckNotAllNA <- function(df, col) {
+  if (inherits(df, "data.frame")) {
+    stopifnot(any(!is.na(df[[col]])))
+  } else if(inherits(df, "tbl_lazy")) {
+    na_ratio <- GetTblNA(df, col)
+    stopifnot(na_ratio < 1)
+  } else {
+    stop("df must be a data frame or a tbl_lazy object")
+  }
+}
+
+#'@keywords internal
+CheckDataType <- function(df, col, fun) {
+  if (inherits(df, "data.frame")) {
+    stopifnot(fun(df[[col]]))
+  } else if(inherits(df, "tbl_lazy")) {
+    df %>%
+      head(5) %>%
+      pull(.data[[col]]) %>%
+      fun() %>%
+      stopifnot()
+  } else {
+    stop("df must be a data frame or a tbl_lazy object")
+  }
+}
+
+#'@keywords internal
+GetTblNA <- function(tbl_lazy, col) {
+  tbl_lazy %>%
+    summarize(
+      na_ratio = sum(ifelse(is.na(.data[[col]]), 1, 0)) / n()
+    ) %>%
+    pull(.data$na_ratio)
+}
+
+#'@keywords internal
+SortDf <- function(data, ...) {
+  if (inherits(data, "data.frame")) {
+    data <- data %>%
+      dplyr::arrange(...)
+  } else if (inherits(data, "tbl_lazy")) {
+    data <- data %>%
+      dbplyr::window_order(...)
+  } else {
+    stop("data must be a data frame or a tbl_lazy object")
+  }
+  return(data)
 }

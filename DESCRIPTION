@@ -12,21 +12,24 @@ RoxygenNote: 7.3.2
 Depends: 
     R (>= 4.0.0),
 Imports:
-    gsm (>= 2.2.0),
     dplyr,
     lubridate,
     rlang,
     stats,
     tibble,
-    magrittr
-Suggests: 
+    magrittr,
+    dbplyr,
+    utils
+Suggests:
+    gsm (>= 2.2.0),
     knitr,
     rmarkdown,
     testthat (>= 3.0.0),
     clindata,
     simaerep (>= 0.6.0),
-    dbplyr,
-    tidyr
+    tidyr,
+    DBI,
+    duckdb
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 URL: https://impala-consortium.github.io/gsm.simaerep/
