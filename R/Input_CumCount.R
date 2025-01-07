@@ -126,16 +126,10 @@ Input_CumCount <- function(
   strDenominatorDateCol,
   strOrphanedMethod = c("filter", "assign")
 ) {
-  # Check if data frames are NULL
-  if (is.null(dfSubjects)) {
-    stop("dfSubjects must be provided")
-  }
-  if (is.null(dfDenominator)) {
-    stop("dfDenominator, must be provided")
-  }
-  if (is.null(dfNumerator)) {
-    stop("dfNumerator, must be provided")
-  }
+
+  CheckDf(dfSubjects)
+  CheckDf(dfDenominator)
+  CheckDf(dfNumerator)
 
   # must be it
   strOrphanedMethod <- match.arg(strOrphanedMethod)
@@ -363,8 +357,6 @@ AnyNA <- function(df, col) {
     return(any(is.na(df[[col]])))
   } else if(inherits(df, "tbl_lazy")) {
     return(GetTblNA(df, col) > 0)
-  } else {
-    stop("df must be a data frame or a tbl_lazy object")
   }
 }
 
@@ -375,8 +367,6 @@ CheckNotAllNA <- function(df, col) {
   } else if(inherits(df, "tbl_lazy")) {
     na_ratio <- GetTblNA(df, col)
     stopifnot(na_ratio < 1)
-  } else {
-    stop("df must be a data frame or a tbl_lazy object")
   }
 }
 
@@ -390,8 +380,6 @@ CheckDataType <- function(df, col, fun) {
       pull(.data[[col]]) %>%
       fun() %>%
       stopifnot()
-  } else {
-    stop("df must be a data frame or a tbl_lazy object")
   }
 }
 
@@ -412,8 +400,19 @@ SortDf <- function(data, ...) {
   } else if (inherits(data, "tbl_lazy")) {
     data <- data %>%
       dbplyr::window_order(...)
-  } else {
-    stop("data must be a data frame or a tbl_lazy object")
   }
+
   return(data)
+}
+
+#'@keywords internal
+CheckDf <- function(x) {
+  # Check if x is a data.frame or tbl_lazy
+  if (!inherits(x, "data.frame") && !inherits(x, "tbl_lazy")) {
+    # Get the name of the variable in the parent environment
+    var_name <- deparse(substitute(x))
+    # Throw an error with a message that includes the variable name
+    stop(sprintf("%s is not a data.frame or tbl_lazy.", var_name), call. = FALSE)
+  }
+  TRUE
 }

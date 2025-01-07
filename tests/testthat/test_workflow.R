@@ -2,7 +2,7 @@ test_that("yaml workflow produces same table as R function", {
 
     mapping <- gsm::MakeWorkflowList(
         strNames = NULL,
-        strPath = system.file("1_mappings", package = "gsm.simaerep"),
+        strPath = system.file("workflow/1_mappings", package = "gsm.simaerep"),
         strPackage = NULL
     )
 
@@ -19,7 +19,7 @@ test_that("yaml workflow produces same table as R function", {
 
     kri_wf <- gsm::MakeWorkflowList(
         strNames = NULL,
-        strPath = system.file("2_metrics", package = "gsm.simaerep"),
+        strPath = system.file("workflow/2_metrics", package = "gsm.simaerep"),
         strPackage = NULL
     )
 
