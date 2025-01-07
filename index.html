@@ -31,19 +31,15 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="articles/ContributorGuidelines.html">ContributorGuidelines</a></li>
   </ul>
 </li>
+<li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
       </ul>
-<ul class="navbar-nav">
-<li class="nav-item"><form class="form-inline" role="search">
- <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="search.json">
-</form></li>
-      </ul>
+<ul class="navbar-nav"></ul>
 </div>
 
 
@@ -65,6 +61,7 @@
 <li>Analyze_Simaerep() will execute <code>simaerep</code>
 </li>
 <li>Flag_Simaerep() will flag based on <code>simaerep</code> statistics</li>
+<li>report functions</li>
 </ul>
 <p>required module configuration file:</p>
 <ul>
@@ -95,11 +92,7 @@
 <li>
 <strong>Workflow Tests</strong> - Additional unit tests confirm that core workflows behave as expected.</li>
 <li>
-<strong>Data Model</strong> - Vignettes providing detailed descriptions of the data model.</li>
-<li>
-<strong>Code Examples</strong> - The Cookbook Vignette provides a series of simple examples, and all functions include examples as part of Roxygen documentation.</li>
-<li>
-<strong>Function Documentation</strong> - Detailed documentation for each function is maintained with Roxygen.</li>
+<strong>Function Documentation</strong> - Detailed documentation for each exported function with examples is maintained with Roxygen.</li>
 <li>
 <strong>Package Checks</strong> - Standard package checks are run using GitHub Actions and must be passing before PRs are merged.</li>
 <li>
@@ -114,6 +107,8 @@
 </h3>
 <p>As development progresses, we will also conduct the following quality control steps:</p>
 <ul>
+<li>
+<strong>Code Examples</strong> - Cookbook Vignette provides examples for code usage.</li>
 <li>
 <strong>Qualification Workflow</strong> - All assessments have been Qualified as described in the Qualification Workflow Vignette. A Qualification Report Vignette is generated and attached to each release.</li>
 <li>
@@ -153,7 +148,6 @@
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
 <li><a href="https://github.com/IMPALA-Consortium/gsm.simaerep/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/IMPALA-Consortium/gsm.simaerep/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
-<li><a href="https://app.codecov.io/gh/IMPALA-Consortium/gsm.simaerep" class="external-link"><img src="https://codecov.io/gh/IMPALA-Consortium/gsm.simaerep/graph/badge.svg" alt="Codecov test coverage"></a></li>
 </ul>
 </div>
 
