@@ -177,7 +177,7 @@ test_that("Check Numerator Events befor/after first/last Denominator and same da
 
 test_that("AssignOrphans - Orphaned Numerator events will not be dropped if GroupID available", {
 
-  dfNumerator <- clindata::ctms_protdev %>% 
+  dfNumerator <- clindata::ctms_protdev %>%
     rename(subjid = subjectenrollmentnumber) %>%
     left_join(clindata::rawplus_dm %>% select(subjid, siteid), by = "subjid") %>%
     # set 30% of subjectid per subject to NA
@@ -229,7 +229,7 @@ test_that("AssignOrphans - Orphaned Numerator events will not be dropped if Grou
   n_pats_with_increase_per_site <- dfCumCount %>%
     select(SubjectID, GroupID, NumberatorOriginal = Numerator) %>%
     left_join(
-      dfCumCountOrphans %>% 
+      dfCumCountOrphans %>%
         select(SubjectID, GroupID, NumeratorDist = Numerator),
         by = c("SubjectID", "GroupID")
     ) %>%
@@ -251,7 +251,7 @@ test_that("AssignOrphans - Orphaned Numerator events will not be dropped if Grou
   NewPatientsWithNumerator <- dfCumCount %>%
     select(SubjectID, GroupID, NumberatorOriginal = Numerator) %>%
     left_join(
-      dfCumCountOrphans %>% 
+      dfCumCountOrphans %>%
         select(SubjectID, GroupID, NumeratorDist = Numerator),
         by = c("SubjectID", "GroupID")
     ) %>%
@@ -274,7 +274,74 @@ test_that("strSubjectCol must exist in all data frames", {
   expect_error(Input_CumCount(test_df_1, test_df_1, test_df_2, strSubjectCol = "SubjectID"))
 })
 
+test_that("Input_CumCount() - use prexisting eventIDs", {
 
+  dfInput <- Input_CumCount(
+    dfSubjects = clindata::rawplus_dm,
+    dfNumerator = clindata::rawplus_ae %>%
+      mutate(numid = row_number()),
+    dfDenominator = clindata::rawplus_visdt %>%
+      mutate(
+        visit_dt = lubridate::ymd(visit_dt),
+        denomid = row_number()
+      ),
+    strSubjectCol = "subjid",
+    strGroupCol = "siteid",
+    strGroupLevel = "Site",
+    strNumeratorDateCol = "aest_dt",
+    strDenominatorDateCol  = "visit_dt",
+    strNumeratorCol = "numid",
+    strDenominatorCol = "denomid",
+  )
+
+  expect_equal(colnames(dfInput), c("SubjectID", "GroupID", "GroupLevel", "Numerator", "Denominator"))
+
+})
+
+test_that("Input_CumCount() - w/o specifying strGroupLevel", {
+
+  dfInput <- Input_CumCount(
+    dfSubjects = clindata::rawplus_dm,
+    dfNumerator = clindata::rawplus_ae,
+    dfDenominator = clindata::rawplus_visdt %>% mutate(visit_dt = lubridate::ymd(visit_dt)),
+    strSubjectCol = "subjid",
+    strGroupCol = "siteid",
+    strGroupLevel = NULL,
+    strNumeratorDateCol = "aest_dt",
+    strDenominatorDateCol  = "visit_dt"
+  )
+
+  expect_equal(unique(dfInput$GroupLevel), "siteid")
+
+})
+
+test_that("Input_CumCount() - results must not change when strOrphanedMethod == 'assign' w/o oprhans", {
+
+  dfInput <- Input_CumCount(
+    dfSubjects = clindata::rawplus_dm,
+    dfNumerator = clindata::rawplus_ae,
+    dfDenominator = clindata::rawplus_visdt %>% mutate(visit_dt = lubridate::ymd(visit_dt)),
+    strSubjectCol = "subjid",
+    strGroupCol = "siteid",
+    strGroupLevel = NULL,
+    strNumeratorDateCol = "aest_dt",
+    strDenominatorDateCol  = "visit_dt"
+  )
+
+  dfInputOrph <- Input_CumCount(
+    dfSubjects = clindata::rawplus_dm,
+    dfNumerator = clindata::rawplus_ae,
+    dfDenominator = clindata::rawplus_visdt %>% mutate(visit_dt = lubridate::ymd(visit_dt)),
+    strSubjectCol = "subjid",
+    strGroupCol = "siteid",
+    strGroupLevel = NULL,
+    strNumeratorDateCol = "aest_dt",
+    strDenominatorDateCol  = "visit_dt",
+    strOrphanedMethod = "assign"
+  )
+  expect_equal(dfInput, dfInputOrph)
+
+})
 
 
 test_that("Input_CumCount used with lazy_tbl returns same results as with data.frame", {
@@ -299,7 +366,7 @@ test_that("Input_CumCount used with lazy_tbl returns same results as with data.f
     strGroupLevel = "Site",
     strNumeratorDateCol = "deviationdate",
     strDenominatorDateCol  = "visit_dt"
-  )  
+  )
 
   db <- duckdb::dbConnect(duckdb::duckdb(), ":memory:")
 
@@ -344,7 +411,7 @@ test_that("Input_CumCount used with lazy_tbl returns same results as with data.f
 
 test_that("AssignOrphans used with lazy_tbl ", {
 
-  dfNumerator <- clindata::ctms_protdev %>% 
+  dfNumerator <- clindata::ctms_protdev %>%
     rename(subjid = subjectenrollmentnumber) %>%
     left_join(clindata::rawplus_dm %>% select(subjid, siteid), by = "subjid") %>%
     # set 30% of subjectid per subject to NA
