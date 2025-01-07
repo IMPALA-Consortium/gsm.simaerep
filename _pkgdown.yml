@@ -4,12 +4,8 @@ template:
 
 navbar:
   structure:
-    left:
-    - home
-    - articles
-    - reference
-    right: github
-
+    left: [articles, Reports, reference, news]
+    right: [search, github]
 reference:
 - title: Functions
   desc: ~
