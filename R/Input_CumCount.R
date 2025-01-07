@@ -6,7 +6,14 @@
 #' Calculate a subject level cumulative numerator event count per denominator event count.
 #'
 #' This function takes in a list of data frames including dfSUBJ, dfNumerator, and dfDenominator,
-#' and calculates a subject level cumulative count.
+#' and calculates a subject level cumulative numerator count per cumulative denominator count. Numerator
+#' events between two denominator events are assigned to the later denominator event.
+#'
+#' Numerator events before first denominator event will be assigned to the first denominator event.
+#' Numerator events after last denominator event will be assigned to last denominator event.
+#'
+#' When numerator events fall on the same day as a denominator event they will be assigned to that event
+#' event if the date time columns imply that numerator event occurred after the denominator.
 #'
 #' The data requirements for the function are as follows:
 #'
@@ -14,16 +21,18 @@
 #' - dfNumerator: A data frame with a column for SubjectID and `strNumeratorCol` if `strNumeratorMethod` is "Sum"
 #' - dfDenominator: A data frame with a column for SubjectID and `strDenominatorCol` if `strDenominatorMethod` is "Sum"
 #'
-#' All other columns are dropped from the output data frame. Note that if no values for a subject are
-#' found in dfNumerator/dfDenominator numerator and denominator values are filled with 0 in the output data frame.
+#' All other columns are dropped from the output data frame. GroupIDs will be added via dfSubjects if not present events
+#' without GroupID and subjects without denominator or numerator event will be dropped.
 #'
-
+#' Numerator events with no SubjectID but with GroupID can get assigned to a random enrolled subject
+#' of the same GroupID
+#'
 #' @param dfSubjects `data.frame` with columns for SubjectID and any other relevant subject information
 #' @param dfNumerator `data.frame` with a column for SubjectID and `strNumeratorDateCol`
 #' @param dfDenominator `data.frame` with a column for SubjectID and `strDenominatorDateCol`
 #' @param strGroupCol `character` Column name in `dfSubjects` to use for grouping.
 #' @param strGroupLevel `character` value for the group level. Default: NULL defaults to `strGroupCol`
-#' @param strSubjectCol `character` Column name in `dfSubjects` to use for subject ID. 
+#' @param strSubjectCol `character` Column name in `dfSubjects` to use for subject ID.
 #' @param strNumeratorCol `character` Column name in `dfNumerator` to use for numerator ID. Default: NULL
 #' @param strDenominatorCol `character` Column name in `dfDenominator` to use for denominator ID. Default: NULL
 #' @param strNumeratorDateCol `character` Column name in `dfNumerator` to use for numerator calculation.
@@ -42,7 +51,55 @@
 #' | Denominator  | Cumulative Count Denominator         | Numeric  |
 #'
 #' @examples
-#' # Run for AE KRI
+#'
+#' # dfSubjects tibble with one subject and one site
+#' dfSubjects <- tibble::tibble(
+#'   SubjectID = 1,
+#'   GroupID = 1
+#' )
+#'
+#' dfNumerator <- tibble::tibble(
+#'     SubjectID = rep(1, 10),
+#'     num_dt = as.Date("2000-01-01") + c(months(0:4), rep(months(7), 2), months(9:11)),
+#'   ) %>%
+#'   dplyr::mutate(
+#'     num_dt = num_dt + lubridate::hours(12)
+#'   )
+#'
+#' # dfNumerator tibble with one subject 10 AEs, two of which on same day
+#'dfNumerator
+#'
+#' dfDenominator <- tibble::tibble(
+#'     SubjectID = rep(1, 4),
+#'     denom_dt = c(as.Date(c("2000-01-03", "2000-04-12", "2000-08-01", "2000-11-12")))
+#'   ) %>%
+#'   dplyr::mutate(
+#'     denom_dt = denom_dt + lubridate::hours(1)
+#'   )
+#'
+#' # dfDenominator tibble with one subject 4 visits, one on same day as two Numerator events
+#' # Denominator time indicates that they occurr before Numerator events
+#'dfDenominator
+#'
+#'
+#'# numerator before first denominator rolls up to first denominator
+#'# numerator after last denominator rolls back to last denominator
+#'# two numerator events on 08-01 add to the 3rd denominator event on same day
+#'
+#'Input_CumCount(
+#'   dfSubjects = dfSubjects,
+#'   dfNumerator = dfNumerator,
+#'   dfDenominator = dfDenominator,
+#'   strSubjectCol = "SubjectID",
+#'   strGroupCol = "GroupID",
+#'   strGroupLevel = "Site",
+#'   strNumeratorDateCol = "num_dt",
+#'   strDenominatorDateCol  = "denom_dt"
+#')
+#'
+#'
+#'
+#' # {clindata} Example for cumulative AE per Visit Count
 #' Input_CumCount(
 #'     dfSubjects = clindata::rawplus_dm,
 #'     dfNumerator = clindata::rawplus_ae,
@@ -55,7 +112,6 @@
 #'   )
 #'
 #' @export
-#' @keywords internal
 
 Input_CumCount <- function(
   dfSubjects,
@@ -163,9 +219,9 @@ Input_CumCount <- function(
   if (strOrphanedMethod == "assign") {
 
     dfNumerator <- AssignOrphans(dfNumerator, dfDenominator)
-    
+
   }
-  
+
   dfNumerator <- dfNumerator %>%
       filter(!is.na(.data$SubjectID))
 
@@ -216,7 +272,7 @@ AddGroupCol <- function(df, dfSubjects, strSubjectCol, strGroupCol, strGroupLeve
   if (is.null(strGroupLevel)) {
     strGroupLevel <- strGroupCol
   }
-  
+
   if (! strGroupCol %in% colnames(df)) {
 
     stopifnot(! any(duplicated(dfSubjects[[strSubjectCol]])))
@@ -301,6 +357,7 @@ AssignOrphans <- function(dfNumerator, dfDenominator) {
 
 }
 
+#'@keywords internal
 AnyNA <- function(df, col) {
   if (inherits(df, "data.frame")) {
     return(any(is.na(df[[col]])))
@@ -311,6 +368,7 @@ AnyNA <- function(df, col) {
   }
 }
 
+#'@keywords internal
 CheckNotAllNA <- function(df, col) {
   if (inherits(df, "data.frame")) {
     stopifnot(any(!is.na(df[[col]])))

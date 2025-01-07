@@ -2,3 +2,16 @@ url: https://impala-consortium.github.io/gsm.simaerep/
 template:
   bootstrap: 5
 
+navbar:
+  structure:
+    left:
+    - home
+    - articles
+    - reference
+    right: github
+
+reference:
+- title: Functions
+  desc: ~
+  contents:
+  - Input_CumCount
