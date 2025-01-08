@@ -3,23 +3,24 @@
 #' @description
 #' `r lifecycle::badge("experimental")`
 #'
-#' Calculate over and under-reporting probabilities for numerator denominator ratio using `simaerep`.
+#' Calculate over and under-reporting probabilities for numerator denominator ratio using [simaerep::simaerep()].
 #'
 #' Uses inframe `simaerep` method and does not apply multiplicity correction as per latest recommendations.
 #'
-#' This function takes dfInput data frame as returned by Input_CumCount()
+#' This function takes dfInput data frame as returned by [Input_CumCount()]
 #'
-#' @param dfInput `data.frame` as returned by Input_CumCount()
+#' @param dfInput `data.frame` as returned by [Input_CumCount()]
 #'
 #' @return `data.frame` with the following specification:
 #'
-#' | Column Name              | Description                                  | Type     |
-#' |--------------------------|----------------------------------------------|----------|
-#' | GroupID                  | The group ID                                 | Character|
-#' | MetricExpected           | Expected ratio from simulations              | Numeric  |
-#' | MetricGroup              | Ratio all subjects in GroupID                | Numeric  |
-#' | OverReportingProbability | Probability over-reporting numerator events  | Numeric  |
-#' | OverReportingProbability | Probability under-reporting numerator events | Numeric  |
+#' | Column Name               | Description                                  | Type     |
+#' |---------------------------|----------------------------------------------|----------|
+#' | GroupID                   | The group ID                                 | Character|
+#' | MetricExpected            | Expected ratio from simulations              | Numeric  |
+#' | MetricGroup               | Ratio all subjects in GroupID                | Numeric  |
+#' | OverReportingProbability  | Probability over-reporting numerator events  | Numeric  |
+#' | UnderReportingProbability | Probability under-reporting numerator events | Numeric  |
+#' @seealso [simaerep::simaerep()], [Input_CumCount()]
 #'@export
 #'@examples
 #' # {clindata} Example for cumulative AE per Visit Count
@@ -86,4 +87,6 @@ Analyze_Simaerep <- function(dfInput) {
       "OverReportingProbability",
       "UnderReportingProbability"
     )))
+
+  return(dfAnalyze)
 }

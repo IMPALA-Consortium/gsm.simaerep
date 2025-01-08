@@ -7,7 +7,7 @@
 Analyze_Simaerep(dfInput)
 }
 \arguments{
-\item{dfInput}{\code{data.frame} as returned by Input_CumCount()}
+\item{dfInput}{\code{data.frame} as returned by \code{\link[=Input_CumCount]{Input_CumCount()}}}
 }
 \value{
 \code{data.frame} with the following specification:\tabular{lll}{
@@ -16,17 +16,17 @@ Analyze_Simaerep(dfInput)
    MetricExpected \tab Expected ratio from simulations \tab Numeric \cr
    MetricGroup \tab Ratio all subjects in GroupID \tab Numeric \cr
    OverReportingProbability \tab Probability over-reporting numerator events \tab Numeric \cr
-   OverReportingProbability \tab Probability under-reporting numerator events \tab Numeric \cr
+   UnderReportingProbability \tab Probability under-reporting numerator events \tab Numeric \cr
 }
 }
 \description{
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
 
-Calculate over and under-reporting probabilities for numerator denominator ratio using \code{simaerep}.
+Calculate over and under-reporting probabilities for numerator denominator ratio using \code{\link[simaerep:simaerep]{simaerep::simaerep()}}.
 
 Uses inframe \code{simaerep} method and does not apply multiplicity correction as per latest recommendations.
 
-This function takes dfInput data frame as returned by Input_CumCount()
+This function takes dfInput data frame as returned by \code{\link[=Input_CumCount]{Input_CumCount()}}
 }
 \examples{
 # {clindata} Example for cumulative AE per Visit Count
@@ -43,4 +43,7 @@ dfInput <- Input_CumCount(
 
 Analyze_Simaerep(dfInput)
 
+}
+\seealso{
+\code{\link[simaerep:simaerep]{simaerep::simaerep()}}, \code{\link[=Input_CumCount]{Input_CumCount()}}
 }
