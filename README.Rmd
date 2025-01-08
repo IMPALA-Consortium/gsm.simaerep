@@ -47,7 +47,43 @@ pak::pak("IMPALA-Consortium/gsm.simaerep")
 
 ## Example
 
-Will be added soon.
+`simaerep` expects the cumulative count of numerator events per denominator event per subject as input.
+
+In this example we we are calculating the cumulative AE count per visit per patient per site.
+
+```{r}
+library(gsm.simaerep)
+
+dfInput <- Input_CumCount(
+   dfSubjects = clindata::rawplus_dm,
+   dfNumerator = clindata::rawplus_ae,
+   dfDenominator = clindata::rawplus_visdt %>% dplyr::mutate(visit_dt = lubridate::ymd(visit_dt)),
+   strSubjectCol = "subjid",
+   strGroupCol = "siteid",
+   strGroupLevel = "Site",
+   strNumeratorDateCol = "aest_dt",
+   strDenominatorDateCol  = "visit_dt"
+ )
+
+dfInput %>%
+  dplyr::filter(max(Numerator) > 1, .by = "SubjectID") %>%
+  head(25) %>%
+  knitr::kable()
+
+dfAnalyzed <- Analyze_Simaerep(dfInput)
+
+dfAnalyzed %>%
+  head() %>%
+  knitr::kable()
+
+dfFlagged <- Flag_Simaerep(dfAnalyzed, vThreshold = c(0.95, 0.99))
+
+dfFlagged %>%
+  head() %>%
+  knitr::kable()
+
+```
+
 
 ## Quality Control
 

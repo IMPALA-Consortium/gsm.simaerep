@@ -8,6 +8,7 @@
 #' @importFrom dplyr arrange
 #' @importFrom dplyr between
 #' @importFrom dplyr bind_rows
+#' @importFrom dplyr case_when
 #' @importFrom dplyr coalesce
 #' @importFrom dplyr count
 #' @importFrom dplyr distinct

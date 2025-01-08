@@ -7,9 +7,8 @@
 #'
 #' Uses inframe `simaerep` method and does not apply multiplicity correction as per latest recommendations.
 #'
-#' This function takes dfInput data frame as returned by [Input_CumCount()]
-#'
 #' @param dfInput `data.frame` as returned by [Input_CumCount()]
+#' @inheritParams simaerep::simaerep
 #'
 #' @return `data.frame` with the following specification:
 #'
@@ -37,7 +36,7 @@
 #'
 #' Analyze_Simaerep(dfInput)
 #'
-Analyze_Simaerep <- function(dfInput) {
+Analyze_Simaerep <- function(dfInput, r = 1000) {
 
   stopifnot(all(
     c("SubjectID", "GroupID", "GroupLevel", "Numerator", "Denominator") %in% colnames(dfInput)
@@ -68,7 +67,7 @@ Analyze_Simaerep <- function(dfInput) {
       study_id = "A"
     ) %>%
     simaerep::simaerep(
-      r = 1000,
+      r = r,
       check = FALSE, # input checks not necessary
       under_only = FALSE,
       visit_med75 = FALSE,
