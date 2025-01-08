@@ -40,7 +40,95 @@ pak::pak("IMPALA-Consortium/gsm.simaerep")
 
 ## Example
 
-Will be added soon.
+`simaerep` expects the cumulative count of numerator events per
+denominator event per subject as input.
+
+In this example we we are calculating the cumulative AE count per visit
+per patient per site.
+
+``` r
+library(gsm.simaerep)
+
+dfInput <- Input_CumCount(
+   dfSubjects = clindata::rawplus_dm,
+   dfNumerator = clindata::rawplus_ae,
+   dfDenominator = clindata::rawplus_visdt %>% dplyr::mutate(visit_dt = lubridate::ymd(visit_dt)),
+   strSubjectCol = "subjid",
+   strGroupCol = "siteid",
+   strGroupLevel = "Site",
+   strNumeratorDateCol = "aest_dt",
+   strDenominatorDateCol  = "visit_dt"
+ )
+
+dfInput %>%
+  dplyr::filter(max(Numerator) > 1, .by = "SubjectID") %>%
+  head(25) %>%
+  knitr::kable()
+```
+
+| SubjectID | GroupID | GroupLevel | Numerator | Denominator |
+|:----------|:--------|:-----------|----------:|------------:|
+| 0486      | 10      | Site       |         0 |           1 |
+| 0486      | 10      | Site       |         0 |           2 |
+| 0486      | 10      | Site       |         0 |           3 |
+| 0486      | 10      | Site       |         0 |           4 |
+| 0486      | 10      | Site       |         0 |           5 |
+| 0486      | 10      | Site       |         0 |           6 |
+| 0486      | 10      | Site       |         0 |           7 |
+| 0486      | 10      | Site       |         0 |           8 |
+| 0486      | 10      | Site       |         2 |           9 |
+| 0486      | 10      | Site       |         2 |          10 |
+| 0486      | 10      | Site       |         2 |          11 |
+| 0486      | 10      | Site       |         2 |          12 |
+| 0486      | 10      | Site       |         2 |          13 |
+| 0486      | 10      | Site       |         2 |          14 |
+| 0486      | 10      | Site       |         2 |          15 |
+| 0486      | 10      | Site       |         2 |          16 |
+| 0486      | 10      | Site       |         2 |          17 |
+| 0486      | 10      | Site       |         2 |          18 |
+| 0486      | 10      | Site       |         2 |          19 |
+| 0486      | 10      | Site       |         2 |          20 |
+| 0486      | 10      | Site       |         2 |          21 |
+| 0489      | 10      | Site       |         0 |           1 |
+| 0489      | 10      | Site       |         0 |           2 |
+| 0489      | 10      | Site       |         2 |           3 |
+| 0489      | 10      | Site       |         2 |           4 |
+
+``` r
+
+dfAnalyzed <- Analyze_Simaerep(dfInput)
+
+dfAnalyzed %>%
+  head() %>%
+  knitr::kable()
+```
+
+| GroupID | MetricExpected | MetricGroup | OverReportingProbability | UnderReportingProbability |
+|:---|---:|---:|---:|---:|
+| 10 | 0.1628333 | 0.0205128 | 0.000 | 1.000 |
+| 100 | 0.1628293 | 0.1463415 | 0.596 | 0.404 |
+| 101 | 0.1706719 | 0.0625000 | 0.169 | 0.831 |
+| 102 | 0.1747246 | 0.1159420 | 0.371 | 0.629 |
+| 103 | 0.1725116 | 0.0930233 | 0.245 | 0.755 |
+| 104 | 0.1639505 | 0.1373626 | 0.403 | 0.597 |
+
+``` r
+
+dfFlagged <- Flag_Simaerep(dfAnalyzed, vThreshold = c(0.95, 0.99))
+
+dfFlagged %>%
+  head() %>%
+  knitr::kable()
+```
+
+| GroupID | MetricExpected | MetricGroup | OverReportingProbability | UnderReportingProbability | Flag |
+|:---|---:|---:|---:|---:|---:|
+| 10 | 0.1628333 | 0.0205128 | 0.000 | 1.000 | -2 |
+| 100 | 0.1628293 | 0.1463415 | 0.596 | 0.404 | 0 |
+| 101 | 0.1706719 | 0.0625000 | 0.169 | 0.831 | 0 |
+| 102 | 0.1747246 | 0.1159420 | 0.371 | 0.629 | 0 |
+| 103 | 0.1725116 | 0.0930233 | 0.245 | 0.755 | 0 |
+| 104 | 0.1639505 | 0.1373626 | 0.403 | 0.597 | 0 |
 
 ## Quality Control
 

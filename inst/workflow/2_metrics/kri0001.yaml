@@ -6,10 +6,12 @@ meta:
   Metric: Adverse Event Rate
   Numerator: Adverse Events
   Denominator: Visit
-  Model: bootstrap
+  Model: bootstrap-simaerep
   Score: probability
   AnalysisType: score
-  Threshold: 1, 5, 95, 99
+  Threshold:
+    - 0.95
+    - 0.99
   nMinDenominator: 1
 spec:
   Mapped_AE:
@@ -44,9 +46,16 @@ steps:
     name: Analyze_Simaerep
     params:
       dfInput: Analysis_Input
+  - output: Analysis_Flagged
+    name: Flag_Simaerep
+    params:
+      dfAnalyzed: Analysis_Analyzed
+      vThreshold: Threshold
   - output: lAnalysis
     name: list
     params:
       ID: ID
       Analysis_Input: Analysis_Input
       Analysis_Analyzed: Analysis_Analyzed
+      Analysis_Flagged: Analysis_Flagged
+
