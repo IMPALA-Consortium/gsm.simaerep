@@ -3,7 +3,7 @@ pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
   ContributorGuidelines: ContributorGuidelines.html
-last_built: 2025-01-07T15:50Z
+last_built: 2025-01-08T15:03Z
 urls:
   reference: https://impala-consortium.github.io/gsm.simaerep/reference
   article: https://impala-consortium.github.io/gsm.simaerep/articles
