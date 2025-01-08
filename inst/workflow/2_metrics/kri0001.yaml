@@ -40,3 +40,13 @@ steps:
       strNumeratorDateCol: aest_dt
       strDenominatorDateCol: visit_dt
       strOrphanedMethod: filter
+  - output: Analysis_Analyzed
+    name: Analyze_Simaerep
+    params:
+      dfInput: Analysis_Input
+  - output: lAnalysis
+    name: list
+    params:
+      ID: ID
+      Analysis_Input: Analysis_Input
+      Analysis_Analyzed: Analysis_Analyzed
