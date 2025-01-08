@@ -33,7 +33,9 @@ test_that("yaml workflow produces same table as R function", {
     strGroupCol = "siteid",
     strGroupLevel = "Site",
     strNumeratorDateCol = "deviationdate",
-    strDenominatorDateCol  = "visit_dt"
+    strDenominatorDateCol  = "visit_dt",
+    # we are not testing "assign", b/c this introduced random element
+    strOrphanedMethod = "filter"
   )
 
   dfInputAE <- Input_CumCount(
@@ -47,7 +49,29 @@ test_that("yaml workflow produces same table as R function", {
     strDenominatorDateCol  = "visit_dt"
   )
 
-  expect_equal(dfInputAE, lResults$Analysis_kri0001)
-  expect_equal(dfInputPD, lResults$Analysis_kri0002)
+  expect_equal(dfInputAE, lResults$Analysis_kri0001$Analysis_Input)
+  expect_equal(dfInputPD, lResults$Analysis_kri0002$Analysis_Input)
+
+
+
+  dfAnalyzedAE <- Analyze_Simaerep(dfInputAE)
+  dfAnalyzedPD <- Analyze_Simaerep(dfInputPD)
+
+  # we can only check the non-random elements for equality
+  expect_equal(
+    select(dfAnalyzedAE, - MetricExpected, - OverReportingProbability, - UnderReportingProbability),
+    select(
+      lResults$Analysis_kri0001$Analysis_Analyzed,
+      - MetricExpected, - OverReportingProbability, - UnderReportingProbability
+    )
+  )
+
+  expect_equal(
+    select(dfAnalyzedPD, - MetricExpected, - OverReportingProbability, - UnderReportingProbability),
+    select(
+      lResults$Analysis_kri0002$Analysis_Analyzed,
+      - MetricExpected, - OverReportingProbability, - UnderReportingProbability
+    )
+  )
 
 })

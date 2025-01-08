@@ -18,8 +18,6 @@ This is in development the MVP will contain the following:
 [here](https://gilead-biostats.github.io/gsm/articles/DataModel.html):
 
 - Input_CumCount() patient-level cumulative count from source data
-- Transform_Blank() this step is not needed for `simaerep`, but defined
-  for consistency with `gsm`
 - Analyze_Simaerep() will execute `simaerep`
 - Flag_Simaerep() will flag based on `simaerep` statistics
 - report functions
