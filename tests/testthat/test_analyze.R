@@ -1,3 +1,17 @@
+
+expected_cols <- c(
+  "GroupID",
+  "GroupLevel",
+  "Numerator",
+  "Denominator",
+  "MetricExpected",
+  "Metric",
+  "OverReportingProbability",
+  "UnderReportingProbability",
+  "Score"
+)
+
+
 test_that("test Input_CumCount PD", {
 
   dfInput <- Input_CumCount(
@@ -12,16 +26,6 @@ test_that("test Input_CumCount PD", {
   )
 
   dfAnalyze <- Analyze_Simaerep(dfInput)
-
-  expected_cols <- c(
-    "GroupID",
-    "GroupLevel",
-    "MetricExpected",
-    "Metric",
-    "OverReportingProbability",
-    "UnderReportingProbability",
-    "Score"
-  )
 
   expect_equal(colnames(dfAnalyze), expected_cols)
 
@@ -41,16 +45,6 @@ test_that("test Input_CumCount AE", {
   )
 
   dfAnalyze <- Analyze_Simaerep(dfInput)
-
-  expected_cols <- c(
-    "GroupID",
-    "GroupLevel",
-    "MetricExpected",
-    "Metric",
-    "OverReportingProbability",
-    "UnderReportingProbability",
-    "Score"
-  )
 
   expect_equal(colnames(dfAnalyze), expected_cols)
 

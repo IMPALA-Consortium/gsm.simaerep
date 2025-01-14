@@ -17,6 +17,9 @@ many rows as desired repetitions. Default: 1000.}
 \code{data.frame} with the following specification:\tabular{lll}{
    Column Name \tab Description \tab Type \cr
    GroupID \tab The group ID \tab Character \cr
+   GroupLevel \tab The group level \tab Character \cr
+   Numerator \tab Numerator events \tab Numeric \cr
+   Denominator \tab Denominator events \tab Numeric \cr
    MetricExpected \tab Expected ratio from simulations \tab Numeric \cr
    Metric \tab Ratio all subjects in GroupID \tab Numeric \cr
    OverReportingProbability \tab Probability over-reporting numerator events \tab Numeric \cr

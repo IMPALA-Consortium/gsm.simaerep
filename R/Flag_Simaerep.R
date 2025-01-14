@@ -1,22 +1,14 @@
 #' Flag_Simaerep
 #'
-#' #' @description
+#' @description
 #' `r lifecycle::badge("experimental")`
 #'
-#' Wrapper for `gsm::Flag()`
+#' Alias for `gsm::Flag()`
 #'
-#' @seealso [gsm::Flag()]
-#' @param ... parameters passed to [gsm::Flag()]
 #' @inheritParams gsm::Flag
+#' @seealso [gsm::Flag()]
 #'
 #' @export
 
-Flag_Simaerep <- function(dfAnalyzed, ...) {
+Flag_Simaerep <- gsm::Flag
 
-  # we force the data.frame to be collected in case lazy table was passed
-  dfAnalyzed <- collect(dfAnalyzed)
-
-  dfFlagged <- gsm::Flag(dfAnalyzed, ...)
-
-  return(dfFlagged)
-}

@@ -53,6 +53,11 @@ steps:
     params:
       dfAnalyzed: Analysis_Analyzed
       vThreshold: Threshold
+  - output: Analysis_Summary
+    name: Summarize
+    params:
+      dfFlagged: Analysis_Flagged
+      nMinDenominator: nMinDenominator
   - output: lAnalysis
     name: list
     params:
@@ -60,4 +65,5 @@ steps:
       Analysis_Input: Analysis_Input
       Analysis_Analyzed: Analysis_Analyzed
       Analysis_Flagged: Analysis_Flagged
+      Analysis_Summary: Analysis_Summary
 

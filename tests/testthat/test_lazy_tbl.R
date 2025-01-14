@@ -1,6 +1,6 @@
 test_that("lazy_tbl input returns same results as with data.frame", {
 
-  # regular data.frame -----------------------------------------------
+  # regular data.frame =================================================
   dfInputAE <- Input_CumCount(
     dfSubjects = clindata::rawplus_dm,
     dfNumerator = clindata::rawplus_ae,
@@ -29,7 +29,7 @@ test_that("lazy_tbl input returns same results as with data.frame", {
   dfFlaggedAE <- Flag_Simaerep(dfAnalyzedAE, vThreshold = c(0.01, 0.05, 0.95, 0.99))
   dfFlaggedPD <- Flag_Simaerep(dfAnalyzedPD, vThreshold = c(0.01, 0.05, 0.95, 0.99))
 
-  # duckdb ----------------------------------------------------------
+  # duckdb ==============================================================
   db <- duckdb::dbConnect(duckdb::duckdb(), ":memory:")
 
   duckdb::dbWriteTable(db, "dm", clindata::rawplus_dm)
@@ -60,15 +60,15 @@ test_that("lazy_tbl input returns same results as with data.frame", {
     strDenominatorDateCol  = "visit_dt"
   )
 
-  tblAnalyzedAE_duckdb <- Analyze_Simaerep(tblInputAE_duckdb, r = dplyr::tbl(db, "r"))
-  tblAnalyzedPD_duckdb <- Analyze_Simaerep(tblInputPD_duckdb, r = dplyr::tbl(db, "r"))
+  dfAnalyzedAE_duckdb <- Analyze_Simaerep(tblInputAE_duckdb, r = dplyr::tbl(db, "r"))
+  dfAnalyzedPD_duckdb <- Analyze_Simaerep(tblInputPD_duckdb, r = dplyr::tbl(db, "r"))
 
-  tblFlaggedAE_duckdb <- Flag_Simaerep(tblAnalyzedAE_duckdb, vThreshold = c(0.01, 0.05, 0.95, 0.99))
-  tblFlaggedPD_duckdb <- Flag_Simaerep(tblAnalyzedPD_duckdb, vThreshold = c(0.01, 0.05, 0.95, 0.99))
+  dfFlaggedAE_duckdb <- Flag_Simaerep(dfAnalyzedAE_duckdb, vThreshold = c(0.01, 0.05, 0.95, 0.99))
+  dfFlaggedPD_duckdb <- Flag_Simaerep(dfAnalyzedPD_duckdb, vThreshold = c(0.01, 0.05, 0.95, 0.99))
 
-  # compare results -------------------------------------------------
+  # compare results =======================================================
 
-  # input
+  # input ---------------------------------------------------
   dfInputPD_duckdb <- tblInputPD_duckdb %>%
     dplyr::collect() %>%
     arrange(GroupID, SubjectID, Denominator)
@@ -80,14 +80,12 @@ test_that("lazy_tbl input returns same results as with data.frame", {
   expect_equal(dfInputAE, dfInputAE_duckdb)
   expect_equal(dfInputPD, dfInputPD_duckdb)
 
-  # analyze
-  dfAnalyzedAE_duckdb <- tblAnalyzedAE_duckdb %>%
-    dplyr::collect() %>%
-    arrange(GroupID)
+  expect_true(inherits(tblInputPD_duckdb, "tbl_lazy"))
+  expect_true(inherits(tblInputAE_duckdb, "tbl_lazy"))
 
-  dfAnalyzedPD_duckdb <- tblAnalyzedPD_duckdb %>%
-    dplyr::collect() %>%
-    arrange(GroupID)
+  # analyze ---------------------------------------------------
+  expect_true(inherits(dfAnalyzedAE_duckdb, "data.frame"))
+  expect_true(inherits(dfAnalyzedPD_duckdb, "data.frame"))
 
   # we can only check the non-random elements for equality
   expect_equal(
@@ -100,16 +98,9 @@ test_that("lazy_tbl input returns same results as with data.frame", {
     select(dfAnalyzedPD_duckdb, - MetricExpected, - OverReportingProbability, - UnderReportingProbability, - Score)
   )
 
-  #flag
-
-  dfFlaggedAE_duckdb <- tblFlaggedAE_duckdb %>%
-    arrange(GroupID)
-
-  dfFlaggedPD_duckdb <- tblFlaggedPD_duckdb %>%
-    arrange(GroupID)
-
-  expect_true(inherits(dfFlaggedAE_duckdb, "data.frame"))
-  expect_true(inherits(dfFlaggedPD_duckdb, "data.frame"))
+  # Flag----------------------------------------------------------
+  # although Analyze_Simaerep collects the lazy tbl to memory we still compare the number of
+  # flagged sites between in memory and duckdb version to show that we get comparable results
 
   n_sites_flaggedAE <- sum(dfFlaggedAE$Flag > 0)
   n_sites_flaggedPD <- sum(dfFlaggedPD$Flag > 0)
