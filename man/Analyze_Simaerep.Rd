@@ -18,9 +18,10 @@ many rows as desired repetitions. Default: 1000.}
    Column Name \tab Description \tab Type \cr
    GroupID \tab The group ID \tab Character \cr
    MetricExpected \tab Expected ratio from simulations \tab Numeric \cr
-   MetricGroup \tab Ratio all subjects in GroupID \tab Numeric \cr
+   Metric \tab Ratio all subjects in GroupID \tab Numeric \cr
    OverReportingProbability \tab Probability over-reporting numerator events \tab Numeric \cr
    UnderReportingProbability \tab Probability under-reporting numerator events \tab Numeric \cr
+   Score \tab Combined Score between \tab Numeric \cr
 }
 }
 \description{
@@ -29,6 +30,10 @@ many rows as desired repetitions. Default: 1000.}
 Calculate over and under-reporting probabilities for numerator denominator ratio using \code{\link[simaerep:simaerep]{simaerep::simaerep()}}.
 
 Uses inframe \code{simaerep} method and does not apply multiplicity correction as per latest recommendations.
+
+The sum of under- and over reporting probability  per group is usually zero, however \code{\link[simaerep:simaerep]{simaerep::simaerep()}}
+adjusts edge cases in which group ratio and expected ratio are all zero. We combine both metrics into a score
+between 0 and 1, where 0 is under-reporting and 1 is over-reporting.
 }
 \examples{
 # {clindata} Example for cumulative AE per Visit Count

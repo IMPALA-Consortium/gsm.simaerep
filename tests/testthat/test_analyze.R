@@ -15,10 +15,12 @@ test_that("test Input_CumCount PD", {
 
   expected_cols <- c(
     "GroupID",
+    "GroupLevel",
     "MetricExpected",
-    "MetricGroup",
+    "Metric",
     "OverReportingProbability",
-    "UnderReportingProbability"
+    "UnderReportingProbability",
+    "Score"
   )
 
   expect_equal(colnames(dfAnalyze), expected_cols)
@@ -42,10 +44,12 @@ test_that("test Input_CumCount AE", {
 
   expected_cols <- c(
     "GroupID",
+    "GroupLevel",
     "MetricExpected",
-    "MetricGroup",
+    "Metric",
     "OverReportingProbability",
-    "UnderReportingProbability"
+    "UnderReportingProbability",
+    "Score"
   )
 
   expect_equal(colnames(dfAnalyze), expected_cols)

@@ -23,7 +23,15 @@ test_that("yaml workflow produces same table as R function", {
         strPackage = NULL
     )
 
-    lResults <- gsm::RunWorkflows(lWorkflows = kri_wf, lData = lMapped)
+    lAnalysis <- gsm::RunWorkflows(lWorkflows = kri_wf, lData = lMapped)
+
+    dfMetrics <- gsm::MakeMetric(lWorkflows = kri_wf)
+
+    dfResults <- gsm::BindResults(lAnalysis = lAnalysis,
+                             strName = "Analysis_Flagged",
+                             dSnapshotDate = Sys.Date(),
+                             strStudyID = "ABC-123", bUselData = FALSE)
+
 
   dfInputPD <- Input_CumCount(
     dfSubjects = clindata::rawplus_dm,
@@ -49,37 +57,37 @@ test_that("yaml workflow produces same table as R function", {
     strDenominatorDateCol  = "visit_dt"
   )
 
-  expect_equal(dfInputAE, lResults$Analysis_kri0001$Analysis_Input)
-  expect_equal(dfInputPD, lResults$Analysis_kri0002$Analysis_Input)
+  expect_equal(dfInputAE, lAnalysis$Analysis_kri0001$Analysis_Input)
+  expect_equal(dfInputPD, lAnalysis$Analysis_kri0002$Analysis_Input)
 
   dfAnalyzedAE <- Analyze_Simaerep(dfInputAE)
   dfAnalyzedPD <- Analyze_Simaerep(dfInputPD)
 
   # we can only check the non-random elements for equality
   expect_equal(
-    select(dfAnalyzedAE, - MetricExpected, - OverReportingProbability, - UnderReportingProbability),
+    select(dfAnalyzedAE, - MetricExpected, - OverReportingProbability, - UnderReportingProbability, - Score),
     select(
-      lResults$Analysis_kri0001$Analysis_Analyzed,
-      - MetricExpected, - OverReportingProbability, - UnderReportingProbability
+      lAnalysis$Analysis_kri0001$Analysis_Analyzed,
+      - MetricExpected, - OverReportingProbability, - UnderReportingProbability, - Score
     )
   )
 
   expect_equal(
-    select(dfAnalyzedPD, - MetricExpected, - OverReportingProbability, - UnderReportingProbability),
+    select(dfAnalyzedPD, - MetricExpected, - OverReportingProbability, - UnderReportingProbability, - Score),
     select(
-      lResults$Analysis_kri0002$Analysis_Analyzed,
-      - MetricExpected, - OverReportingProbability, - UnderReportingProbability
+      lAnalysis$Analysis_kri0002$Analysis_Analyzed,
+      - MetricExpected, - OverReportingProbability, - UnderReportingProbability, - Score
     )
   )
 
-  dfFlaggedAE <- Flag_Simaerep(dfAnalyzedAE, vThreshold = c(0.95, 0.99))
-  dfFlaggedPD <- Flag_Simaerep(dfAnalyzedPD, vThreshold = c(0.95, 0.99))
+  dfFlaggedAE <- Flag_Simaerep(dfAnalyzedAE, vThreshold = c(0.01, 0.05, 0.95, 0.99))
+  dfFlaggedPD <- Flag_Simaerep(dfAnalyzedPD, vThreshold = c(0.01, 0.05, 0.95, 0.99))
 
   n_sites_flaggedAE <- sum(dfFlaggedAE$Flag > 0)
   n_sites_flaggedPD <- sum(dfFlaggedPD$Flag > 0)
 
-  n_sites_flaggedAE_wflow <- sum(lResults$Analysis_kri0001$Analysis_Flagged$Flag > 0)
-  n_sites_flaggedPD_wflow <- sum(lResults$Analysis_kri0002$Analysis_Flagged$Flag > 0)
+  n_sites_flaggedAE_wflow <- sum(lAnalysis$Analysis_kri0001$Analysis_Flagged$Flag > 0)
+  n_sites_flaggedPD_wflow <- sum(lAnalysis$Analysis_kri0002$Analysis_Flagged$Flag > 0)
 
   tolerance = dplyr::n_distinct(dfFlaggedAE$GroupID) * 0.02
 
@@ -102,19 +110,19 @@ test_that("yaml workflow produces same table as R function", {
     filter(Flag > 0) %>%
     pull(GroupID)
 
-  sites_flaggedAE_wflow <- lResults$Analysis_kri0001$Analysis_Flagged %>%
+  sites_flaggedAE_wflow <- lAnalysis$Analysis_kri0001$Analysis_Flagged %>%
     filter(Flag > 0) %>%
     pull(GroupID)
 
-  sites_flaggedAE2_wflow <- lResults$Analysis_kri0001$Analysis_Flagged %>%
+  sites_flaggedAE2_wflow <- lAnalysis$Analysis_kri0001$Analysis_Flagged %>%
     filter(Flag == 2) %>%
     pull(GroupID)
 
-  sites_flaggedPD_wflow <- lResults$Analysis_kri0002$Analysis_Flagged %>%
+  sites_flaggedPD_wflow <- lAnalysis$Analysis_kri0002$Analysis_Flagged %>%
     filter(Flag > 0) %>%
     pull(GroupID)
 
-  sites_flaggedPD2_wflow <- lResults$Analysis_kri0002$Analysis_Flagged %>%
+  sites_flaggedPD2_wflow <- lAnalysis$Analysis_kri0002$Analysis_Flagged %>%
     filter(Flag > 2) %>%
     pull(GroupID)
 

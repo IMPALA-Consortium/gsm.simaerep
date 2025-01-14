@@ -1,3 +1,5 @@
+
+
 test_that("test Flag_Simaerep PD", {
 
   dfInput <- Input_CumCount(
@@ -12,24 +14,22 @@ test_that("test Flag_Simaerep PD", {
   )
 
   dfAnalyze <- Analyze_Simaerep(dfInput)
-  dfFlagged <- Flag_Simaerep(dfAnalyze, vThreshold = c(0.95, 0.99))
+  dfFlagged <- Flag_Simaerep(dfAnalyze, vThreshold = c(0.1, 0.5, 0.95, 0.99))
 
   expected_cols <- c(
     "GroupID",
+    "GroupLevel",
     "MetricExpected",
-    "MetricGroup",
+    "Metric",
     "OverReportingProbability",
     "UnderReportingProbability",
+    "Score",
     "Flag"
   )
 
   expect_equal(colnames(dfFlagged), expected_cols)
 
   expect_equal(sort(unique(dfFlagged$Flag)), c(-2, -1, 0, 1, 2))
-
-  dfFlagged <- Flag_Simaerep(dfAnalyze, vThreshold = 0.95)
-
-  expect_equal(sort(unique(dfFlagged$Flag)), c(-1, 0, 1))
 
 })
 
@@ -47,24 +47,22 @@ test_that("test Flag_Simaerep AE", {
   )
 
   dfAnalyze <- Analyze_Simaerep(dfInput)
-  dfFlagged <- Flag_Simaerep(dfAnalyze, vThreshold = c(0.95, 0.99))
+  dfFlagged <- Flag_Simaerep(dfAnalyze, vThreshold = c(0.1, 0.5, 0.95, 0.99))
 
   expected_cols <- c(
     "GroupID",
+    "GroupLevel",
     "MetricExpected",
-    "MetricGroup",
+    "Metric",
     "OverReportingProbability",
     "UnderReportingProbability",
+    "Score",
     "Flag"
   )
 
   expect_equal(colnames(dfFlagged), expected_cols)
 
   expect_equal(sort(unique(dfFlagged$Flag)), c(-2, -1, 0, 1, 2))
-
-  dfFlagged <- Flag_Simaerep(dfAnalyze, vThreshold = 0.95)
-
-  expect_equal(sort(unique(dfFlagged$Flag)), c(-1, 0, 1))
 
 })
 
