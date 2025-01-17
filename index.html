@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">gsm.simaerep</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.900</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,6 +35,13 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="articles/ContributorGuidelines.html">ContributorGuidelines</a></li>
+    <li><a class="dropdown-item" href="articles/Cookbook.html">Cookbook</a></li>
+  </ul>
+</li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-sample-reports" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Sample Reports</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-sample-reports">
+<li><a class="dropdown-item" href="report_kri_site.html">Site Report</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
@@ -56,19 +63,42 @@
 <!-- badges: start -->
 
 <p>This is a <a href="https://github.com/openpharma/simaerep/" class="external-link">{simaerep}</a> extension for the <a href="https://github.com/Gilead-BioStats/gsm" class="external-link">{gsm}</a> package.</p>
-<p>This is in development the MVP will contain the following:</p>
+<p>The package provides:</p>
 <p><code>gsm</code>-style functions as detailed <a href="https://gilead-biostats.github.io/gsm/articles/DataModel.html" class="external-link">here</a>:</p>
 <ul>
-<li>Input_CumCount() patient-level cumulative count from source data</li>
-<li>Analyze_Simaerep() will execute <code>simaerep</code>
+<li>
+<code><a href="reference/Input_CumCount.html">Input_CumCount()</a></code> patient-level cumulative count from source data</li>
+<li>
+<code><a href="reference/Analyze_Simaerep.html">Analyze_Simaerep()</a></code> will execute <code>simaerep</code>
 </li>
-<li>Flag_Simaerep() will flag based on <code>simaerep</code> statistics</li>
-<li>report functions</li>
+<li>
+<code><a href="reference/Flag_Simaerep.html">Flag_Simaerep()</a></code> alias of <code><a href="https://gilead-biostats.github.io/gsm/reference/Flag.html" class="external-link">gsm::Flag</a></code>
+</li>
 </ul>
-<p>required module configuration file:</p>
+<p>required module configuration files:</p>
 <ul>
-<li><code>inst/workflow/4_modules/gsm.simaerep.yaml</code></li>
+<li><code>inst/workflow/1_mappings</code></li>
+<li><code>inst/workflow/2_metrics</code></li>
 </ul>
+<p>KRI:</p>
+<ul>
+<li>AE Over/Under- Reporting Probability</li>
+<li>PD Over/Under- Reporting Probability</li>
+<li>AE Z-Score</li>
+<li>PD Z-Score</li>
+</ul>
+<div class="section level2">
+<h2 id="why-use-simaerep">Why use {simaerep}?<a class="anchor" aria-label="anchor" href="#why-use-simaerep"></a>
+</h2>
+<p>{simaerep} uses a metric ratio to detect over/under-reporting of subject-related clinical events such as AEs. It accounts for sites having different denominator counts similarly to z-scores derived from normal approximations in funnel plots which is the {gsm} standard. On top of that <strong>{simaerep} considers changing event (numerator) probabilities over time</strong>. This advantage is particularly important when monitoring ongoing studies and sites start enrolling patients at different times. Typically event rates are higher at the beginning of a study and decrease over time. {simaerep} can detect this pattern and adjust for it and we <strong>avoid comparing sites with a few patients that are all in follow-up to sites with many patients that at the beginning of their treatment cycle</strong>. In a simulation experiment we could show that {simaerep} outperforms z-scores when event rates are not constant over-time but comparable when event rates are constant over time <a href="https://openpharma.github.io/simaerep/articles/funnel_perf.html" class="external-link">see documentation</a>. This <a href="https://impala-consortium.github.io/gsm.simaerep/report_kri_site.html">example report</a> plots {simaerep} results onto the the familiar {gsm} scatter plots next to their z-score counter parts. We can appreciate the similarity of the results the most noticeable difference is {simaerep} assigning greater scores to allegedly under-reporting sites. As the normal approximation produces negative lower boundaries for lower denominator counts that are set to zero, high z-scores associated with high probabilities are unobtainable in these regions. The calibrated outlier probabilities obtained from z-scores are not symmetric, a site with a z-score of 2 does not have the same outlier probability as a site with a z-score of -2. {simaerep} is <strong>non-parametric</strong> and provides realistic probabilities for all ranges of denominator counts for upper and lower outliers.</p>
+<p>Resources:</p>
+<ul>
+<li><a href="https://openpharma.github.io/simaerep/articles/performance.html" class="external-link">simaerep statistical performance</a></li>
+<li>Bootstrap Simulation for Outlier Detection in Operational Site Metrics Using Patient Reassignment <a href="https://phuse.s3.eu-central-1.amazonaws.com/Archive/2024/Connect/EU/Strasbourg/PAP_AR04.pdf" class="external-link">PHUSE Paper</a>, <a href="https://phuse.s3.eu-central-1.amazonaws.com/Archive/2024/Connect/EU/Strasbourg/PRE_AR04.pdf" class="external-link">PHUSE Presentation</a>
+</li>
+<li><a href="https://link.springer.com/article/10.1007/s43441-024-00631-8" class="external-link">An Open-Source R Package for Detection of Adverse Events Under-Reporting in Clinical Trials: Implementation and Validation by the IMPALA (Inter coMPany quALity Analytics) Consortium</a></li>
+</ul>
+</div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -76,14 +106,17 @@
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("pak")</span></span>
 <span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"Gilead-BioStats/clindata"</span><span class="op">)</span></span>
-<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"Gilead-BioStats/gsm"</span><span class="op">)</span></span>
+<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"Gilead-BioStats/gsm@v2.2.1"</span><span class="op">)</span></span>
 <span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"IMPALA-Consortium/gsm.simaerep"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a>
+</h2>
+<p>For a more detailed description see the <a href="https://impala-consortium.github.io/gsm.simaerep/articles/Cookbook.html">gsm.simaerep Cookbook</a></p>
 </div>
 <div class="section level2">
 <h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
 </h2>
-<p><code>simaerep</code> expects the cumulative count of numerator events per denominator event per subject as input.</p>
-<p>In this example we we are calculating the cumulative AE count per visit per patient per site.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://impala-consortium.github.io/gsm.simaerep/">gsm.simaerep</a></span><span class="op">)</span></span>
 <span></span>
@@ -98,338 +131,25 @@
 <span>   strDenominatorDateCol  <span class="op">=</span> <span class="st">"visit_dt"</span></span>
 <span> <span class="op">)</span></span>
 <span></span>
-<span><span class="va">dfInput</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">Numerator</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">1</span>, .by <span class="op">=</span> <span class="st">"SubjectID"</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">25</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<thead><tr class="header">
-<th align="left">SubjectID</th>
-<th align="left">GroupID</th>
-<th align="left">GroupLevel</th>
-<th align="right">Numerator</th>
-<th align="right">Denominator</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">0486</td>
-<td align="left">10</td>
-<td align="left">Site</td>
-<td align="right">0</td>
-<td align="right">1</td>
-</tr>
-<tr class="even">
-<td align="left">0486</td>
-<td align="left">10</td>
-<td align="left">Site</td>
-<td align="right">0</td>
-<td align="right">2</td>
-</tr>
-<tr class="odd">
-<td align="left">0486</td>
-<td align="left">10</td>
-<td align="left">Site</td>
-<td align="right">0</td>
-<td align="right">3</td>
-</tr>
-<tr class="even">
-<td align="left">0486</td>
-<td align="left">10</td>
-<td align="left">Site</td>
-<td align="right">0</td>
-<td align="right">4</td>
-</tr>
-<tr class="odd">
-<td align="left">0486</td>
-<td align="left">10</td>
-<td align="left">Site</td>
-<td align="right">0</td>
-<td align="right">5</td>
-</tr>
-<tr class="even">
-<td align="left">0486</td>
-<td align="left">10</td>
-<td align="left">Site</td>
-<td align="right">0</td>
-<td align="right">6</td>
-</tr>
-<tr class="odd">
-<td align="left">0486</td>
-<td align="left">10</td>
-<td align="left">Site</td>
-<td align="right">0</td>
-<td align="right">7</td>
-</tr>
-<tr class="even">
-<td align="left">0486</td>
-<td align="left">10</td>
-<td align="left">Site</td>
-<td align="right">0</td>
-<td align="right">8</td>
-</tr>
-<tr class="odd">
-<td align="left">0486</td>
-<td align="left">10</td>
-<td align="left">Site</td>
-<td align="right">2</td>
-<td align="right">9</td>
-</tr>
-<tr class="even">
-<td align="left">0486</td>
-<td align="left">10</td>
-<td align="left">Site</td>
-<td align="right">2</td>
-<td align="right">10</td>
-</tr>
-<tr class="odd">
-<td align="left">0486</td>
-<td align="left">10</td>
-<td align="left">Site</td>
-<td align="right">2</td>
-<td align="right">11</td>
-</tr>
-<tr class="even">
-<td align="left">0486</td>
-<td align="left">10</td>
-<td align="left">Site</td>
-<td align="right">2</td>
-<td align="right">12</td>
-</tr>
-<tr class="odd">
-<td align="left">0486</td>
-<td align="left">10</td>
-<td align="left">Site</td>
-<td align="right">2</td>
-<td align="right">13</td>
-</tr>
-<tr class="even">
-<td align="left">0486</td>
-<td align="left">10</td>
-<td align="left">Site</td>
-<td align="right">2</td>
-<td align="right">14</td>
-</tr>
-<tr class="odd">
-<td align="left">0486</td>
-<td align="left">10</td>
-<td align="left">Site</td>
-<td align="right">2</td>
-<td align="right">15</td>
-</tr>
-<tr class="even">
-<td align="left">0486</td>
-<td align="left">10</td>
-<td align="left">Site</td>
-<td align="right">2</td>
-<td align="right">16</td>
-</tr>
-<tr class="odd">
-<td align="left">0486</td>
-<td align="left">10</td>
-<td align="left">Site</td>
-<td align="right">2</td>
-<td align="right">17</td>
-</tr>
-<tr class="even">
-<td align="left">0486</td>
-<td align="left">10</td>
-<td align="left">Site</td>
-<td align="right">2</td>
-<td align="right">18</td>
-</tr>
-<tr class="odd">
-<td align="left">0486</td>
-<td align="left">10</td>
-<td align="left">Site</td>
-<td align="right">2</td>
-<td align="right">19</td>
-</tr>
-<tr class="even">
-<td align="left">0486</td>
-<td align="left">10</td>
-<td align="left">Site</td>
-<td align="right">2</td>
-<td align="right">20</td>
-</tr>
-<tr class="odd">
-<td align="left">0486</td>
-<td align="left">10</td>
-<td align="left">Site</td>
-<td align="right">2</td>
-<td align="right">21</td>
-</tr>
-<tr class="even">
-<td align="left">0489</td>
-<td align="left">10</td>
-<td align="left">Site</td>
-<td align="right">0</td>
-<td align="right">1</td>
-</tr>
-<tr class="odd">
-<td align="left">0489</td>
-<td align="left">10</td>
-<td align="left">Site</td>
-<td align="right">0</td>
-<td align="right">2</td>
-</tr>
-<tr class="even">
-<td align="left">0489</td>
-<td align="left">10</td>
-<td align="left">Site</td>
-<td align="right">2</td>
-<td align="right">3</td>
-</tr>
-<tr class="odd">
-<td align="left">0489</td>
-<td align="left">10</td>
-<td align="left">Site</td>
-<td align="right">2</td>
-<td align="right">4</td>
-</tr>
-</tbody>
-</table>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
 <span><span class="va">dfAnalyzed</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/Analyze_Simaerep.html">Analyze_Simaerep</a></span><span class="op">(</span><span class="va">dfInput</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">dfAnalyzed</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<colgroup>
-<col width="20%">
-<col width="20%">
-<col width="20%">
-<col width="20%">
-<col width="20%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">GroupID</th>
-<th align="right">MetricExpected</th>
-<th align="right">MetricGroup</th>
-<th align="right">OverReportingProbability</th>
-<th align="right">UnderReportingProbability</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">10</td>
-<td align="right">0.1628333</td>
-<td align="right">0.0205128</td>
-<td align="right">0.000</td>
-<td align="right">1.000</td>
-</tr>
-<tr class="even">
-<td align="left">100</td>
-<td align="right">0.1628293</td>
-<td align="right">0.1463415</td>
-<td align="right">0.596</td>
-<td align="right">0.404</td>
-</tr>
-<tr class="odd">
-<td align="left">101</td>
-<td align="right">0.1706719</td>
-<td align="right">0.0625000</td>
-<td align="right">0.169</td>
-<td align="right">0.831</td>
-</tr>
-<tr class="even">
-<td align="left">102</td>
-<td align="right">0.1747246</td>
-<td align="right">0.1159420</td>
-<td align="right">0.371</td>
-<td align="right">0.629</td>
-</tr>
-<tr class="odd">
-<td align="left">103</td>
-<td align="right">0.1725116</td>
-<td align="right">0.0930233</td>
-<td align="right">0.245</td>
-<td align="right">0.755</td>
-</tr>
-<tr class="even">
-<td align="left">104</td>
-<td align="right">0.1639505</td>
-<td align="right">0.1373626</td>
-<td align="right">0.403</td>
-<td align="right">0.597</td>
-</tr>
-</tbody>
-</table>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="va">dfFlagged</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/Flag_Simaerep.html">Flag_Simaerep</a></span><span class="op">(</span><span class="va">dfAnalyzed</span>, vThreshold <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.95</span>, <span class="fl">0.99</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">dfFlagged</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/Flag_Simaerep.html">Flag_Simaerep</a></span><span class="op">(</span><span class="va">dfAnalyzed</span>, vThreshold <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.99</span>, <span class="op">-</span><span class="fl">0.95</span>, <span class="fl">0.95</span>, <span class="fl">0.99</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; ℹ Sorted dfFlagged using custom Flag order: 2.Sorted dfFlagged using custom Flag order: -2.Sorted dfFlagged using custom Flag order: 1.Sorted dfFlagged using custom Flag order: -1.Sorted dfFlagged using custom Flag order: 0.</span></span>
 <span></span>
-<span><span class="va">dfFlagged</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<table style="width:100%;" class="table">
-<colgroup>
-<col width="16%">
-<col width="16%">
-<col width="16%">
-<col width="16%">
-<col width="16%">
-<col width="16%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">GroupID</th>
-<th align="right">MetricExpected</th>
-<th align="right">MetricGroup</th>
-<th align="right">OverReportingProbability</th>
-<th align="right">UnderReportingProbability</th>
-<th align="right">Flag</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">10</td>
-<td align="right">0.1628333</td>
-<td align="right">0.0205128</td>
-<td align="right">0.000</td>
-<td align="right">1.000</td>
-<td align="right">-2</td>
-</tr>
-<tr class="even">
-<td align="left">100</td>
-<td align="right">0.1628293</td>
-<td align="right">0.1463415</td>
-<td align="right">0.596</td>
-<td align="right">0.404</td>
-<td align="right">0</td>
-</tr>
-<tr class="odd">
-<td align="left">101</td>
-<td align="right">0.1706719</td>
-<td align="right">0.0625000</td>
-<td align="right">0.169</td>
-<td align="right">0.831</td>
-<td align="right">0</td>
-</tr>
-<tr class="even">
-<td align="left">102</td>
-<td align="right">0.1747246</td>
-<td align="right">0.1159420</td>
-<td align="right">0.371</td>
-<td align="right">0.629</td>
-<td align="right">0</td>
-</tr>
-<tr class="odd">
-<td align="left">103</td>
-<td align="right">0.1725116</td>
-<td align="right">0.0930233</td>
-<td align="right">0.245</td>
-<td align="right">0.755</td>
-<td align="right">0</td>
-</tr>
-<tr class="even">
-<td align="left">104</td>
-<td align="right">0.1639505</td>
-<td align="right">0.1373626</td>
-<td align="right">0.403</td>
-<td align="right">0.597</td>
-<td align="right">0</td>
-</tr>
-</tbody>
-</table>
+<span><span class="fu">gsm</span><span class="fu">::</span><span class="fu"><a href="https://gilead-biostats.github.io/gsm/reference/Visualize_Scatter.html" class="external-link">Visualize_Scatter</a></span><span class="op">(</span></span>
+<span>  <span class="va">dfFlagged</span>,</span>
+<span>  dfBounds <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  strGroupLabel <span class="op">=</span> <span class="st">"GroupLevel"</span>,</span>
+<span>  strUnit <span class="op">=</span> <span class="st">"Visits"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-2-1.png" width="100%"></p>
+</div>
+<div class="section level2">
+<h2 id="sample-report">Sample Report<a class="anchor" aria-label="anchor" href="#sample-report"></a>
+</h2>
+<ul>
+<li><a href="https://impala-consortium.github.io/gsm.simaerep/report_kri_site.html">Sample Report</a></li>
+</ul>
 </div>
 <div class="section level2">
 <h2 id="quality-control">Quality Control<a class="anchor" aria-label="anchor" href="#quality-control"></a>
@@ -437,7 +157,7 @@
 <p>Since {gsm} is designed for use in a <a href="https://en.wikipedia.org/wiki/Good_clinical_practice" class="external-link">GCP</a> framework, we have conducted extensive quality control as part of our development process. In particular, we do the following during early development:</p>
 <ul>
 <li>
-<strong>Unit Tests</strong> - Unit tests are written for all core functions.</li>
+<strong>Unit Tests</strong> - Unit tests are written for all core functions, 100% coverage required.</li>
 <li>
 <strong>Workflow Tests</strong> - Additional unit tests confirm that core workflows behave as expected.</li>
 <li>
@@ -450,14 +170,14 @@
 <strong>Code Formatting</strong> - Code is formatted with {styler} before each release.</li>
 <li>
 <strong>Contributor Guidelines</strong> - Detailed contributor guidelines including step-by-step processes for code development and releases are provided as a vignette.</li>
+<li>
+<strong>Code Demonstration</strong> - <a href="https://impala-consortium.github.io/gsm.simaerep/articles/Cookbook.html">Cookbook</a> Vignette provides demos and explanations for code usage.</li>
 </ul>
 <div class="section level3">
 <h3 id="parking">Parking<a class="anchor" aria-label="anchor" href="#parking"></a>
 </h3>
 <p>As development progresses, we will also conduct the following quality control steps:</p>
 <ul>
-<li>
-<strong>Code Examples</strong> - Cookbook Vignette provides examples for code usage.</li>
 <li>
 <strong>Qualification Workflow</strong> - All assessments have been Qualified as described in the Qualification Workflow Vignette. A Qualification Report Vignette is generated and attached to each release.</li>
 <li>
