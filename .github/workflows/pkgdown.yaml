@@ -70,13 +70,13 @@ jobs:
 
           lMapped <- gsm::RunWorkflows(lWorkflows = mapping_wf, lData = lRaw)
 
-          dfMetrics <- gsm::MakeMetric(lWorkflows = metrics_wf)
-
           metrics_wf <- gsm::MakeWorkflowList(
                   strNames = NULL,
                   strPath = system.file("workflow/2_metrics", package = "gsm.simaerep"),
                   strPackage = NULL
               )
+
+          dfMetrics <- gsm::MakeMetric(lWorkflows = metrics_wf)
 
           lAnalyzed <- gsm::RunWorkflows(lWorkflows = metrics_wf, lData = lMapped)
 
