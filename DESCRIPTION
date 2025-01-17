@@ -19,9 +19,9 @@ Imports:
     tibble,
     magrittr,
     dbplyr,
-    utils
+    utils,
+    gsm
 Suggests:
-    gsm (>= 2.2.0),
     knitr,
     rmarkdown,
     testthat (>= 3.0.0),
