@@ -6,3 +6,5 @@
 ^pkgdown$
 ^\.github$
 ^LICENSE\.md$
+^[^/]+\.html$
+^vignette/.+\html$

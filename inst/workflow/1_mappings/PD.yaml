@@ -1,9 +1,9 @@
 meta:
   Type: Mapped
   ID: PD
-  Description: Protocol Deviation Data Mapping 
+  Description: Protocol Deviation Data Mapping
   Priority: 1
-spec: 
+spec:
   Raw_PD:
     subjectenrollmentnumber:
       type: character

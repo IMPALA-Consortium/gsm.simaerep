@@ -26,7 +26,7 @@ test_that("test Flag_Simaerep PD", {
   )
 
   dfAnalyze <- Analyze_Simaerep(dfInput)
-  dfFlagged <- Flag_Simaerep(dfAnalyze, vThreshold = c(0.1, 0.5, 0.95, 0.99))
+  dfFlagged <- Flag_Simaerep(dfAnalyze, vThreshold = c(-0.99, -0.95, 0.95, 0.99))
 
   expect_equal(colnames(dfFlagged), expected_cols)
 
@@ -48,7 +48,7 @@ test_that("test Flag_Simaerep AE", {
   )
 
   dfAnalyze <- Analyze_Simaerep(dfInput)
-  dfFlagged <- Flag_Simaerep(dfAnalyze, vThreshold = c(0.1, 0.5, 0.95, 0.99))
+  dfFlagged <- Flag_Simaerep(dfAnalyze, vThreshold = c(-0.99, -0.95, 0.95, 0.99))
 
   expect_equal(colnames(dfFlagged), expected_cols)
 
@@ -56,4 +56,24 @@ test_that("test Flag_Simaerep AE", {
 
 })
 
+test_that("test Flag_Simaerep result compatible with gsm::Summarize", {
 
+  dfInput <- Input_CumCount(
+    dfSubjects = clindata::rawplus_dm,
+    dfNumerator = clindata::rawplus_ae,
+    dfDenominator = clindata::rawplus_visdt %>% mutate(visit_dt = lubridate::ymd(visit_dt)),
+    strSubjectCol = "subjid",
+    strGroupCol = "siteid",
+    strGroupLevel = "Site",
+    strNumeratorDateCol = "aest_dt",
+    strDenominatorDateCol  = "visit_dt"
+  )
+
+  dfAnalyze <- Analyze_Simaerep(dfInput)
+  dfFlagged <- Flag_Simaerep(dfAnalyze, vThreshold = c(-0.99, -0.95, 0.95, 0.99))
+
+  expect_snapshot(
+    dfSummarize <- gsm::Summarize(dfFlagged, nMinDenominator = 1)
+  )
+
+})

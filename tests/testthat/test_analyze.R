@@ -12,7 +12,7 @@ expected_cols <- c(
 )
 
 
-test_that("test Input_CumCount PD", {
+test_that("test Analyze_Simaerep PD", {
 
   dfInput <- Input_CumCount(
     dfSubjects = clindata::rawplus_dm,
@@ -31,7 +31,7 @@ test_that("test Input_CumCount PD", {
 
 })
 
-test_that("test Input_CumCount AE", {
+test_that("test Analyze_Simaerep AE", {
 
   dfInput <- Input_CumCount(
     dfSubjects = clindata::rawplus_dm,

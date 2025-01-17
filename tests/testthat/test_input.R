@@ -373,7 +373,7 @@ test_that("AssignOrphans used with lazy_tbl ", {
     strDenominatorDateCol  = "visit_dt",
     strOrphanedMethod = "assign"
   ) %>%
-  filter(Denominator == max(Denominator), .by = c(SubjectID)) %>%
+  filter(Denominator == max(Denominator, na.rm = TRUE), .by = c(SubjectID)) %>%
   dplyr::collect() %>%
   arrange(GroupID, SubjectID, Denominator)
 

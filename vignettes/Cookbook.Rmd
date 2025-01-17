@@ -1,0 +1,226 @@
+---
+title: "Cookbook"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Cookbook}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r cook1 , include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+<!-- chunk labels need to be unique to not get conflicts when rendering Rmd KRI report -->
+
+# Introduction
+
+This vignette contains sample code showing how to use the [gsm](https://github.com/Gilead-BioStats/gsm) extension [gsm.simaerep](https://github.com/IMPALA-Consortium/gsm.simaerep)
+using sample data from [clindata](https://github.com/Gilead-BioStats/clindata).
+
+In order to familiarize yourself with the `gsm` package, please refer to the [gsm cookbook](https://gilead-biostats.github.io/gsm/articles/Cookbook.html).
+
+## Installation
+
+```{r cook2, eval=FALSE}
+install.packages("pak")
+pak::pak("Gilead-BioStats/clindata")
+pak::pak("Gilead-BioStats/gsm")
+pak::pak("IMPALA-Consortium/gsm.simaerep")
+```
+
+## Load
+
+```{r cook3}
+
+suppressPackageStartupMessages(library(dplyr))
+library(gsm)
+library(gsm.simaerep)
+```
+
+# {gsm.simaerep} Functions
+
+`simaerep` expects the cumulative count of numerator events per denominator event per subject as input.
+
+In this example we we are calculating the cumulative AE count per visit per patient per site.
+
+```{r cook4}
+
+dfInput <- Input_CumCount(
+   dfSubjects = clindata::rawplus_dm,
+   dfNumerator = clindata::rawplus_ae,
+   dfDenominator = clindata::rawplus_visdt %>% dplyr::mutate(visit_dt = lubridate::ymd(visit_dt)),
+   strSubjectCol = "subjid",
+   strGroupCol = "siteid",
+   strGroupLevel = "Site",
+   strNumeratorDateCol = "aest_dt",
+   strDenominatorDateCol  = "visit_dt"
+ )
+
+dfInput %>%
+  dplyr::filter(max(Numerator) > 1, .by = "SubjectID") %>%
+  head(25) %>%
+  knitr::kable()
+```
+
+Now we can analyze the data using `Analyze_Simaerep()` and add flags with `Flag_Simaerep()` which adds a Score between -1 and 1. Positive values indicate the over-reporting probability and negative values indicate the under-reporting probability.
+
+MetricExpected is the average simulated metric value for a site that has the same number of patients with identical number of visits. Sites with identical metric ratios can have different expected metrics as the total number of patients and their individual visit count varies.
+
+```{r cook5}
+
+dfAnalyzed <- Analyze_Simaerep(dfInput)
+dfFlagged <- Flag_Simaerep(dfAnalyzed, vThreshold = c(-0.99, -0.95, 0.95, 0.99))
+
+
+dfFlagged %>%
+  arrange(Score) %>%
+  head(5) %>%
+  knitr::kable()
+
+```
+
+```{r cook6}
+dfFlagged %>%
+  arrange(Score) %>%
+  tail(5) %>%
+  knitr::kable()
+```
+
+These results are compatible with the `gsm` package for visualization.
+
+*`simaerep* scores represent are related to the metric ratio do not use a metric based threshold for flagging. Therefore we do not need to calculate boundaries to pass to the plotting function.
+
+```{r cook7}
+gsm::Visualize_Scatter(
+  dfFlagged,
+  dfBounds = NULL,
+  strGroupLabel = "GroupLevel",
+  strUnit = "Visits"
+)
+```
+
+```{r cook8}
+gsm::Widget_ScatterPlot(
+  dfFlagged,
+  dfBounds = NULL
+)
+```
+
+```{r cook9}
+gsm::Widget_BarChart(
+  dfFlagged
+)
+```
+
+
+# Report Building
+
+We can create a workflow to create the `gsm` KRI report.
+
+## Mapping
+
+```{r cook10, message=FALSE}
+
+lRaw <- list(
+        Raw_SUBJ = clindata::rawplus_dm,
+        Raw_AE = clindata::rawplus_ae,
+        Raw_VISIT = clindata::rawplus_visdt,
+        Raw_PD = clindata::ctms_protdev,
+        Raw_ENROLL = clindata::rawplus_enroll,
+        Raw_SITE = clindata::ctms_site  %>%
+          rename(studyid = protocol) %>%
+          rename(invid = pi_number) %>%
+          rename(InvestigatorFirstName = pi_first_name) %>%
+          rename(InvestigatorLastName = pi_last_name) %>%
+          rename(City = city) %>%
+          rename(State = state) %>%
+          rename(Country = country) %>%
+          rename(Status = site_status),
+        Raw_STUDY = clindata::ctms_study %>%
+          rename(studyid = protocol_number) %>%
+          rename(Status = status)
+    )
+
+mapping_wf <- gsm::MakeWorkflowList(
+    strNames = NULL,
+    strPath = system.file("workflow/1_mappings", package = "gsm.simaerep"),
+    strPackage = NULL
+)
+
+lMapped <- gsm::RunWorkflows(lWorkflows = mapping_wf, lData = lRaw)
+```
+
+## Metrics
+
+```{r cook11, message=FALSE}
+metrics_wf <- gsm::MakeWorkflowList(
+        strNames = NULL,
+        strPath = system.file("workflow/2_metrics", package = "gsm.simaerep"),
+        strPackage = NULL
+    )
+
+lAnalyzed <- gsm::RunWorkflows(lWorkflows = metrics_wf, lData = lMapped)
+```
+
+## Report Generation - Workflow
+
+This part is identical with `gsm`.
+
+```{r cook12, message=FALSE}
+
+reporting_wf <- gsm::MakeWorkflowList(strPath = "workflow/3_reporting")
+
+lReport <- gsm::RunWorkflows(reporting_wf, c(lMapped, list(lAnalyzed = lAnalyzed,
+                                                       lWorkflows = metrics_wf)))
+
+module_wf_gsm <- gsm::MakeWorkflowList(strPath = "workflow/4_modules", strNames = "report_kri_site.yaml")
+
+lModule <- gsm::RunWorkflows(module_wf_gsm, lReport)
+```
+
+## Report Generation - Script
+
+```{r cook13, warning=FALSE, message=FALSE}
+
+dfMetrics <- MakeMetric(lWorkflows = metrics_wf)
+
+dfResults <- BindResults(lAnalysis = lAnalyzed,
+                         strName = "Analysis_Summary",
+                         dSnapshotDate = Sys.Date(),
+                         strStudyID = "ABC-123")
+
+dfGroups <- bind_rows(
+  lMapped$Mapped_STUDY,
+  lMapped$Mapped_SITE,
+  lMapped$Country
+)
+
+dfBounds <- gsm::MakeBounds(
+  dfResults = dfResults,
+  dfMetrics = dfMetrics
+)
+
+lCharts <- gsm::MakeCharts(
+  dfResults = dfResults %>%
+    filter(GroupLevel == 'Site'),
+  dfMetrics = dfMetrics %>%
+    filter(GroupLevel == 'Site'),
+  dfGroups = dfGroups,
+  dfBounds = dfBounds
+)
+
+gsm::Report_KRI(
+  lCharts = lCharts,
+  dfResults =  dfResults,
+  dfGroups =  dfGroups,
+  dfMetrics = dfMetrics,
+  strOutputFile = "report_kri_site.html"
+)
+```
+

@@ -113,6 +113,11 @@ Analyze_Simaerep <- function(dfInput, r = 1000) {
         .data$OverReportingProbability + .data$UnderReportingProbability == 1 ~ .data$OverReportingProbability,
         .data$OverReportingProbability >= .data$UnderReportingProbability ~ .data$OverReportingProbability,
         .data$OverReportingProbability < .data$UnderReportingProbability ~ 1 - .data$UnderReportingProbability
+      ),
+      Score = ifelse(
+        .data$OverReportingProbability >= .data$UnderReportingProbability,
+        .data$OverReportingProbability,
+        - .data$UnderReportingProbability
       )
     ) %>%
     select(any_of(c(

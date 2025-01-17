@@ -6,7 +6,7 @@ test_that("lazy_tbl input returns same results as with data.frame", {
     dfNumerator = clindata::rawplus_ae,
     dfDenominator = clindata::rawplus_visdt %>% mutate(visit_dt = lubridate::ymd(visit_dt)),
     strSubjectCol = "subjid",
-    strGroupCol = "siteid",
+    strGroupCol = "invid",
     strGroupLevel = "Site",
     strNumeratorDateCol = "aest_dt",
     strDenominatorDateCol  = "visit_dt"
@@ -17,7 +17,7 @@ test_that("lazy_tbl input returns same results as with data.frame", {
     dfNumerator = clindata::ctms_protdev %>% rename(subjid = subjectenrollmentnumber),
     dfDenominator = clindata::rawplus_visdt %>% mutate(visit_dt = lubridate::ymd(visit_dt)),
     strSubjectCol = "subjid",
-    strGroupCol = "siteid",
+    strGroupCol = "invid",
     strGroupLevel = "Site",
     strNumeratorDateCol = "deviationdate",
     strDenominatorDateCol  = "visit_dt"
@@ -43,7 +43,7 @@ test_that("lazy_tbl input returns same results as with data.frame", {
     dfNumerator = dplyr::tbl(db, "ae"),
     dfDenominator = dplyr::tbl(db, "visit") %>% mutate(visit_dt = sql("TRY_CAST(visit_dt AS DATE)")),
     strSubjectCol = "subjid",
-    strGroupCol = "siteid",
+    strGroupCol = "invid",
     strGroupLevel = "Site",
     strNumeratorDateCol = "aest_dt",
     strDenominatorDateCol  = "visit_dt"
@@ -54,7 +54,7 @@ test_that("lazy_tbl input returns same results as with data.frame", {
     dfNumerator = dplyr::tbl(db, "pd") %>% rename(subjid = subjectenrollmentnumber),
     dfDenominator = dplyr::tbl(db, "visit") %>% mutate(visit_dt = sql("TRY_CAST(visit_dt AS DATE)")),
     strSubjectCol = "subjid",
-    strGroupCol = "siteid",
+    strGroupCol = "invid",
     strGroupLevel = "Site",
     strNumeratorDateCol = "deviationdate",
     strDenominatorDateCol  = "visit_dt"
@@ -63,8 +63,8 @@ test_that("lazy_tbl input returns same results as with data.frame", {
   dfAnalyzedAE_duckdb <- Analyze_Simaerep(tblInputAE_duckdb, r = dplyr::tbl(db, "r"))
   dfAnalyzedPD_duckdb <- Analyze_Simaerep(tblInputPD_duckdb, r = dplyr::tbl(db, "r"))
 
-  dfFlaggedAE_duckdb <- Flag_Simaerep(dfAnalyzedAE_duckdb, vThreshold = c(0.01, 0.05, 0.95, 0.99))
-  dfFlaggedPD_duckdb <- Flag_Simaerep(dfAnalyzedPD_duckdb, vThreshold = c(0.01, 0.05, 0.95, 0.99))
+  dfFlaggedAE_duckdb <- Flag_Simaerep(dfAnalyzedAE_duckdb, vThreshold = c(-0.99, -0.95, 0.95, 0.99))
+  dfFlaggedPD_duckdb <- Flag_Simaerep(dfAnalyzedPD_duckdb, vThreshold = c(-0.99, -0.95, 0.95, 0.99))
 
   # compare results =======================================================
 
