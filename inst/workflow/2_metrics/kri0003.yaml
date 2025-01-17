@@ -1,21 +1,21 @@
 meta:
   Type: Analysis
-  ID: kri0002
+  ID: kri0003
   GroupLevel: Site
-  Abbreviation: AE-ZScore
-  Metric: Adverse Event Rate ZScore
-  Numerator: Adverse Events
+  Abbreviation: PD-Simaerep
+  Metric: Protocol Deviation Rate
+  Numerator: Protocol Deviation Simaerep
   Denominator: Visit
-  Model: Normal Approximation
-  Score: Adjusted Z-Score
-  AnalysisType: rate
-  Threshold: -2,-1,2,3
+  Model: bootstrap-simaerep
+  Score: Over/Under-Reporting Probability
+  AnalysisType: identity
+  Threshold: -0.99, -0.95, 0.95, 0.99
   nMinDenominator: 1
 spec:
-  Mapped_AE:
+  Mapped_PD:
     subjid:
       type: character
-    aest_dt:
+    deviationdate:
       type: Date
   Mapped_SUBJ:
     subjid:
@@ -33,30 +33,28 @@ steps:
     params:
       strThreshold: Threshold
   - output: Analysis_Input
-    name: Input_Rate
+    name: Input_CumCount
     params:
       dfSubjects: Mapped_SUBJ
-      dfNumerator: Mapped_AE
+      dfNumerator: Mapped_PD
       dfDenominator: Mapped_VISIT
       strSubjectCol: subjid
       strGroupCol: invid
-      strGroupLevel: GroupLevel
-  - output: Analysis_Transformed
-    name: Transform_Rate
+      strGroupLevel: Site
+      strNumeratorDateCol: deviationdate
+      strDenominatorDateCol: visit_dt
+      strOrphanedMethod: filter
+  - output: Analysis_Analyzed
+    name: Analyze_Simaerep
     params:
       dfInput: Analysis_Input
-  - output: Analysis_Analyzed
-    name: Analyze_NormalApprox
-    params:
-      dfTransformed: Analysis_Transformed
-      strType: AnalysisType
   - output: Analysis_Flagged
     name: Flag_Simaerep
     params:
       dfAnalyzed: Analysis_Analyzed
       vThreshold: vThreshold
   - output: Analysis_Summary
-    name: gsm::Summarize
+    name: Summarize
     params:
       dfFlagged: Analysis_Flagged
       nMinDenominator: nMinDenominator
@@ -65,8 +63,6 @@ steps:
     params:
       ID: ID
       Analysis_Input: Analysis_Input
-      Analysis_Transformed: Analysis_Transformed
       Analysis_Analyzed: Analysis_Analyzed
       Analysis_Flagged: Analysis_Flagged
       Analysis_Summary: Analysis_Summary
-

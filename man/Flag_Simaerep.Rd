@@ -2,49 +2,32 @@
 % Please edit documentation in R/Flag_Simaerep.R
 \name{Flag_Simaerep}
 \alias{Flag_Simaerep}
-\title{Flag Simaerep}
+\title{Flag_Simaerep}
 \usage{
-Flag_Simaerep(dfAnalyzed, vThreshold)
+Flag_Simaerep(
+  dfAnalyzed,
+  strColumn = "Score",
+  vThreshold = c(-3, -2, 2, 3),
+  vFlag = c(-2, -1, 0, 1, 2),
+  vFlagOrder = c(2, -2, 1, -1, 0)
+)
 }
 \arguments{
-\item{dfAnalyzed}{\code{data.frame} as returned by \code{\link[=Analyze_Simaerep]{Analyze_Simaerep()}}}
+\item{dfAnalyzed}{\code{data.frame} where flags should be added.}
 
-\item{vThreshold}{\code{numeric} vector of thresholds to flag groups. Must be between 0 and 1.}
-}
-\value{
-\code{data.frame} with the following specification:\tabular{lll}{
-   Column Name \tab Description \tab Type \cr
-   GroupID \tab The group ID \tab Character \cr
-   MetricExpected \tab Expected ratio from simulations \tab Numeric \cr
-   MetricGroup \tab Ratio all subjects in GroupID \tab Numeric \cr
-   OverReportingProbability \tab Probability over-reporting numerator events \tab Numeric \cr
-   UnderReportingProbability \tab Probability under-reporting numerator events \tab Numeric \cr
-   Flag \tab Flag for group \tab Numeric \cr
-}
+\item{strColumn}{\code{character} Name of the column to use for thresholding. Default: \code{"Score"}}
+
+\item{vThreshold}{\code{numeric} Vector of numeric values representing threshold values. Default is \code{c(-3,-2,2,3)} which is typical for z-scores.}
+
+\item{vFlag}{\code{numeric} Vector of flag values. There must be one more item in Flag than thresholds - that is \code{length(vThreshold)+1 == length(vFlagValues)}. Default is \code{c(-2,-1,0,1,2)}, which is typical for z-scores.}
+
+\item{vFlagOrder}{\code{numeric} Vector of ordered flag values. Output data.frame will be sorted based on flag column using the order provided. NULL (or values that don't match vFlag) will leave the data unsorted. Must have identical values to vFlag. Default is \code{c(2,-2,1,-1,0)} which puts largest z-score outliers first in the data set.}
 }
 \description{
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
 
-Flag over and under-reporting probabilities. The sum of under- and over reporting probability
-per group is usually zero, however \code{\link[simaerep:simaerep]{simaerep::simaerep()}} adjusts edge cases in which group ratio
-and expected ratio are all zero'
-}
-\examples{
-# {clindata} Example for cumulative AE per Visit Count
-dfInput <- Input_CumCount(
-    dfSubjects = clindata::rawplus_dm,
-    dfNumerator = clindata::rawplus_ae,
-    dfDenominator = clindata::rawplus_visdt \%>\% dplyr::mutate(visit_dt = lubridate::ymd(visit_dt)),
-    strSubjectCol = "subjid",
-    strGroupCol = "siteid",
-    strGroupLevel = "Site",
-    strNumeratorDateCol = "aest_dt",
-    strDenominatorDateCol  = "visit_dt"
-  )
-
-dfAnalyzed <- Analyze_Simaerep(dfInput)
-Flag_Simaerep(dfAnalyzed, vThreshold = c(0.95, 0.99))
+Alias for \code{gsm::Flag()}
 }
 \seealso{
-\code{\link[=Analyze_Simaerep]{Analyze_Simaerep()}}
+\code{\link[gsm:Flag]{gsm::Flag()}}
 }

@@ -1,10 +1,10 @@
 meta:
   Type: Mapped
-  ID: SUBJ
-  Description: Subject Data Mapping
+  ID: ENROLL
+  Description: Enrollment Data Mapping
   Priority: 1
 spec:
-  Raw_SUBJ:
+  Raw_ENROLL:
     studyid:
       type: character
     invid:
@@ -13,17 +13,13 @@ spec:
       type: character
     subjid:
       type: character
-    subject_nsv:
+    subjectid:
       type: character
     enrollyn:
       type: character
-    timeonstudy:
-      type: integer
-    siteid:
-      type: character
 steps:
-  - output: Mapped_SUBJ
+  - output: Mapped_ENROLL
     name: =
     params:
-      lhs: Mapped_SUBJ
-      rhs: Raw_SUBJ
+      lhs: Mapped_ENROLL
+      rhs: Raw_ENROLL

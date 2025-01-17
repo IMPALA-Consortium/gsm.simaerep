@@ -1,9 +1,9 @@
 meta:
   Type: Mapped
   ID: AE
-  Description: Adverse Event Data Mapping 
+  Description: Adverse Event Data Mapping
   Priority: 1
-spec: 
+spec:
  Raw_AE:
     subjid:
       type: character

@@ -387,7 +387,7 @@ CheckDataType <- function(df, col, fun) {
 GetTblNA <- function(tbl_lazy, col) {
   tbl_lazy %>%
     summarize(
-      na_ratio = sum(ifelse(is.na(.data[[col]]), 1, 0)) / n()
+      na_ratio = sum(ifelse(is.na(.data[[col]]), 1, 0), na.rm = TRUE) / n()
     ) %>%
     pull(.data$na_ratio)
 }

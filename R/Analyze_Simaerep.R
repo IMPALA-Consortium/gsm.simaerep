@@ -7,6 +7,10 @@
 #'
 #' Uses inframe `simaerep` method and does not apply multiplicity correction as per latest recommendations.
 #'
+#' The sum of under- and over reporting probability  per group is usually zero, however [simaerep::simaerep()]
+#' adjusts edge cases in which group ratio and expected ratio are all zero. We combine both metrics into a score
+#' between 0 and 1, where 0 is under-reporting and 1 is over-reporting.
+#'
 #' @param dfInput `data.frame` as returned by [Input_CumCount()]
 #' @inheritParams simaerep::simaerep
 #'
@@ -15,10 +19,15 @@
 #' | Column Name               | Description                                  | Type     |
 #' |---------------------------|----------------------------------------------|----------|
 #' | GroupID                   | The group ID                                 | Character|
+#' | GroupLevel                | The group level                              | Character|
+#' | Numerator                 | Numerator events                             | Numeric  |
+#' | Denominator               | Denominator events                           | Numeric  |
 #' | MetricExpected            | Expected ratio from simulations              | Numeric  |
-#' | MetricGroup               | Ratio all subjects in GroupID                | Numeric  |
+#' | Metric                    | Ratio all subjects in GroupID                | Numeric  |
 #' | OverReportingProbability  | Probability over-reporting numerator events  | Numeric  |
 #' | UnderReportingProbability | Probability under-reporting numerator events | Numeric  |
+#' | Score                     | Combined Score between                       | Numeric  |
+#'
 #' @seealso [simaerep::simaerep()], [Input_CumCount()]
 #'@export
 #'@examples
@@ -49,12 +58,17 @@ Analyze_Simaerep <- function(dfInput, r = 1000) {
 
   colmaps <- c(
     site_number = "GroupID",
+    GroupLevel = "GroupLevel",
     patnum = "SubjectID",
-    visit = "Denominator",
     n_ae = "Numerator",
+    visit = "Denominator",
     events_per_visit_study = "MetricExpected",
-    events_per_visit_site = "MetricGroup"
+    events_per_visit_site = "Metric"
   )
+
+  grouplvl <- dfInput %>%
+    pull(.data$GroupLevel) %>%
+    unique()
 
   colmaps_inverse <- names(colmaps)
   names(colmaps_inverse) <- colmaps
@@ -76,16 +90,44 @@ Analyze_Simaerep <- function(dfInput, r = 1000) {
       progress = TRUE
     )
 
+  dfInputCount <- dfInput %>%
+    filter(
+      .data$Denominator == max(.data$Denominator, na.rm = TRUE),
+      .by = c("GroupID", "SubjectID")) %>%
+    summarize(
+      visit = sum(.data$Denominator, na.rm = TRUE),
+      n_ae = sum(.data$Numerator, na.rm = TRUE),
+      .by = c("GroupID")
+    )
+
   dfAnalyze <- eventrep$df_eval %>%
+    left_join(
+      dfInputCount,
+      by = c(site_number = "GroupID")
+    ) %>%
     mutate(
+      GroupLevel = .env$grouplvl,
       OverReportingProbability = 1 - .data$prob_high,
-      UnderReportingProbability = 1 - .data$prob_low
+      UnderReportingProbability = 1 - .data$prob_low,
+      Score = case_when(
+        .data$OverReportingProbability + .data$UnderReportingProbability == 1 ~ .data$OverReportingProbability,
+        .data$OverReportingProbability >= .data$UnderReportingProbability ~ .data$OverReportingProbability,
+        .data$OverReportingProbability < .data$UnderReportingProbability ~ 1 - .data$UnderReportingProbability
+      ),
+      Score = ifelse(
+        .data$OverReportingProbability >= .data$UnderReportingProbability,
+        .data$OverReportingProbability,
+        - .data$UnderReportingProbability
+      )
     ) %>%
     select(any_of(c(
       colmaps_inverse,
       "OverReportingProbability",
-      "UnderReportingProbability"
-    )))
+      "UnderReportingProbability",
+      "Score"
+    ))) %>%
+    collect() %>%
+    arrange(.data$GroupID)
 
   return(dfAnalyze)
 }

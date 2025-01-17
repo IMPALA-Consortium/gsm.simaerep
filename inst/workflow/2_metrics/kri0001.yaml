@@ -2,16 +2,14 @@ meta:
   Type: Analysis
   ID: kri0001
   GroupLevel: Site
-  Abbreviation: AE
-  Metric: Adverse Event Rate
+  Abbreviation: AE-Simaerep
+  Metric: Adverse Event Rate Simaerep
   Numerator: Adverse Events
   Denominator: Visit
   Model: bootstrap-simaerep
-  Score: probability
-  AnalysisType: score
-  Threshold:
-    - 0.95
-    - 0.99
+  Score: Over/Under-Reporting Probability
+  AnalysisType: identity
+  Threshold: -0.99, -0.95, 0.95, 0.99
   nMinDenominator: 1
 spec:
   Mapped_AE:
@@ -22,7 +20,7 @@ spec:
   Mapped_SUBJ:
     subjid:
       type: character
-    siteid:
+    invid:
       type: character
   Mapped_VISIT:
     subjid:
@@ -30,6 +28,10 @@ spec:
     visit_dt:
       type: Date
 steps:
+  - output: vThreshold
+    name: ParseThreshold
+    params:
+      strThreshold: Threshold
   - output: Analysis_Input
     name: Input_CumCount
     params:
@@ -37,7 +39,7 @@ steps:
       dfNumerator: Mapped_AE
       dfDenominator: Mapped_VISIT
       strSubjectCol: subjid
-      strGroupCol: siteid
+      strGroupCol: invid
       strGroupLevel: Site
       strNumeratorDateCol: aest_dt
       strDenominatorDateCol: visit_dt
@@ -50,7 +52,12 @@ steps:
     name: Flag_Simaerep
     params:
       dfAnalyzed: Analysis_Analyzed
-      vThreshold: Threshold
+      vThreshold: vThreshold
+  - output: Analysis_Summary
+    name: gsm::Summarize
+    params:
+      dfFlagged: Analysis_Flagged
+      nMinDenominator: nMinDenominator
   - output: lAnalysis
     name: list
     params:
@@ -58,4 +65,5 @@ steps:
       Analysis_Input: Analysis_Input
       Analysis_Analyzed: Analysis_Analyzed
       Analysis_Flagged: Analysis_Flagged
+      Analysis_Summary: Analysis_Summary
 

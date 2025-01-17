@@ -1,10 +1,10 @@
 meta:
   Type: Analysis
-  ID: kri0002
+  ID: kri0004
   GroupLevel: Site
-  Abbreviation: AE-ZScore
-  Metric: Adverse Event Rate ZScore
-  Numerator: Adverse Events
+  Abbreviation: PD-ZScore
+  Metric: Protocol Deviation Rate ZScore
+  Numerator: Protocol Deviation
   Denominator: Visit
   Model: Normal Approximation
   Score: Adjusted Z-Score
@@ -12,10 +12,10 @@ meta:
   Threshold: -2,-1,2,3
   nMinDenominator: 1
 spec:
-  Mapped_AE:
+  Mapped_PD:
     subjid:
       type: character
-    aest_dt:
+    deviationdate:
       type: Date
   Mapped_SUBJ:
     subjid:
@@ -32,11 +32,16 @@ steps:
     name: ParseThreshold
     params:
       strThreshold: Threshold
+  - output: Filtered_PD
+    name: RunQuery
+    params:
+      df: Mapped_PD
+      strQuery: "SELECT * FROM df WHERE deviationdate IS NOT NULL"
   - output: Analysis_Input
     name: Input_Rate
     params:
       dfSubjects: Mapped_SUBJ
-      dfNumerator: Mapped_AE
+      dfNumerator: Filtered_PD
       dfDenominator: Mapped_VISIT
       strSubjectCol: subjid
       strGroupCol: invid

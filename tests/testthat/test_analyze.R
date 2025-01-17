@@ -1,4 +1,18 @@
-test_that("test Input_CumCount PD", {
+
+expected_cols <- c(
+  "GroupID",
+  "GroupLevel",
+  "Numerator",
+  "Denominator",
+  "MetricExpected",
+  "Metric",
+  "OverReportingProbability",
+  "UnderReportingProbability",
+  "Score"
+)
+
+
+test_that("test Analyze_Simaerep PD", {
 
   dfInput <- Input_CumCount(
     dfSubjects = clindata::rawplus_dm,
@@ -13,19 +27,11 @@ test_that("test Input_CumCount PD", {
 
   dfAnalyze <- Analyze_Simaerep(dfInput)
 
-  expected_cols <- c(
-    "GroupID",
-    "MetricExpected",
-    "MetricGroup",
-    "OverReportingProbability",
-    "UnderReportingProbability"
-  )
-
   expect_equal(colnames(dfAnalyze), expected_cols)
 
 })
 
-test_that("test Input_CumCount AE", {
+test_that("test Analyze_Simaerep AE", {
 
   dfInput <- Input_CumCount(
     dfSubjects = clindata::rawplus_dm,
@@ -39,14 +45,6 @@ test_that("test Input_CumCount AE", {
   )
 
   dfAnalyze <- Analyze_Simaerep(dfInput)
-
-  expected_cols <- c(
-    "GroupID",
-    "MetricExpected",
-    "MetricGroup",
-    "OverReportingProbability",
-    "UnderReportingProbability"
-  )
 
   expect_equal(colnames(dfAnalyze), expected_cols)
 

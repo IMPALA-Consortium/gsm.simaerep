@@ -6,6 +6,12 @@ navbar:
   structure:
     left: [articles, Reports, reference, news]
     right: [search, github]
+  components:
+    Reports:
+      text: Sample Reports
+      menu:
+        - text: Site Report
+          href: report_kri_site.html
 reference:
 - title: Functions
   desc: ~
