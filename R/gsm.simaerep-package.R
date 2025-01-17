@@ -27,6 +27,7 @@
 #' @importFrom dplyr summarize
 #' @importFrom dplyr ungroup
 #' @importFrom dplyr union_all
+#' @importFrom gsm Flag
 #' @importFrom lubridate hours
 #' @importFrom lubridate is.instant
 #' @importFrom rlang .data
