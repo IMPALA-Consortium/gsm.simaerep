@@ -48,6 +48,8 @@ jobs:
       - name: Check for gsm
         run: |
           library(gsm)
+          print(.libPaths())
+          print(installed.packages()["gsm", ])
           install.packages("devtools")
           devtools::install()
           devtools::check()
