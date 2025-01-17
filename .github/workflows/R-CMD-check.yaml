@@ -30,13 +30,6 @@ jobs:
       R_KEEP_PKG_SOURCE: yes
 
     steps:
-      - uses: actions/cache@v2
-        with:
-          path: ${{ env.R_LIBS_USER }}
-          key: ${{ runner.os }}-r-cache-v1-${{ hashFiles('**/DESCRIPTION') }}
-          restore-keys: |
-            ${{ runner.os }}-r-cache-v1-
-
       - uses: actions/checkout@v4
 
       - uses: r-lib/actions/setup-pandoc@v2
