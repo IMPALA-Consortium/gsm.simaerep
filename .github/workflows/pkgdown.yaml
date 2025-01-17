@@ -70,7 +70,7 @@ jobs:
 
           lMapped <- gsm::RunWorkflows(lWorkflows = mapping_wf, lData = lRaw)
 
-          dfMetrics <- MakeMetric(lWorkflows = metrics_wf)
+          dfMetrics <- gsm::MakeMetric(lWorkflows = metrics_wf)
 
           metrics_wf <- gsm::MakeWorkflowList(
                   strNames = NULL,
@@ -80,12 +80,12 @@ jobs:
 
           lAnalyzed <- gsm::RunWorkflows(lWorkflows = metrics_wf, lData = lMapped)
 
-          dfResults <- BindResults(lAnalysis = lAnalyzed,
+          dfResults <- gsm::BindResults(lAnalysis = lAnalyzed,
                                    strName = "Analysis_Summary",
                                    dSnapshotDate = Sys.Date(),
                                    strStudyID = "ABC-123")
 
-          dfGroups <- bind_rows(
+          dfGroups <- dplyr::bind_rows(
             lMapped$Mapped_STUDY,
             lMapped$Mapped_SITE,
             lMapped$Country

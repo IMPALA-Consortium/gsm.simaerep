@@ -188,14 +188,14 @@ lModule <- gsm::RunWorkflows(module_wf_gsm, lReport)
 
 ```{r cook13, warning=FALSE, message=FALSE}
 
-dfMetrics <- MakeMetric(lWorkflows = metrics_wf)
+dfMetrics <- gsm::MakeMetric(lWorkflows = metrics_wf)
 
-dfResults <- BindResults(lAnalysis = lAnalyzed,
+dfResults <- gsm::BindResults(lAnalysis = lAnalyzed,
                          strName = "Analysis_Summary",
                          dSnapshotDate = Sys.Date(),
                          strStudyID = "ABC-123")
 
-dfGroups <- bind_rows(
+dfGroups <- dplyr::bind_rows(
   lMapped$Mapped_STUDY,
   lMapped$Mapped_SITE,
   lMapped$Country
