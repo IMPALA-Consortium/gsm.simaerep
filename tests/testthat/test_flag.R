@@ -1,4 +1,3 @@
-
 expected_cols <- c(
   "GroupID",
   "GroupLevel",
@@ -13,7 +12,6 @@ expected_cols <- c(
 )
 
 test_that("test Flag_Simaerep PD", {
-
   dfInput <- Input_CumCount(
     dfSubjects = clindata::rawplus_dm,
     dfNumerator = clindata::ctms_protdev %>% rename(subjid = subjectenrollmentnumber),
@@ -22,7 +20,7 @@ test_that("test Flag_Simaerep PD", {
     strGroupCol = "siteid",
     strGroupLevel = "Site",
     strNumeratorDateCol = "deviationdate",
-    strDenominatorDateCol  = "visit_dt"
+    strDenominatorDateCol = "visit_dt"
   )
 
   dfAnalyze <- Analyze_Simaerep(dfInput)
@@ -31,11 +29,9 @@ test_that("test Flag_Simaerep PD", {
   expect_equal(colnames(dfFlagged), expected_cols)
 
   expect_equal(sort(unique(dfFlagged$Flag)), c(-2, -1, 0, 1, 2))
-
 })
 
 test_that("test Flag_Simaerep AE", {
-
   dfInput <- Input_CumCount(
     dfSubjects = clindata::rawplus_dm,
     dfNumerator = clindata::rawplus_ae,
@@ -44,7 +40,7 @@ test_that("test Flag_Simaerep AE", {
     strGroupCol = "siteid",
     strGroupLevel = "Site",
     strNumeratorDateCol = "aest_dt",
-    strDenominatorDateCol  = "visit_dt"
+    strDenominatorDateCol = "visit_dt"
   )
 
   dfAnalyze <- Analyze_Simaerep(dfInput)
@@ -53,11 +49,9 @@ test_that("test Flag_Simaerep AE", {
   expect_equal(colnames(dfFlagged), expected_cols)
 
   expect_equal(sort(unique(dfFlagged$Flag)), c(-2, -1, 0, 1, 2))
-
 })
 
 test_that("test Flag_Simaerep result compatible with gsm::Summarize", {
-
   dfInput <- Input_CumCount(
     dfSubjects = clindata::rawplus_dm,
     dfNumerator = clindata::rawplus_ae,
@@ -66,7 +60,7 @@ test_that("test Flag_Simaerep result compatible with gsm::Summarize", {
     strGroupCol = "siteid",
     strGroupLevel = "Site",
     strNumeratorDateCol = "aest_dt",
-    strDenominatorDateCol  = "visit_dt"
+    strDenominatorDateCol = "visit_dt"
   )
 
   dfAnalyze <- Analyze_Simaerep(dfInput)
@@ -75,5 +69,4 @@ test_that("test Flag_Simaerep result compatible with gsm::Summarize", {
   expect_snapshot(
     dfSummarize <- gsm::Summarize(dfFlagged, nMinDenominator = 1)
   )
-
 })

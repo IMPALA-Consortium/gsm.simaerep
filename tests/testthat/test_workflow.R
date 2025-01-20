@@ -1,42 +1,41 @@
 test_that("yaml workflow produces same table as R function", {
+  mapping <- gsm::MakeWorkflowList(
+    strNames = NULL,
+    strPath = system.file("workflow/1_mappings", package = "gsm.simaerep"),
+    strPackage = NULL
+  )
 
-    mapping <- gsm::MakeWorkflowList(
-        strNames = NULL,
-        strPath = system.file("workflow/1_mappings", package = "gsm.simaerep"),
-        strPackage = NULL
-    )
+  lRaw <- list(
+    Raw_SUBJ = clindata::rawplus_dm,
+    Raw_AE = clindata::rawplus_ae,
+    Raw_VISIT = clindata::rawplus_visdt,
+    Raw_PD = clindata::ctms_protdev,
+    Raw_ENROLL = clindata::rawplus_enroll,
+    Raw_SITE = clindata::ctms_site %>%
+      rename(studyid = protocol) %>%
+      rename(invid = pi_number) %>%
+      rename(InvestigatorFirstName = pi_first_name) %>%
+      rename(InvestigatorLastName = pi_last_name) %>%
+      rename(City = city) %>%
+      rename(State = state) %>%
+      rename(Country = country) %>%
+      rename(Status = site_status),
+    Raw_STUDY = clindata::ctms_study %>%
+      rename(studyid = protocol_number) %>%
+      rename(Status = status)
+  )
 
-    lRaw <- list(
-      Raw_SUBJ = clindata::rawplus_dm,
-      Raw_AE = clindata::rawplus_ae,
-      Raw_VISIT = clindata::rawplus_visdt,
-      Raw_PD = clindata::ctms_protdev,
-      Raw_ENROLL = clindata::rawplus_enroll,
-      Raw_SITE = clindata::ctms_site  %>%
-        rename(studyid = protocol) %>%
-        rename(invid = pi_number) %>%
-        rename(InvestigatorFirstName = pi_first_name) %>%
-        rename(InvestigatorLastName = pi_last_name) %>%
-        rename(City = city) %>%
-        rename(State = state) %>%
-        rename(Country = country) %>%
-        rename(Status = site_status),
-      Raw_STUDY = clindata::ctms_study %>%
-        rename(studyid = protocol_number) %>%
-        rename(Status = status)
-    )
+  lMapped <- gsm::RunWorkflows(lWorkflows = mapping, lData = lRaw)
 
-    lMapped <- gsm::RunWorkflows(lWorkflows = mapping, lData = lRaw)
+  kri_wf <- gsm::MakeWorkflowList(
+    strNames = NULL,
+    strPath = system.file("workflow/2_metrics", package = "gsm.simaerep"),
+    strPackage = NULL
+  )
 
-    kri_wf <- gsm::MakeWorkflowList(
-        strNames = NULL,
-        strPath = system.file("workflow/2_metrics", package = "gsm.simaerep"),
-        strPackage = NULL
-    )
+  lAnalysis <- gsm::RunWorkflows(lWorkflows = kri_wf, lData = lMapped)
 
-    lAnalysis <- gsm::RunWorkflows(lWorkflows = kri_wf, lData = lMapped)
-
-    dfMetrics <- gsm::MakeMetric(lWorkflows = kri_wf)
+  dfMetrics <- gsm::MakeMetric(lWorkflows = kri_wf)
 
   dfInputPD <- Input_CumCount(
     dfSubjects = clindata::rawplus_dm,
@@ -46,7 +45,7 @@ test_that("yaml workflow produces same table as R function", {
     strGroupCol = "invid",
     strGroupLevel = "Site",
     strNumeratorDateCol = "deviationdate",
-    strDenominatorDateCol  = "visit_dt",
+    strDenominatorDateCol = "visit_dt",
     # we are not testing "assign", b/c this introduced random element
     strOrphanedMethod = "filter"
   )
@@ -59,7 +58,7 @@ test_that("yaml workflow produces same table as R function", {
     strGroupCol = "invid",
     strGroupLevel = "Site",
     strNumeratorDateCol = "aest_dt",
-    strDenominatorDateCol  = "visit_dt"
+    strDenominatorDateCol = "visit_dt"
   )
 
   expect_equal(dfInputAE, lAnalysis$Analysis_kri0001$Analysis_Input)
@@ -70,18 +69,18 @@ test_that("yaml workflow produces same table as R function", {
 
   # we can only check the non-random elements for equality
   expect_equal(
-    select(dfAnalyzedAE, - MetricExpected, - OverReportingProbability, - UnderReportingProbability, - Score),
+    select(dfAnalyzedAE, -MetricExpected, -OverReportingProbability, -UnderReportingProbability, -Score),
     select(
       lAnalysis$Analysis_kri0001$Analysis_Analyzed,
-      - MetricExpected, - OverReportingProbability, - UnderReportingProbability, - Score
+      -MetricExpected, -OverReportingProbability, -UnderReportingProbability, -Score
     )
   )
 
   expect_equal(
-    select(dfAnalyzedPD, - MetricExpected, - OverReportingProbability, - UnderReportingProbability, - Score),
+    select(dfAnalyzedPD, -MetricExpected, -OverReportingProbability, -UnderReportingProbability, -Score),
     select(
       lAnalysis$Analysis_kri0003$Analysis_Analyzed,
-      - MetricExpected, - OverReportingProbability, - UnderReportingProbability, - Score
+      -MetricExpected, -OverReportingProbability, -UnderReportingProbability, -Score
     )
   )
 
@@ -94,7 +93,7 @@ test_that("yaml workflow produces same table as R function", {
   n_sites_flaggedAE_wflow <- sum(lAnalysis$Analysis_kri0001$Analysis_Flagged$Flag > 0)
   n_sites_flaggedPD_wflow <- sum(lAnalysis$Analysis_kri0003$Analysis_Flagged$Flag > 0)
 
-  tolerance = dplyr::n_distinct(dfFlaggedAE$GroupID) * 0.02
+  tolerance <- dplyr::n_distinct(dfFlaggedAE$GroupID) * 0.02
 
   expect_true(between(n_sites_flaggedAE_wflow, n_sites_flaggedAE - tolerance, n_sites_flaggedAE + tolerance))
   expect_true(between(n_sites_flaggedPD_wflow, n_sites_flaggedPD - tolerance, n_sites_flaggedPD + tolerance))
@@ -136,5 +135,4 @@ test_that("yaml workflow produces same table as R function", {
 
   expect_true(all(sites_flaggedPD2 %in% sites_flaggedPD_wflow))
   expect_true(all(sites_flaggedPD2_wflow %in% sites_flaggedPD))
-
 })

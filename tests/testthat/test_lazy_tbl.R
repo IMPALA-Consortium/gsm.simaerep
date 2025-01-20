@@ -1,5 +1,4 @@
 test_that("lazy_tbl input returns same results as with data.frame", {
-
   # regular data.frame =================================================
   dfInputAE <- Input_CumCount(
     dfSubjects = clindata::rawplus_dm,
@@ -9,7 +8,7 @@ test_that("lazy_tbl input returns same results as with data.frame", {
     strGroupCol = "invid",
     strGroupLevel = "Site",
     strNumeratorDateCol = "aest_dt",
-    strDenominatorDateCol  = "visit_dt"
+    strDenominatorDateCol = "visit_dt"
   )
 
   dfInputPD <- Input_CumCount(
@@ -20,7 +19,7 @@ test_that("lazy_tbl input returns same results as with data.frame", {
     strGroupCol = "invid",
     strGroupLevel = "Site",
     strNumeratorDateCol = "deviationdate",
-    strDenominatorDateCol  = "visit_dt"
+    strDenominatorDateCol = "visit_dt"
   )
 
   dfAnalyzedAE <- Analyze_Simaerep(dfInputAE)
@@ -46,7 +45,7 @@ test_that("lazy_tbl input returns same results as with data.frame", {
     strGroupCol = "invid",
     strGroupLevel = "Site",
     strNumeratorDateCol = "aest_dt",
-    strDenominatorDateCol  = "visit_dt"
+    strDenominatorDateCol = "visit_dt"
   )
 
   tblInputPD_duckdb <- Input_CumCount(
@@ -57,7 +56,7 @@ test_that("lazy_tbl input returns same results as with data.frame", {
     strGroupCol = "invid",
     strGroupLevel = "Site",
     strNumeratorDateCol = "deviationdate",
-    strDenominatorDateCol  = "visit_dt"
+    strDenominatorDateCol = "visit_dt"
   )
 
   dfAnalyzedAE_duckdb <- Analyze_Simaerep(tblInputAE_duckdb, r = dplyr::tbl(db, "r"))
@@ -89,13 +88,13 @@ test_that("lazy_tbl input returns same results as with data.frame", {
 
   # we can only check the non-random elements for equality
   expect_equal(
-    select(dfAnalyzedAE, - MetricExpected, - OverReportingProbability, - UnderReportingProbability, - Score),
-    select(dfAnalyzedAE_duckdb, - MetricExpected, - OverReportingProbability, - UnderReportingProbability, - Score)
+    select(dfAnalyzedAE, -MetricExpected, -OverReportingProbability, -UnderReportingProbability, -Score),
+    select(dfAnalyzedAE_duckdb, -MetricExpected, -OverReportingProbability, -UnderReportingProbability, -Score)
   )
 
   expect_equal(
-    select(dfAnalyzedPD, - MetricExpected, - OverReportingProbability, - UnderReportingProbability, - Score),
-    select(dfAnalyzedPD_duckdb, - MetricExpected, - OverReportingProbability, - UnderReportingProbability, - Score)
+    select(dfAnalyzedPD, -MetricExpected, -OverReportingProbability, -UnderReportingProbability, -Score),
+    select(dfAnalyzedPD_duckdb, -MetricExpected, -OverReportingProbability, -UnderReportingProbability, -Score)
   )
 
   # Flag----------------------------------------------------------
@@ -108,7 +107,7 @@ test_that("lazy_tbl input returns same results as with data.frame", {
   n_sites_flaggedAE_duckdb <- sum(dfFlaggedAE_duckdb$Flag > 0)
   n_sites_flaggedPD_duckdb <- sum(dfFlaggedPD_duckdb$Flag > 0)
 
-  tolerance = dplyr::n_distinct(dfFlaggedAE$GroupID) * 0.02
+  tolerance <- dplyr::n_distinct(dfFlaggedAE$GroupID) * 0.02
 
   expect_true(between(n_sites_flaggedAE_duckdb, n_sites_flaggedAE - tolerance, n_sites_flaggedAE + tolerance))
   expect_true(between(n_sites_flaggedPD_duckdb, n_sites_flaggedPD - tolerance, n_sites_flaggedPD + tolerance))
@@ -152,5 +151,4 @@ test_that("lazy_tbl input returns same results as with data.frame", {
   expect_true(all(sites_flaggedPD2_duckdb %in% sites_flaggedPD))
 
   DBI::dbDisconnect(db)
-
 })

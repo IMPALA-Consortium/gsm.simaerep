@@ -41,15 +41,15 @@ between 0 and 1, where 0 is under-reporting and 1 is over-reporting.
 \examples{
 # {clindata} Example for cumulative AE per Visit Count
 dfInput <- Input_CumCount(
-    dfSubjects = clindata::rawplus_dm,
-    dfNumerator = clindata::rawplus_ae,
-    dfDenominator = clindata::rawplus_visdt \%>\% dplyr::mutate(visit_dt = lubridate::ymd(visit_dt)),
-    strSubjectCol = "subjid",
-    strGroupCol = "siteid",
-    strGroupLevel = "Site",
-    strNumeratorDateCol = "aest_dt",
-    strDenominatorDateCol  = "visit_dt"
-  )
+  dfSubjects = clindata::rawplus_dm,
+  dfNumerator = clindata::rawplus_ae,
+  dfDenominator = clindata::rawplus_visdt \%>\% dplyr::mutate(visit_dt = lubridate::ymd(visit_dt)),
+  strSubjectCol = "subjid",
+  strGroupCol = "siteid",
+  strGroupLevel = "Site",
+  strNumeratorDateCol = "aest_dt",
+  strDenominatorDateCol = "visit_dt"
+)
 
 Analyze_Simaerep(dfInput)
 
