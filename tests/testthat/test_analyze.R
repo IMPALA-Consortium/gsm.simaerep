@@ -1,4 +1,3 @@
-
 expected_cols <- c(
   "GroupID",
   "GroupLevel",
@@ -13,7 +12,6 @@ expected_cols <- c(
 
 
 test_that("test Analyze_Simaerep PD", {
-
   dfInput <- Input_CumCount(
     dfSubjects = clindata::rawplus_dm,
     dfNumerator = clindata::ctms_protdev %>% rename(subjid = subjectenrollmentnumber),
@@ -22,17 +20,15 @@ test_that("test Analyze_Simaerep PD", {
     strGroupCol = "siteid",
     strGroupLevel = "Site",
     strNumeratorDateCol = "deviationdate",
-    strDenominatorDateCol  = "visit_dt"
+    strDenominatorDateCol = "visit_dt"
   )
 
   dfAnalyze <- Analyze_Simaerep(dfInput)
 
   expect_equal(colnames(dfAnalyze), expected_cols)
-
 })
 
 test_that("test Analyze_Simaerep AE", {
-
   dfInput <- Input_CumCount(
     dfSubjects = clindata::rawplus_dm,
     dfNumerator = clindata::rawplus_ae,
@@ -41,11 +37,10 @@ test_that("test Analyze_Simaerep AE", {
     strGroupCol = "siteid",
     strGroupLevel = "Site",
     strNumeratorDateCol = "aest_dt",
-    strDenominatorDateCol  = "visit_dt"
+    strDenominatorDateCol = "visit_dt"
   )
 
   dfAnalyze <- Analyze_Simaerep(dfInput)
 
   expect_equal(colnames(dfAnalyze), expected_cols)
-
 })

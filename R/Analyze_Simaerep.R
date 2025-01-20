@@ -1,4 +1,4 @@
-#'Analyze Simaerep
+#' Analyze Simaerep
 #'
 #' @description
 #' `r lifecycle::badge("experimental")`
@@ -29,31 +29,30 @@
 #' | Score                     | Combined Score between                       | Numeric  |
 #'
 #' @seealso [simaerep::simaerep()], [Input_CumCount()]
-#'@export
-#'@examples
+#' @export
+#' @examples
 #' # {clindata} Example for cumulative AE per Visit Count
 #' dfInput <- Input_CumCount(
-#'     dfSubjects = clindata::rawplus_dm,
-#'     dfNumerator = clindata::rawplus_ae,
-#'     dfDenominator = clindata::rawplus_visdt %>% dplyr::mutate(visit_dt = lubridate::ymd(visit_dt)),
-#'     strSubjectCol = "subjid",
-#'     strGroupCol = "siteid",
-#'     strGroupLevel = "Site",
-#'     strNumeratorDateCol = "aest_dt",
-#'     strDenominatorDateCol  = "visit_dt"
-#'   )
+#'   dfSubjects = clindata::rawplus_dm,
+#'   dfNumerator = clindata::rawplus_ae,
+#'   dfDenominator = clindata::rawplus_visdt %>% dplyr::mutate(visit_dt = lubridate::ymd(visit_dt)),
+#'   strSubjectCol = "subjid",
+#'   strGroupCol = "siteid",
+#'   strGroupLevel = "Site",
+#'   strNumeratorDateCol = "aest_dt",
+#'   strDenominatorDateCol = "visit_dt"
+#' )
 #'
 #' Analyze_Simaerep(dfInput)
 #'
 Analyze_Simaerep <- function(dfInput, r = 1000) {
-
   stopifnot(all(
     c("SubjectID", "GroupID", "GroupLevel", "Numerator", "Denominator") %in% colnames(dfInput)
   ))
 
   stopifnot(
     "Multiple rows per SubjectId expected. Use Input_CumCount() for dfInput!" =
-    pull(count(dfInput), .data$n) >  pull(count(distinct(dfInput, .data$SubjectID)), .data$n)
+      pull(count(dfInput), .data$n) > pull(count(distinct(dfInput, .data$SubjectID)), .data$n)
   )
 
   colmaps <- c(
@@ -93,7 +92,8 @@ Analyze_Simaerep <- function(dfInput, r = 1000) {
   dfInputCount <- dfInput %>%
     filter(
       .data$Denominator == max(.data$Denominator, na.rm = TRUE),
-      .by = c("GroupID", "SubjectID")) %>%
+      .by = c("GroupID", "SubjectID")
+    ) %>%
     summarize(
       visit = sum(.data$Denominator, na.rm = TRUE),
       n_ae = sum(.data$Numerator, na.rm = TRUE),
@@ -117,7 +117,7 @@ Analyze_Simaerep <- function(dfInput, r = 1000) {
       Score = ifelse(
         .data$OverReportingProbability >= .data$UnderReportingProbability,
         .data$OverReportingProbability,
-        - .data$UnderReportingProbability
+        -.data$UnderReportingProbability
       )
     ) %>%
     select(any_of(c(

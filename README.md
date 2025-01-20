@@ -102,15 +102,15 @@ Cookbook](https://impala-consortium.github.io/gsm.simaerep/articles/Cookbook.htm
 library(gsm.simaerep)
 
 dfInput <- Input_CumCount(
-   dfSubjects = clindata::rawplus_dm,
-   dfNumerator = clindata::rawplus_ae,
-   dfDenominator = clindata::rawplus_visdt %>% dplyr::mutate(visit_dt = lubridate::ymd(visit_dt)),
-   strSubjectCol = "subjid",
-   strGroupCol = "siteid",
-   strGroupLevel = "Site",
-   strNumeratorDateCol = "aest_dt",
-   strDenominatorDateCol  = "visit_dt"
- )
+  dfSubjects = clindata::rawplus_dm,
+  dfNumerator = clindata::rawplus_ae,
+  dfDenominator = clindata::rawplus_visdt %>% dplyr::mutate(visit_dt = lubridate::ymd(visit_dt)),
+  strSubjectCol = "subjid",
+  strGroupCol = "siteid",
+  strGroupLevel = "Site",
+  strNumeratorDateCol = "aest_dt",
+  strDenominatorDateCol = "visit_dt"
+)
 
 dfAnalyzed <- Analyze_Simaerep(dfInput)
 

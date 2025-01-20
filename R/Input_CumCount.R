@@ -59,34 +59,34 @@
 #' )
 #'
 #' dfNumerator <- tibble::tibble(
-#'     SubjectID = rep(1, 10),
-#'     num_dt = as.Date("2000-01-01") + c(months(0:4), rep(months(7), 2), months(9:11)),
-#'   ) %>%
+#'   SubjectID = rep(1, 10),
+#'   num_dt = as.Date("2000-01-01") + c(months(0:4), rep(months(7), 2), months(9:11)),
+#' ) %>%
 #'   dplyr::mutate(
 #'     num_dt = num_dt + lubridate::hours(12)
 #'   )
 #'
 #' # dfNumerator tibble with one subject 10 AEs, two of which on same day
-#'dfNumerator
+#' dfNumerator
 #'
 #' dfDenominator <- tibble::tibble(
-#'     SubjectID = rep(1, 4),
-#'     denom_dt = c(as.Date(c("2000-01-03", "2000-04-12", "2000-08-01", "2000-11-12")))
-#'   ) %>%
+#'   SubjectID = rep(1, 4),
+#'   denom_dt = c(as.Date(c("2000-01-03", "2000-04-12", "2000-08-01", "2000-11-12")))
+#' ) %>%
 #'   dplyr::mutate(
 #'     denom_dt = denom_dt + lubridate::hours(1)
 #'   )
 #'
 #' # dfDenominator tibble with one subject 4 visits, one on same day as two Numerator events
 #' # Denominator time indicates that they occurr before Numerator events
-#'dfDenominator
+#' dfDenominator
 #'
 #'
-#'# numerator before first denominator rolls up to first denominator
-#'# numerator after last denominator rolls back to last denominator
-#'# two numerator events on 08-01 add to the 3rd denominator event on same day
+#' # numerator before first denominator rolls up to first denominator
+#' # numerator after last denominator rolls back to last denominator
+#' # two numerator events on 08-01 add to the 3rd denominator event on same day
 #'
-#'Input_CumCount(
+#' Input_CumCount(
 #'   dfSubjects = dfSubjects,
 #'   dfNumerator = dfNumerator,
 #'   dfDenominator = dfDenominator,
@@ -94,39 +94,37 @@
 #'   strGroupCol = "GroupID",
 #'   strGroupLevel = "Site",
 #'   strNumeratorDateCol = "num_dt",
-#'   strDenominatorDateCol  = "denom_dt"
-#')
+#'   strDenominatorDateCol = "denom_dt"
+#' )
 #'
 #'
 #'
 #' # {clindata} Example for cumulative AE per Visit Count
 #' Input_CumCount(
-#'     dfSubjects = clindata::rawplus_dm,
-#'     dfNumerator = clindata::rawplus_ae,
-#'     dfDenominator = clindata::rawplus_visdt %>% dplyr::mutate(visit_dt = lubridate::ymd(visit_dt)),
-#'     strSubjectCol = "subjid",
-#'     strGroupCol = "siteid",
-#'     strGroupLevel = "Site",
-#'     strNumeratorDateCol = "aest_dt",
-#'     strDenominatorDateCol  = "visit_dt"
-#'   )
+#'   dfSubjects = clindata::rawplus_dm,
+#'   dfNumerator = clindata::rawplus_ae,
+#'   dfDenominator = clindata::rawplus_visdt %>% dplyr::mutate(visit_dt = lubridate::ymd(visit_dt)),
+#'   strSubjectCol = "subjid",
+#'   strGroupCol = "siteid",
+#'   strGroupLevel = "Site",
+#'   strNumeratorDateCol = "aest_dt",
+#'   strDenominatorDateCol = "visit_dt"
+#' )
 #'
 #' @export
 
 Input_CumCount <- function(
-  dfSubjects,
-  dfNumerator,
-  dfDenominator,
-  strGroupCol,
-  strGroupLevel = NULL,
-  strSubjectCol,
-  strNumeratorCol = NULL,
-  strDenominatorCol = NULL,
-  strNumeratorDateCol,
-  strDenominatorDateCol,
-  strOrphanedMethod = c("filter", "assign")
-) {
-
+    dfSubjects,
+    dfNumerator,
+    dfDenominator,
+    strGroupCol,
+    strGroupLevel = NULL,
+    strSubjectCol,
+    strNumeratorCol = NULL,
+    strDenominatorCol = NULL,
+    strNumeratorDateCol,
+    strDenominatorDateCol,
+    strOrphanedMethod = c("filter", "assign")) {
   CheckDf(dfSubjects)
   CheckDf(dfDenominator)
   CheckDf(dfNumerator)
@@ -211,18 +209,16 @@ Input_CumCount <- function(
   dfDenominator <- AddGroupCol(dfDenominator, dfSubjects, strSubjectCol, strGroupCol, strGroupLevel)
 
   if (strOrphanedMethod == "assign") {
-
     dfNumerator <- AssignOrphans(dfNumerator, dfDenominator)
-
   }
 
   dfNumerator <- dfNumerator %>%
-      filter(!is.na(.data$SubjectID))
+    filter(!is.na(.data$SubjectID))
 
   dfEvents <- union_all(
-      dfNumerator %>% distinct(.data$SubjectID, .data$GroupID, .data$GroupLevel, .data$EventID, .data$Date, .data$EventType),
-      dfDenominator %>% distinct(.data$SubjectID, .data$GroupID, .data$GroupLevel,.data$EventID, .data$Date, .data$EventType)
-    )
+    dfNumerator %>% distinct(.data$SubjectID, .data$GroupID, .data$GroupLevel, .data$EventID, .data$Date, .data$EventType),
+    dfDenominator %>% distinct(.data$SubjectID, .data$GroupID, .data$GroupLevel, .data$EventID, .data$Date, .data$EventType)
+  )
 
   dfCumCount <- dfEvents %>%
     mutate(
@@ -259,17 +255,15 @@ Input_CumCount <- function(
 
 #' Handle all dfSubjects operations, only if GroupID is not yet in Numerator or Denominator frames.
 #' Will also filter all events with no GroupID
-#'@keywords internal
+#' @keywords internal
 AddGroupCol <- function(df, dfSubjects, strSubjectCol, strGroupCol, strGroupLevel) {
-
   # if `strGroupLevel` is null, use `strGroupCol`
   if (is.null(strGroupLevel)) {
     strGroupLevel <- strGroupCol
   }
 
-  if (! strGroupCol %in% colnames(df)) {
-
-    stopifnot(! any(duplicated(dfSubjects[[strSubjectCol]])))
+  if (!strGroupCol %in% colnames(df)) {
+    stopifnot(!any(duplicated(dfSubjects[[strSubjectCol]])))
 
     # Rename SubjectID in dfSubjects
     dfSubjects <- dfSubjects %>%
@@ -285,23 +279,21 @@ AddGroupCol <- function(df, dfSubjects, strSubjectCol, strGroupCol, strGroupLeve
       )
   }
 
- df <- df %>%
+  df <- df %>%
     rename(
       "GroupID" = {{ strGroupCol }}
     ) %>%
     mutate(
       GroupLevel = strGroupLevel
     ) %>%
-    filter(! is.na(.data$GroupID))
+    filter(!is.na(.data$GroupID))
 
- return(df)
-
+  return(df)
 }
 
-#'@keywords internal
+#' @keywords internal
 AssignOrphans <- function(dfNumerator, dfDenominator) {
-
-  if (! AnyNA(dfNumerator, "SubjectID")) {
+  if (!AnyNA(dfNumerator, "SubjectID")) {
     return(dfNumerator)
   }
 
@@ -310,7 +302,7 @@ AssignOrphans <- function(dfNumerator, dfDenominator) {
   dfEventMinMax <- union_all(
     select(dfNumerator, all_of(cols)),
     select(dfDenominator, all_of(cols))
-    ) %>%
+  ) %>%
     group_by(.data$GroupID, .data$SubjectID) %>%
     summarize(
       "MinDate" = min(.data$Date, na.rm = TRUE),
@@ -325,7 +317,7 @@ AssignOrphans <- function(dfNumerator, dfDenominator) {
 
   dfOrphans <- dfNumerator %>%
     filter(is.na(.data$SubjectID)) %>%
-    select(- "SubjectID")
+    select(-"SubjectID")
 
   dfOrphansAssigned <- dfOrphans %>%
     # join in all subjects from group to event and filter only eligible subjects
@@ -334,7 +326,7 @@ AssignOrphans <- function(dfNumerator, dfDenominator) {
     # select a random patient for event
     mutate(rwn = runif(n())) %>%
     SortDf(.data$rwn) %>%
-    select(- "rwn") %>%
+    select(-"rwn") %>%
     group_by(.data$EventID) %>%
     filter(row_number() == 1) %>%
     ungroup() %>%
@@ -348,33 +340,32 @@ AssignOrphans <- function(dfNumerator, dfDenominator) {
     )
 
   return(dfNumerator)
-
 }
 
-#'@keywords internal
+#' @keywords internal
 AnyNA <- function(df, col) {
   if (inherits(df, "data.frame")) {
     return(any(is.na(df[[col]])))
-  } else if(inherits(df, "tbl_lazy")) {
+  } else if (inherits(df, "tbl_lazy")) {
     return(GetTblNA(df, col) > 0)
   }
 }
 
-#'@keywords internal
+#' @keywords internal
 CheckNotAllNA <- function(df, col) {
   if (inherits(df, "data.frame")) {
     stopifnot(any(!is.na(df[[col]])))
-  } else if(inherits(df, "tbl_lazy")) {
+  } else if (inherits(df, "tbl_lazy")) {
     na_ratio <- GetTblNA(df, col)
     stopifnot(na_ratio < 1)
   }
 }
 
-#'@keywords internal
+#' @keywords internal
 CheckDataType <- function(df, col, fun) {
   if (inherits(df, "data.frame")) {
     stopifnot(fun(df[[col]]))
-  } else if(inherits(df, "tbl_lazy")) {
+  } else if (inherits(df, "tbl_lazy")) {
     df %>%
       head(5) %>%
       pull(.data[[col]]) %>%
@@ -383,7 +374,7 @@ CheckDataType <- function(df, col, fun) {
   }
 }
 
-#'@keywords internal
+#' @keywords internal
 GetTblNA <- function(tbl_lazy, col) {
   tbl_lazy %>%
     summarize(
@@ -392,7 +383,7 @@ GetTblNA <- function(tbl_lazy, col) {
     pull(.data$na_ratio)
 }
 
-#'@keywords internal
+#' @keywords internal
 SortDf <- function(data, ...) {
   if (inherits(data, "data.frame")) {
     data <- data %>%
@@ -405,7 +396,7 @@ SortDf <- function(data, ...) {
   return(data)
 }
 
-#'@keywords internal
+#' @keywords internal
 CheckDf <- function(x) {
   # Check if x is a data.frame or tbl_lazy
   if (!inherits(x, "data.frame") && !inherits(x, "tbl_lazy")) {

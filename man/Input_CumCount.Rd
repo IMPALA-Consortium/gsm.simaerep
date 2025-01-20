@@ -89,9 +89,9 @@ dfSubjects <- tibble::tibble(
 )
 
 dfNumerator <- tibble::tibble(
-    SubjectID = rep(1, 10),
-    num_dt = as.Date("2000-01-01") + c(months(0:4), rep(months(7), 2), months(9:11)),
-  ) \%>\%
+  SubjectID = rep(1, 10),
+  num_dt = as.Date("2000-01-01") + c(months(0:4), rep(months(7), 2), months(9:11)),
+) \%>\%
   dplyr::mutate(
     num_dt = num_dt + lubridate::hours(12)
   )
@@ -100,9 +100,9 @@ dfNumerator <- tibble::tibble(
 dfNumerator
 
 dfDenominator <- tibble::tibble(
-    SubjectID = rep(1, 4),
-    denom_dt = c(as.Date(c("2000-01-03", "2000-04-12", "2000-08-01", "2000-11-12")))
-  ) \%>\%
+  SubjectID = rep(1, 4),
+  denom_dt = c(as.Date(c("2000-01-03", "2000-04-12", "2000-08-01", "2000-11-12")))
+) \%>\%
   dplyr::mutate(
     denom_dt = denom_dt + lubridate::hours(1)
   )
@@ -124,21 +124,21 @@ Input_CumCount(
   strGroupCol = "GroupID",
   strGroupLevel = "Site",
   strNumeratorDateCol = "num_dt",
-  strDenominatorDateCol  = "denom_dt"
+  strDenominatorDateCol = "denom_dt"
 )
 
 
 
 # {clindata} Example for cumulative AE per Visit Count
 Input_CumCount(
-    dfSubjects = clindata::rawplus_dm,
-    dfNumerator = clindata::rawplus_ae,
-    dfDenominator = clindata::rawplus_visdt \%>\% dplyr::mutate(visit_dt = lubridate::ymd(visit_dt)),
-    strSubjectCol = "subjid",
-    strGroupCol = "siteid",
-    strGroupLevel = "Site",
-    strNumeratorDateCol = "aest_dt",
-    strDenominatorDateCol  = "visit_dt"
-  )
+  dfSubjects = clindata::rawplus_dm,
+  dfNumerator = clindata::rawplus_ae,
+  dfDenominator = clindata::rawplus_visdt \%>\% dplyr::mutate(visit_dt = lubridate::ymd(visit_dt)),
+  strSubjectCol = "subjid",
+  strGroupCol = "siteid",
+  strGroupLevel = "Site",
+  strNumeratorDateCol = "aest_dt",
+  strDenominatorDateCol = "visit_dt"
+)
 
 }
