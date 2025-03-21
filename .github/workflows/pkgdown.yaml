@@ -42,7 +42,7 @@ jobs:
           devtools::load_all()
           library(gsm.reporting)
           library(gsm.core)
-          library(gsm.reporting)
+          library(gsm.kri)
           library(gsm.mapping)
 
           dir.create(here::here("pkgdown", "assets"), recursive = TRUE)
