@@ -38,4 +38,7 @@ VignetteBuilder: knitr
 URL: https://impala-consortium.github.io/gsm.simaerep/
 Remotes:
     clindata=Gilead-BioStats/clindata,
-    gsm=Gilead-BioStats/gsm
+    gsm.core=Gilead-BioStats/gsm.core,
+    gsm.mapping=Gilead-BioStats/gsm.mapping,
+    gsm.kri=Gilead-BioStats/gsm.kri,
+    gsm.reporting=Gilead-BioStats/gsm.reporting
