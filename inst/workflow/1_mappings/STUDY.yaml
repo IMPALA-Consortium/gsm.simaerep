@@ -51,7 +51,7 @@ steps:
       df: Raw_STUDY
       strQuery: "SELECT studyid as GroupID, * FROM df"
   - output: Temp_CTMSStudy
-    name: MakeLongMeta
+    name: gsm.mapping::MakeLongMeta
     params:
       data: Temp_CTMSStudyWide
       strGroupLevel: "Study"
@@ -79,7 +79,7 @@ steps:
       "y": Temp_StudyCountsWide
       by: GroupID
   - output: Temp_CountTargetsWide_addsite
-    name: CalculatePercentage
+    name: gsm.mapping::CalculatePercentage
     params:
       data: Temp_CountTargetsWide
       strCurrentCol: SiteCount
@@ -87,7 +87,7 @@ steps:
       strPercVal: PercentSitesActivated
       strPercStrVal: SiteActivation
   - output: Temp_CountTargetsWide_addsitepts
-    name: CalculatePercentage
+    name: gsm.mapping::CalculatePercentage
     params:
       data: Temp_CountTargetsWide_addsite
       strCurrentCol: ParticipantCount
@@ -95,7 +95,7 @@ steps:
       strPercVal: PercentParticipantsEnrolled
       strPercStrVal: ParticipantEnrollment
   - output: Temp_CountTargetsWide_ActiveParticipants
-    name: CalculatePercentage
+    name: gsm.mapping::CalculatePercentage
     params:
       data: Temp_CountTargetsWide_addsitepts
       strCurrentCol: ActiveParticipantCount
@@ -103,7 +103,7 @@ steps:
       strPercVal: PercentParticipantsActive
       strPercStrVal: ActiveParticipants
   - output: Temp_CountTargetsPercs
-    name: MakeLongMeta
+    name: gsm.mapping::MakeLongMeta
     params:
       data: Temp_CountTargetsWide_ActiveParticipants
       strGroupLevel: "Study"

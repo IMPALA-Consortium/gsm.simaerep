@@ -26,8 +26,8 @@ Flag_Simaerep(
 \description{
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
 
-Alias for \code{gsm::Flag()}
+Alias for \code{gsm.core::Flag()}
 }
 \seealso{
-\code{\link[gsm:Flag]{gsm::Flag()}}
+\code{\link[gsm.core:Flag]{gsm.core::Flag()}}
 }

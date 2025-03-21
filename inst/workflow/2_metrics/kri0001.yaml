@@ -54,7 +54,7 @@ steps:
       dfAnalyzed: Analysis_Analyzed
       vThreshold: vThreshold
   - output: Analysis_Summary
-    name: gsm::Summarize
+    name: gsm.core::Summarize
     params:
       dfFlagged: Analysis_Flagged
       nMinDenominator: nMinDenominator

@@ -19,7 +19,7 @@ The package provides:
 
 - `Input_CumCount()` patient-level cumulative count from source data
 - `Analyze_Simaerep()` will execute `simaerep`
-- `Flag_Simaerep()` alias of `gsm::Flag`
+- `Flag_Simaerep()` alias of `gsm.core::Flag`
 
 required module configuration files:
 
@@ -85,10 +85,15 @@ You can install the development version of gsm.simaerep from
 [GitHub](https://github.com/IMPALA-Consortium/gsm.simaerep/) with:
 
 ``` r
-# install.packages("pak")
-pak::pak("Gilead-BioStats/clindata")
-pak::pak("Gilead-BioStats/gsm@v2.2.1")
-pak::pak("IMPALA-Consortium/gsm.simaerep")
+# install.packages("remotes")
+remotes::install_github("Gilead-BioStats/clindata")
+
+remotes::install_github("Gilead-BioStats/gsm.core@v1.0.0")
+remotes::install_github("Gilead-BioStats/gsm.mapping@v1.0.0")
+remotes::install_github("Gilead-BioStats/gsm.kri@v1.0.0")
+remotes::install_github("Gilead-BioStats/gsm.reporting@v1.0.0")
+
+remotes::install_github("IMPALA-Consortium/gsm.simaerep")
 ```
 
 ## Documentation
@@ -100,6 +105,7 @@ Cookbook](https://impala-consortium.github.io/gsm.simaerep/articles/Cookbook.htm
 
 ``` r
 library(gsm.simaerep)
+library(gsm.kri)
 
 dfInput <- Input_CumCount(
   dfSubjects = clindata::rawplus_dm,
@@ -117,7 +123,7 @@ dfAnalyzed <- Analyze_Simaerep(dfInput)
 dfFlagged <- Flag_Simaerep(dfAnalyzed, vThreshold = c(-0.99, -0.95, 0.95, 0.99))
 #> ℹ Sorted dfFlagged using custom Flag order: 2.Sorted dfFlagged using custom Flag order: -2.Sorted dfFlagged using custom Flag order: 1.Sorted dfFlagged using custom Flag order: -1.Sorted dfFlagged using custom Flag order: 0.
 
-gsm::Visualize_Scatter(
+gsm.kri::Visualize_Scatter(
   dfFlagged,
   dfBounds = NULL,
   strGroupLabel = "GroupLevel",

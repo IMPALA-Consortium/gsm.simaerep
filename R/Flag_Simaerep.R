@@ -3,11 +3,11 @@
 #' @description
 #' `r lifecycle::badge("experimental")`
 #'
-#' Alias for `gsm::Flag()`
+#' Alias for `gsm.core::Flag()`
 #'
-#' @inheritParams gsm::Flag
-#' @seealso [gsm::Flag()]
+#' @inheritParams gsm.core::Flag
+#' @seealso [gsm.core::Flag()]
 #'
 #' @export
 
-Flag_Simaerep <- gsm::Flag
+Flag_Simaerep <- gsm.core::Flag

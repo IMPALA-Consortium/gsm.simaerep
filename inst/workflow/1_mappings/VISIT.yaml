@@ -1,9 +1,9 @@
 meta:
   Type: Mapped
   ID: VISIT
-  Description: Subject Visit Data Mapping 
+  Description: Subject Visit Data Mapping
   Priority: 1
-spec: 
+spec:
  Raw_VISIT:
     subjid:
       type: character

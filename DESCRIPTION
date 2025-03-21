@@ -1,6 +1,6 @@
 Package: gsm.simaerep
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.1
+Title: Add simaerep KRI to gsm
+Version: 0.0.2
 Authors@R: 
     person("Björn", "Koneswarakantha", , "bjoern.koneswarakantha@roche.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-4585-7799"))
@@ -20,7 +20,7 @@ Imports:
     magrittr,
     dbplyr,
     utils,
-    gsm
+    gsm.core
 Suggests:
     knitr,
     rmarkdown,
@@ -29,10 +29,16 @@ Suggests:
     simaerep (>= 0.6.0),
     tidyr,
     DBI,
-    duckdb
+    duckdb,
+    gsm.kri,
+    gsm.mapping,
+    gsm.reporting
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 URL: https://impala-consortium.github.io/gsm.simaerep/
 Remotes:
     clindata=Gilead-BioStats/clindata,
-    gsm=Gilead-BioStats/gsm
+    gsm.core=Gilead-BioStats/gsm.core@v1.0.0,
+    gsm.mapping=Gilead-BioStats/gsm.mapping@v1.0.0,
+    gsm.kri=Gilead-BioStats/gsm.kri@v1.0.0,
+    gsm.reporting=Gilead-BioStats/gsm.reporting@v1.0.0
