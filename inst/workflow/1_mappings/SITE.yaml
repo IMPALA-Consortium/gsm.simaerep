@@ -45,7 +45,7 @@ steps:
       df: Raw_SITE
       strQuery: "SELECT invid as GroupID, * FROM df"
   - output: Temp_CTMSSite
-    name: MakeLongMeta
+    name: gsm.mapping::MakeLongMeta
     params:
       data: Temp_CTMSSiteWide
       strGroupLevel: 'Site'
@@ -62,7 +62,7 @@ steps:
         FROM df
         GROUP BY invid
   - output: Temp_SiteCountsWide_ActiveParticipants
-    name: CalculatePercentage
+    name: gsm.mapping::CalculatePercentage
     params:
       data: Temp_SiteCountsWide
       strCurrentCol: ActiveParticipantCount
@@ -70,7 +70,7 @@ steps:
       strPercVal: PercentParticipantsActive
       strPercStrVal: ActiveParticipants
   - output: Temp_SiteCounts
-    name: MakeLongMeta
+    name: gsm.mapping::MakeLongMeta
     params:
       data: Temp_SiteCountsWide_ActiveParticipants
       strGroupLevel: "Site"

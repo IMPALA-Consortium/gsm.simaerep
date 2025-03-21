@@ -38,7 +38,10 @@ pak::pak("IMPALA-Consortium/gsm.simaerep")
 
 ```{r cook3}
 suppressPackageStartupMessages(library(dplyr))
-library(gsm)
+library(gsm.core)
+library(gsm.mapping)
+library(gsm.kri)
+library(gsm.reporting)
 library(gsm.simaerep)
 ```
 
@@ -93,7 +96,7 @@ These results are compatible with the `gsm` package for visualization.
 *`simaerep* scores represent are related to the metric ratio do not use a metric based threshold for flagging. Therefore we do not need to calculate boundaries to pass to the plotting function.
 
 ```{r cook7}
-gsm::Visualize_Scatter(
+gsm.kri::Visualize_Scatter(
   dfFlagged,
   dfBounds = NULL,
   strGroupLabel = "GroupLevel",
@@ -102,14 +105,14 @@ gsm::Visualize_Scatter(
 ```
 
 ```{r cook8}
-gsm::Widget_ScatterPlot(
+gsm.kri::Widget_ScatterPlot(
   dfFlagged,
   dfBounds = NULL
 )
 ```
 
 ```{r cook9}
-gsm::Widget_BarChart(
+gsm.kri::Widget_BarChart(
   dfFlagged
 )
 ```
@@ -142,25 +145,25 @@ lRaw <- list(
     rename(Status = status)
 )
 
-mapping_wf <- gsm::MakeWorkflowList(
+mapping_wf <- gsm.core::MakeWorkflowList(
   strNames = NULL,
   strPath = system.file("workflow/1_mappings", package = "gsm.simaerep"),
   strPackage = NULL
 )
 
-lMapped <- gsm::RunWorkflows(lWorkflows = mapping_wf, lData = lRaw)
+lMapped <- gsm.core::RunWorkflows(lWorkflows = mapping_wf, lData = lRaw)
 ```
 
 ## Metrics
 
 ```{r cook11, message=FALSE}
-metrics_wf <- gsm::MakeWorkflowList(
+metrics_wf <- gsm.core::MakeWorkflowList(
   strNames = NULL,
   strPath = system.file("workflow/2_metrics", package = "gsm.simaerep"),
   strPackage = NULL
 )
 
-lAnalyzed <- gsm::RunWorkflows(lWorkflows = metrics_wf, lData = lMapped)
+lAnalyzed <- gsm.core::RunWorkflows(lWorkflows = metrics_wf, lData = lMapped)
 ```
 
 ## Report Generation - Workflow
@@ -168,24 +171,24 @@ lAnalyzed <- gsm::RunWorkflows(lWorkflows = metrics_wf, lData = lMapped)
 This part is identical with `gsm`.
 
 ```{r cook12, message=FALSE}
-reporting_wf <- gsm::MakeWorkflowList(strPath = "workflow/3_reporting")
+reporting_wf <- gsm.core::MakeWorkflowList(strPath = "workflow/3_reporting", strPackage = "gsm.reporting")
 
-lReport <- gsm::RunWorkflows(reporting_wf, c(lMapped, list(
+lReport <- gsm.core::RunWorkflows(reporting_wf, c(lMapped, list(
   lAnalyzed = lAnalyzed,
   lWorkflows = metrics_wf
 )))
 
-module_wf_gsm <- gsm::MakeWorkflowList(strPath = "workflow/4_modules", strNames = "report_kri_site.yaml")
+module_wf_gsm <- gsm.core::MakeWorkflowList(strPath = "workflow/4_modules", strPackage = "gsm.kri", strNames = "report_kri_site.yaml")
 
-lModule <- gsm::RunWorkflows(module_wf_gsm, lReport)
+lModule <- gsm.core::RunWorkflows(module_wf_gsm, lReport)
 ```
 
 ## Report Generation - Script
 
 ```{r cook13, warning=FALSE, message=FALSE}
-dfMetrics <- gsm::MakeMetric(lWorkflows = metrics_wf)
+dfMetrics <- gsm.reporting::MakeMetric(lWorkflows = metrics_wf)
 
-dfResults <- gsm::BindResults(
+dfResults <- gsm.reporting::BindResults(
   lAnalysis = lAnalyzed,
   strName = "Analysis_Summary",
   dSnapshotDate = Sys.Date(),
@@ -198,12 +201,12 @@ dfGroups <- dplyr::bind_rows(
   lMapped$Country
 )
 
-dfBounds <- gsm::MakeBounds(
+dfBounds <- gsm.reporting::MakeBounds(
   dfResults = dfResults,
   dfMetrics = dfMetrics
 )
 
-lCharts <- gsm::MakeCharts(
+lCharts <- gsm.kri::MakeCharts(
   dfResults = dfResults %>%
     filter(GroupLevel == "Site"),
   dfMetrics = dfMetrics %>%
@@ -212,7 +215,7 @@ lCharts <- gsm::MakeCharts(
   dfBounds = dfBounds
 )
 
-gsm::Report_KRI(
+gsm.kri::Report_KRI(
   lCharts = lCharts,
   dfResults = dfResults,
   dfGroups = dfGroups,

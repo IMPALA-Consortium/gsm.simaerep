@@ -27,7 +27,7 @@ steps:
         FROM df
         GROUP BY country
   - output: Temp_CountryCountsWide_ActiveParticipants
-    name: CalculatePercentage
+    name: gsm.mapping::CalculatePercentage
     params:
       data: Temp_CountryCountsWide
       strCurrentCol: ActiveParticipantCount
@@ -35,7 +35,7 @@ steps:
       strPercVal: PercentParticipantsActive
       strPercStrVal: ActiveParticipants
   - output: Mapped_COUNTRY
-    name: MakeLongMeta
+    name: gsm.mapping::MakeLongMeta
     params:
       data: Temp_CountryCountsWide_ActiveParticipants
       strGroupLevel: "Country"

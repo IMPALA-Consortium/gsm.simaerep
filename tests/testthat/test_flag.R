@@ -51,7 +51,7 @@ test_that("test Flag_Simaerep AE", {
   expect_equal(sort(unique(dfFlagged$Flag)), c(-2, -1, 0, 1, 2))
 })
 
-test_that("test Flag_Simaerep result compatible with gsm::Summarize", {
+test_that("test Flag_Simaerep result compatible with gsm.core::Summarize", {
   dfInput <- Input_CumCount(
     dfSubjects = clindata::rawplus_dm,
     dfNumerator = clindata::rawplus_ae,
@@ -67,6 +67,6 @@ test_that("test Flag_Simaerep result compatible with gsm::Summarize", {
   dfFlagged <- Flag_Simaerep(dfAnalyze, vThreshold = c(-0.99, -0.95, 0.95, 0.99))
 
   expect_snapshot(
-    dfSummarize <- gsm::Summarize(dfFlagged, nMinDenominator = 1)
+    dfSummarize <- gsm.core::Summarize(dfFlagged, nMinDenominator = 1)
   )
 })

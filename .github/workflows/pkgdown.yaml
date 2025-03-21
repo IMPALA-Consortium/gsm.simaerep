@@ -40,6 +40,11 @@ jobs:
         shell: Rscript {0}
         run: |
           devtools::load_all()
+          library(gsm.reporting)
+          library(gsm.core)
+          library(gsm.reporting)
+          library(gsm.mapping)
+
           dir.create(here::here("pkgdown", "assets"), recursive = TRUE)
 
           lRaw <- list(
@@ -62,25 +67,25 @@ jobs:
                     rename(Status = status)
               )
 
-          mapping_wf <- gsm::MakeWorkflowList(
+          mapping_wf <- gsm.core::MakeWorkflowList(
               strNames = NULL,
               strPath = system.file("workflow/1_mappings", package = "gsm.simaerep"),
               strPackage = NULL
           )
 
-          lMapped <- gsm::RunWorkflows(lWorkflows = mapping_wf, lData = lRaw)
+          lMapped <- gsm.core::RunWorkflows(lWorkflows = mapping_wf, lData = lRaw)
 
-          metrics_wf <- gsm::MakeWorkflowList(
+          metrics_wf <- gsm.core::MakeWorkflowList(
                   strNames = NULL,
                   strPath = system.file("workflow/2_metrics", package = "gsm.simaerep"),
                   strPackage = NULL
               )
 
-          dfMetrics <- gsm::MakeMetric(lWorkflows = metrics_wf)
+          dfMetrics <- gsm.reporting::MakeMetric(lWorkflows = metrics_wf)
 
-          lAnalyzed <- gsm::RunWorkflows(lWorkflows = metrics_wf, lData = lMapped)
+          lAnalyzed <- gsm.core::RunWorkflows(lWorkflows = metrics_wf, lData = lMapped)
 
-          dfResults <- gsm::BindResults(lAnalysis = lAnalyzed,
+          dfResults <- gsm.reporting::BindResults(lAnalysis = lAnalyzed,
                                    strName = "Analysis_Summary",
                                    dSnapshotDate = Sys.Date(),
                                    strStudyID = "ABC-123")
@@ -91,12 +96,12 @@ jobs:
             lMapped$Country
           )
 
-          dfBounds <- gsm::MakeBounds(
+          dfBounds <- gsm.reporting::MakeBounds(
             dfResults = dfResults,
             dfMetrics = dfMetrics
           )
 
-          lCharts <- gsm::MakeCharts(
+          lCharts <- gsm.kri::MakeCharts(
             dfResults = dfResults %>%
               filter(GroupLevel == 'Site'),
             dfMetrics = dfMetrics %>%
@@ -105,7 +110,7 @@ jobs:
             dfBounds = dfBounds
           )
 
-          gsm::Report_KRI(
+          gsm.kri::Report_KRI(
             lCharts = lCharts,
             dfResults =  dfResults,
             dfGroups =  dfGroups,

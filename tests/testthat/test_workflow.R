@@ -1,5 +1,5 @@
 test_that("yaml workflow produces same table as R function", {
-  mapping <- gsm::MakeWorkflowList(
+  mapping <- gsm.core::MakeWorkflowList(
     strNames = NULL,
     strPath = system.file("workflow/1_mappings", package = "gsm.simaerep"),
     strPackage = NULL
@@ -25,17 +25,17 @@ test_that("yaml workflow produces same table as R function", {
       rename(Status = status)
   )
 
-  lMapped <- gsm::RunWorkflows(lWorkflows = mapping, lData = lRaw)
+  lMapped <- gsm.core::RunWorkflows(lWorkflows = mapping, lData = lRaw)
 
-  kri_wf <- gsm::MakeWorkflowList(
+  kri_wf <- gsm.core::MakeWorkflowList(
     strNames = NULL,
     strPath = system.file("workflow/2_metrics", package = "gsm.simaerep"),
     strPackage = NULL
   )
 
-  lAnalysis <- gsm::RunWorkflows(lWorkflows = kri_wf, lData = lMapped)
+  lAnalysis <- gsm.core::RunWorkflows(lWorkflows = kri_wf, lData = lMapped)
 
-  dfMetrics <- gsm::MakeMetric(lWorkflows = kri_wf)
+  dfMetrics <- gsm.reporting::MakeMetric(lWorkflows = kri_wf)
 
   dfInputPD <- Input_CumCount(
     dfSubjects = clindata::rawplus_dm,

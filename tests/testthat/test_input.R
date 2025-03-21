@@ -43,7 +43,7 @@ test_that("Input_CumCount same final count as Input_Rate for AEs and Visits with
     ) %>%
     arrange(SubjectID)
 
-  dfRate <- gsm::Input_Rate(
+  dfRate <- gsm.core::Input_Rate(
     dfSubjects = clindata::rawplus_dm,
     dfNumerator = clindata::rawplus_ae %>% filter(!is.na(aest_dt)),
     dfDenominator = clindata::rawplus_visdt %>% filter(!is.na(lubridate::ymd(visit_dt))),
@@ -75,7 +75,7 @@ test_that("Input_CumCount same final count as Input_Rate for PDs and Visits with
     ) %>%
     arrange(SubjectID)
 
-  dfRate <- gsm::Input_Rate(
+  dfRate <- gsm.core::Input_Rate(
     dfSubjects = clindata::rawplus_dm,
     dfNumerator = clindata::ctms_protdev %>% rename(subjid = subjectenrollmentnumber) %>% filter(!is.na(deviationdate)),
     dfDenominator = clindata::rawplus_visdt %>% filter(!is.na(lubridate::ymd(visit_dt))),
