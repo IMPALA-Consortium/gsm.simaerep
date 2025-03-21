@@ -105,6 +105,7 @@ Cookbook](https://impala-consortium.github.io/gsm.simaerep/articles/Cookbook.htm
 
 ``` r
 library(gsm.simaerep)
+library(gsm.kri)
 
 dfInput <- Input_CumCount(
   dfSubjects = clindata::rawplus_dm,
