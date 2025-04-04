@@ -8,9 +8,12 @@ meta:
   Denominator: Visit
   Model: bootstrap-simaerep
   Score: Over/Under-Reporting Probability
+  ScoreExtra: N Expected PD's
   AnalysisType: identity
   Threshold: -0.99, -0.95, 0.95, 0.99
   nMinDenominator: 1
+  ChartsMetricFunction: ChartsMetricSimaerep
+  ChartsContinousFuntion: ChartsContinousDefault
 spec:
   Mapped_PD:
     subjid:
@@ -54,10 +57,19 @@ steps:
       dfAnalyzed: Analysis_Analyzed
       vThreshold: vThreshold
   - output: Analysis_Summary
-    name: Summarize
+    name: gsm.core::Summarize
     params:
       dfFlagged: Analysis_Flagged
       nMinDenominator: nMinDenominator
+      strColumns:
+        - GroupID
+        - GroupLevel
+        - Numerator
+        - Denominator
+        - Metric
+        - Score
+        - ScoreExtra
+        - Flag
   - output: lAnalysis
     name: list
     params:

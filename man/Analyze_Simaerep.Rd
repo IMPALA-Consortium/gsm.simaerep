@@ -20,11 +20,11 @@ many rows as desired repetitions. Default: 1000.}
    GroupLevel \tab The group level \tab Character \cr
    Numerator \tab Numerator events \tab Numeric \cr
    Denominator \tab Denominator events \tab Numeric \cr
-   MetricExpected \tab Expected ratio from simulations \tab Numeric \cr
    Metric \tab Ratio all subjects in GroupID \tab Numeric \cr
    OverReportingProbability \tab Probability over-reporting numerator events \tab Numeric \cr
    UnderReportingProbability \tab Probability under-reporting numerator events \tab Numeric \cr
    Score \tab Combined Score between \tab Numeric \cr
+   ScoreExtra \tab Count of Expected Numerator Events \tab Numeric \cr
 }
 }
 \description{

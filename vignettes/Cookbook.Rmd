@@ -105,9 +105,10 @@ gsm.kri::Visualize_Scatter(
 ```
 
 ```{r cook8}
-gsm.kri::Widget_ScatterPlot(
+Widget_ScatterPlot(
   dfFlagged,
-  dfBounds = NULL
+  dfBounds = NULL,
+  bDebug = FALSE
 )
 ```
 
@@ -186,7 +187,11 @@ lModule <- gsm.core::RunWorkflows(module_wf_gsm, lReport)
 ## Report Generation - Script
 
 ```{r cook13, warning=FALSE, message=FALSE}
+
 dfMetrics <- gsm.reporting::MakeMetric(lWorkflows = metrics_wf)
+
+lAnalyzed <- gsm.core::RunWorkflows(lWorkflows = metrics_wf, lData = lMapped)
+
 
 dfResults <- gsm.reporting::BindResults(
   lAnalysis = lAnalyzed,
@@ -212,7 +217,8 @@ lCharts <- gsm.kri::MakeCharts(
   dfMetrics = dfMetrics %>%
     filter(GroupLevel == "Site"),
   dfGroups = dfGroups,
-  dfBounds = dfBounds
+  dfBounds = dfBounds,
+  bDebug = FALSE
 )
 
 gsm.kri::Report_KRI(
@@ -220,7 +226,8 @@ gsm.kri::Report_KRI(
   dfResults = dfResults,
   dfGroups = dfGroups,
   dfMetrics = dfMetrics,
-  strOutputFile = "report_kri_site.html"
+  strOutputFile = "report_kri_site.html",
+  strRmdInputPath = system.file("report", "Report_KRI.Rmd", package = "gsm.simaerep")
 )
 ```
 
