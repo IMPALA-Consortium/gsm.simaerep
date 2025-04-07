@@ -43,6 +43,6 @@ URL: https://impala-consortium.github.io/gsm.simaerep/
 Remotes:
     clindata=Gilead-BioStats/clindata,
     gsm.core=IMPALA-Consortium/gsm.core@dev,
-    gsm.mapping=IMPALA-Consortium/gsm.mapping@dev,
+    gsm.mapping=IMPALA-Consortium/gsm.mapping@main,
     gsm.kri=IMPALA-Consortium/gsm.kri@dev,
     gsm.reporting=IMPALA-Consortium/gsm.reporting@dev
