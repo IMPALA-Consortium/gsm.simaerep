@@ -61,7 +61,7 @@ steps:
     params:
       dfFlagged: Analysis_Flagged
       nMinDenominator: nMinDenominator
-      strColumns:
+      vColumns:
         - GroupID
         - GroupLevel
         - Numerator
