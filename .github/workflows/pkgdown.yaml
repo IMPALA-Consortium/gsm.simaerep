@@ -116,7 +116,8 @@ jobs:
             dfGroups =  dfGroups,
             dfMetrics = dfMetrics,
             strOutputDir = here::here("pkgdown", "assets"),
-            strOutputFile = "report_kri_site.html"
+            strOutputFile = "report_kri_site.html",
+            strRmdInputPath = system.file("report", "Report_KRI.Rmd", package = "gsm.simaerep")
           )
 
       - name: Build site

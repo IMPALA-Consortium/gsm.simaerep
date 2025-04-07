@@ -6,16 +6,22 @@
 \usage{
 ChartsMetricSimaerep(
   lCharts,
-  dfResults_latest,
+  dfResults,
   lMetric,
   dfGroups,
-  dfBounds_latest,
+  dfBounds,
   vThreshold,
   bDebug
 )
 }
 \arguments{
 \item{lCharts}{\code{list}, Default: list()}
+
+\item{dfResults}{`data.frame` A stacked summary of analysis pipeline output.
+Created by passing a list of results returned by [Summarize()] to
+[BindResults()]. Expected columns: `GroupID`, `GroupLevel`, `Numerator`,
+`Denominator`, `Metric`, `Score`, `Flag`, `MetricID`, `StudyID`,
+`SnapshotDate`.}
 
 \item{lMetric}{`list` Metric-specific metadata for use in charts and
 reporting. Created by passing an `lWorkflow` object to [MakeMetric()] and
@@ -27,6 +33,12 @@ turing it into a list. Expected columns: `File`,`MetricID`, `Group`,
 \item{dfGroups}{`data.frame` Group-level metadata dictionary. Created by
 passing CTMS site and study data to [MakeLongMeta()]. Expected columns:
 `GroupID`, `GroupLevel`, `Param`, `Value`.}
+
+\item{dfBounds}{`data.frame` Set of predicted percentages/rates and upper-
+and lower-bounds across the full range of sample sizes/total exposure
+values for reporting. Created by passing `dfResults` and `dfMetrics` to
+[MakeBounds()]. Expected columns: `Threshold`, `Denominator`, `Numerator`,
+`Metric`, `MetricID`, `StudyID`, `SnapshotDate`.}
 
 \item{vThreshold}{`numeric` Threshold values for metric.}
 
@@ -51,11 +63,11 @@ strMetricID = "Analysis_kri0001"
 
 dfResults_latest <-  gsm.core::reportingResults \%>\%
  dplyr::filter(MetricID == strMetricID) \%>\%
- FilterByLatestSnapshotDate()
+ gsm.kri::FilterByLatestSnapshotDate()
 
 dfBounds_latest <- gsm.core::reportingBounds \%>\%
  dplyr::filter(MetricID == strMetricID) \%>\%
- FilterByLatestSnapshotDate()
+ gsm.kri::FilterByLatestSnapshotDate()
 
 dfGroups <- gsm.core::reportingGroups
 
@@ -66,7 +78,7 @@ lMetric <- gsm.core::reportingMetrics \%>\%
 vThreshold = gsm.core::ParseThreshold(lMetric$Threshold, bSort = FALSE)
 
 lCharts <- lCharts \%>\%
-  ChartsMetricDefault(
+  ChartsMetricSimaerep(
     dfResults= dfResults_latest,
     lMetric = lMetric,
     dfGroups = dfGroups,

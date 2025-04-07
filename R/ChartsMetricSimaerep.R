@@ -19,11 +19,11 @@
 #' 
 #' dfResults_latest <-  gsm.core::reportingResults %>%
 #'  dplyr::filter(MetricID == strMetricID) %>%
-#'  FilterByLatestSnapshotDate()
+#'  gsm.kri::FilterByLatestSnapshotDate()
 #' 
 #' dfBounds_latest <- gsm.core::reportingBounds %>%
 #'  dplyr::filter(MetricID == strMetricID) %>%
-#'  FilterByLatestSnapshotDate()
+#'  gsm.kri::FilterByLatestSnapshotDate()
 #' 
 #' dfGroups <- gsm.core::reportingGroups
 #' 
@@ -34,7 +34,7 @@
 #' vThreshold = gsm.core::ParseThreshold(lMetric$Threshold, bSort = FALSE)
 #' 
 #' lCharts <- lCharts %>%
-#'   ChartsMetricDefault(
+#'   ChartsMetricSimaerep(
 #'     dfResults= dfResults_latest,
 #'     lMetric = lMetric,
 #'     dfGroups = dfGroups,

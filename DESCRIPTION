@@ -20,7 +20,12 @@ Imports:
     magrittr,
     dbplyr,
     utils,
-    gsm.core
+    gsm.core,
+    gsm.kri,
+    htmlwidgets,
+    jsonlite,
+    purrr,
+    fontawesome
 Suggests:
     knitr,
     rmarkdown,
@@ -30,7 +35,6 @@ Suggests:
     tidyr,
     DBI,
     duckdb,
-    gsm.kri,
     gsm.mapping,
     gsm.reporting
 Config/testthat/edition: 3

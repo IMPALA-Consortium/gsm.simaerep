@@ -88,13 +88,13 @@ test_that("lazy_tbl input returns same results as with data.frame", {
 
   # we can only check the non-random elements for equality
   expect_equal(
-    select(dfAnalyzedAE, -MetricExpected, -OverReportingProbability, -UnderReportingProbability, -Score),
-    select(dfAnalyzedAE_duckdb, -MetricExpected, -OverReportingProbability, -UnderReportingProbability, -Score)
+    select(dfAnalyzedAE, -ScoreExtra, -OverReportingProbability, -UnderReportingProbability, -Score),
+    select(dfAnalyzedAE_duckdb, -ScoreExtra, -OverReportingProbability, -UnderReportingProbability, -Score)
   )
 
   expect_equal(
-    select(dfAnalyzedPD, -MetricExpected, -OverReportingProbability, -UnderReportingProbability, -Score),
-    select(dfAnalyzedPD_duckdb, -MetricExpected, -OverReportingProbability, -UnderReportingProbability, -Score)
+    select(dfAnalyzedPD, -ScoreExtra, -OverReportingProbability, -UnderReportingProbability, -Score),
+    select(dfAnalyzedPD_duckdb, -ScoreExtra, -OverReportingProbability, -UnderReportingProbability, -Score)
   )
 
   # Flag----------------------------------------------------------

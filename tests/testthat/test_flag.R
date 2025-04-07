@@ -3,11 +3,11 @@ expected_cols <- c(
   "GroupLevel",
   "Numerator",
   "Denominator",
-  "MetricExpected",
   "Metric",
   "OverReportingProbability",
   "UnderReportingProbability",
   "Score",
+  "ScoreExtra",
   "Flag"
 )
 

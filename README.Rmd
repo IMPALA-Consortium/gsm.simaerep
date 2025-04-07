@@ -30,11 +30,23 @@ The package provides:
 - `Input_CumCount()` patient-level cumulative count from source data
 - `Analyze_Simaerep()` will execute `simaerep`
 - `Flag_Simaerep()` alias of `gsm.core::Flag`
+- `ChartsMetricsSimaerep()`create `simaerep` specific charts as html widgets
+- `Widget_ScatterPlot()` html widget for scatter plot
+- `Widget_GroupOverview` html widget for group overview
 
 required module configuration files:
 
 - `inst/workflow/1_mappings`
 - `inst/workflow/2_metrics`
+
+customized `gsm.viz` js library
+
+- `inst/htmlwidgets/lib/gsm.viz-2.2.0`
+
+customized Rmd report template
+
+- `inst/report/Report_KRI.Rmd`
+
 
 KRI:
 

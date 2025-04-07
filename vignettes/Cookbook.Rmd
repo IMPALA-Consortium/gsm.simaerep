@@ -71,7 +71,7 @@ dfInput %>%
 
 Now we can analyze the data using `Analyze_Simaerep()` and add flags with `Flag_Simaerep()` which adds a Score between -1 and 1. Positive values indicate the over-reporting probability and negative values indicate the under-reporting probability.
 
-MetricExpected is the average simulated metric value for a site that has the same number of patients with identical number of visits. Sites with identical metric ratios can have different expected metrics as the total number of patients and their individual visit count varies.
+ScoreExtra is the number of expected AEs for a site with the same patient configuration.
 
 ```{r cook5}
 dfAnalyzed <- Analyze_Simaerep(dfInput)
@@ -180,6 +180,8 @@ lReport <- gsm.core::RunWorkflows(reporting_wf, c(lMapped, list(
 )))
 
 module_wf_gsm <- gsm.core::MakeWorkflowList(strPath = "workflow/4_modules", strPackage = "gsm.kri", strNames = "report_kri_site.yaml")
+
+module_wf_gsm$report_kri_site$steps[[4]]$params$strRmdInputPath <- system.file("report/Report_KRI.Rmd", package = "gsm.simaerep")
 
 lModule <- gsm.core::RunWorkflows(module_wf_gsm, lReport)
 ```
