@@ -28,7 +28,7 @@
 #'     strNumeratorDateCol = "aest_dt",
 #'     strDenominatorDateCol = "visit_dt"
 #' )
-#' 
+#'
 #' dfResults <- dfInput %>%
 #'     Analyze_Simaerep() %>%
 #'     Flag_Simaerep(
@@ -37,7 +37,7 @@
 #'     dplyr::mutate(
 #'         MetricID = lMetric$MetricID
 #'     )
-#' 
+#'
 #' Widget_ScatterPlot(
 #'     dfResults = dfResults,
 #'     lMetric = lMetric,
