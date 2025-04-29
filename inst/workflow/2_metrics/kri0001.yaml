@@ -2,13 +2,13 @@ meta:
   Type: Analysis
   ID: kri0001
   GroupLevel: Site
-  Abbreviation: AE-Simaerep
-  Metric: Adverse Event Rate Simaerep
+  Abbreviation: EAE
+  Metric: Adverse Event Rate
   Numerator: Adverse Events
   Denominator: Visit
   Model: bootstrap-simaerep
   Score: Over/Under-Reporting Probability
-  ExpectedNumerator: N Expected AE's
+  ExpectedNumerator: Expected AEs
   AnalysisType: identity
   Threshold: -0.99, -0.95, 0.95, 0.99
   nMinDenominator: 1

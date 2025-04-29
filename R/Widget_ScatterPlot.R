@@ -11,22 +11,43 @@
 #' @param strShinyGroupSelectID `character` Element ID of group select in Shiny context. Default: `'GroupID'`.
 #'
 #' @examples
-#' ## Filter data to one metric and snapshot
-#' reportingResults_filter <- gsm.core::reportingResults %>%
-#'   dplyr::filter(MetricID == "Analysis_kri0001" & SnapshotDate == max(SnapshotDate))
-#'
-#' reportingMetrics_filter <- gsm.core::reportingMetrics %>%
-#'   dplyr::filter(MetricID == "Analysis_kri0001") %>%
-#'   as.list()
-#'
-#' reportingBounds_filter <- gsm.core::reportingBounds %>%
-#'   dplyr::filter(MetricID == "Analysis_kri0001" & SnapshotDate == max(SnapshotDate))
-#'
+#' lMetric <- system.file('workflow', '2_metrics', 'kri0001.yaml', package = 'gsm.simaerep') %>%
+#'     yaml::read_yaml() %>%
+#'     .[[ 'meta' ]]
+#' lMetric$MetricID <- glue::glue('{lMetric$Type}_{lMetric$ID}')
+#' 
+#' # {clindata} Example for cumulative AE per Visit Count
+#' dfInput <- Input_CumCount(
+#'     dfSubjects = clindata::rawplus_dm,
+#'     dfNumerator = clindata::rawplus_ae,
+#'     dfDenominator = clindata::rawplus_visdt %>%
+#'         dplyr::mutate(visit_dt = lubridate::ymd(visit_dt)),
+#'     strSubjectCol = "subjid",
+#'     strGroupCol = "siteid",
+#'     strGroupLevel = "Site",
+#'     strNumeratorDateCol = "aest_dt",
+#'     strDenominatorDateCol = "visit_dt"
+#' )
+#' 
+#' dfResults <- dfInput %>%
+#'     Analyze_Simaerep() %>%
+#'     Flag_Simaerep(
+#'         vThreshold = gsm.core::ParseThreshold(lMetric$Threshold)
+#'     ) %>%
+#'     dplyr::mutate(
+#'         MetricID = lMetric$MetricID
+#'     )
+#' 
 #' Widget_ScatterPlot(
-#'   dfResults = reportingResults_filter,
-#'   lMetric = reportingMetrics_filter,
-#'   dfGroups = gsm.core::reportingGroups,
-#'   dfBounds = reportingBounds_filter
+#'     dfResults = dfResults,
+#'     lMetric = lMetric,
+#'     resultTooltipKeys = list(
+#'         ExpectedNumerator = 'Expected Numerator',
+#'         Numerator = lMetric$Numerator,
+#'         Denominator = lMetric$Denominator,
+#'         Metric = lMetric$Metric,
+#'         Score = lMetric$Score
+#'     )
 #' )
 #'
 #' @export
@@ -38,7 +59,9 @@ Widget_ScatterPlot <- function(
     dfBounds = NULL,
     bAddGroupSelect = TRUE,
     strShinyGroupSelectID = "GroupID",
-    bDebug = FALSE
+    lAdditionalSettings = list(),
+    bDebug = FALSE,
+    ...
 ) {
   gsm.core::stop_if(cnd = !is.data.frame(dfResults), "dfResults is not a data.frame")
   gsm.core::stop_if(cnd = !(is.null(lMetric) || (is.list(lMetric) && !is.data.frame(lMetric))), "lMetric must be a list, but not a data.frame")
@@ -49,16 +72,21 @@ Widget_ScatterPlot <- function(
   gsm.core::stop_if(cnd = !is.logical(bDebug), "bDebug is not a logical")
 
   # define widget inputs
-  input <- list(
-    dfResults = dfResults,
-    lMetric = lMetric,
-    dfGroups = dfGroups,
-    dfBounds = dfBounds,
-    bAddGroupSelect = bAddGroupSelect,
-    strShinyGroupSelectID = strShinyGroupSelectID,
-    strFootnote = ifelse(!is.null(dfGroups), "Point size is relative to the number of enrolled participants.", ""),
-    bDebug = bDebug
-  )
+  input <- c(
+      list(
+        dfResults = dfResults,
+        lMetric = c(
+            lMetric,
+            list(...) # additional chart configuration
+        ),
+        dfGroups = dfGroups,
+        dfBounds = dfBounds,
+        bAddGroupSelect = bAddGroupSelect,
+        strShinyGroupSelectID = strShinyGroupSelectID,
+        strFootnote = ifelse(!is.null(dfGroups), "Point size is relative to the number of enrolled participants.", ""),
+        bDebug = bDebug
+      )
+    )
 
   # create widget
   widget <- htmlwidgets::createWidget(

@@ -2,13 +2,13 @@ meta:
   Type: Analysis
   ID: kri0003
   GroupLevel: Site
-  Abbreviation: PD-Simaerep
+  Abbreviation: EPD
   Metric: Protocol Deviation Rate
-  Numerator: Protocol Deviation Simaerep
+  Numerator: Protocol Deviations
   Denominator: Visit
   Model: bootstrap-simaerep
   Score: Over/Under-Reporting Probability
-  ScoreExtra: N Expected PD's
+  ExpectedNumerator: Expected PDs
   AnalysisType: identity
   Threshold: -0.99, -0.95, 0.95, 0.99
   nMinDenominator: 1
