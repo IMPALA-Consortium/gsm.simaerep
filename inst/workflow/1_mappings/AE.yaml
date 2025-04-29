@@ -9,6 +9,8 @@ spec:
       type: character
     aest_dt:
       type: Date
+    aeser:
+      type: character
 steps:
   - output: Mapped_AE
     name: =

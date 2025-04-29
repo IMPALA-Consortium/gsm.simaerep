@@ -2,7 +2,7 @@ meta:
   Type: Analysis
   ID: kri0003
   GroupLevel: Site
-  Abbreviation: EPD
+  Abbreviation: PD
   Metric: Protocol Deviation Rate
   Numerator: Protocol Deviations
   Denominator: Visit
@@ -31,10 +31,6 @@ spec:
     visit_dt:
       type: Date
 steps:
-  - output: vThreshold
-    name: ParseThreshold
-    params:
-      strThreshold: Threshold
   - output: Analysis_Input
     name: Input_CumCount
     params:
@@ -51,6 +47,10 @@ steps:
     name: Analyze_Simaerep
     params:
       dfInput: Analysis_Input
+  - output: vThreshold
+    name: ParseThreshold
+    params:
+      strThreshold: Threshold
   - output: Analysis_Flagged
     name: Flag_Simaerep
     params:

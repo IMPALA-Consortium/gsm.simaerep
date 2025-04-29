@@ -42,7 +42,7 @@
 #'     dfResults = dfResults,
 #'     lMetric = lMetric,
 #'     resultTooltipKeys = list(
-#'         ExpectedNumerator = 'Expected Numerator',
+#'         ExpectedNumerator = lMetric$ExpectedNumerator,
 #'         Numerator = lMetric$Numerator,
 #'         Denominator = lMetric$Denominator,
 #'         Metric = lMetric$Metric,
