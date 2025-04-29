@@ -8,7 +8,7 @@ meta:
   Denominator: Visit
   Model: bootstrap-simaerep
   Score: Over/Under-Reporting Probability
-  ScoreExtra: N Expected AE's
+  ExpectedNumerator: N Expected AE's
   AnalysisType: identity
   Threshold: -0.99, -0.95, 0.95, 0.99
   nMinDenominator: 1
@@ -61,15 +61,6 @@ steps:
     params:
       dfFlagged: Analysis_Flagged
       nMinDenominator: nMinDenominator
-      vColumns:
-        - GroupID
-        - GroupLevel
-        - Numerator
-        - Denominator
-        - Metric
-        - Score
-        - ScoreExtra
-        - Flag
   - output: lAnalysis
     name: list
     params:

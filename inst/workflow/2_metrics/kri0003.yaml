@@ -61,15 +61,6 @@ steps:
     params:
       dfFlagged: Analysis_Flagged
       nMinDenominator: nMinDenominator
-      vColumns:
-        - GroupID
-        - GroupLevel
-        - Numerator
-        - Denominator
-        - Metric
-        - Score
-        - ScoreExtra
-        - Flag
   - output: lAnalysis
     name: list
     params:
@@ -78,3 +69,4 @@ steps:
       Analysis_Analyzed: Analysis_Analyzed
       Analysis_Flagged: Analysis_Flagged
       Analysis_Summary: Analysis_Summary
+

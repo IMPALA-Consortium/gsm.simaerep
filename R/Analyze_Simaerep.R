@@ -26,7 +26,7 @@
 #' | OverReportingProbability  | Probability over-reporting numerator events  | Numeric  |
 #' | UnderReportingProbability | Probability under-reporting numerator events | Numeric  |
 #' | Score                     | Combined Score between                       | Numeric  |
-#' | ScoreExtra                | Count of Expected Numerator Events           | Numeric  |
+#' | ExpectedNumerator         | Count of Expected Numerator Events           | Numeric  |
 #'
 #' @seealso [simaerep::simaerep()], [Input_CumCount()]
 #' @export
@@ -118,14 +118,14 @@ Analyze_Simaerep <- function(dfInput, r = 1000) {
         .data$OverReportingProbability,
         -.data$UnderReportingProbability
       ),
-      ScoreExtra = .data$events_per_visit_study * .data$visit
+      ExpectedNumerator = .data$events_per_visit_study * .data$visit
     ) %>%
     select(any_of(c(
       colmaps_inverse,
       "OverReportingProbability",
       "UnderReportingProbability",
       "Score",
-      "ScoreExtra"
+      "ExpectedNumerator"
     ))) %>%
     collect() %>%
     arrange(.data$GroupID)
