@@ -36,7 +36,7 @@ steps:
       df: Reporting_Metrics
       strQuery: "SELECT * FROM df WHERE GroupLevel == 'Site'"
   - output: lCharts_Site
-    name: MakeCharts
+    name: gsm.kri::MakeCharts
     params:
       dfResults: Reporting_Results_Site
       dfMetrics: Reporting_Metrics_Site
@@ -44,14 +44,29 @@ steps:
       dfBounds: null
       resultTooltipKeys:
         - ExpectedNumerator
+        - Score
+        - Metric
         - Numerator
         - Denominator
-        - Metric
-        - Score
-          #- output: lReport
-          #  name: gsm.kri::Report_KRI
-          #  params:
-          #    lCharts: lCharts_Site
-          #    dfResults: Reporting_Results_Site
-          #    dfGroups: Reporting_Groups
-          #    dfMetrics: Reporting_Metrics_Site
+  # TODO: pull `Widget_GroupOverview` out of `Report_KRI` to allow customization
+  #- output: lGroupOverview_Site
+  #  name: gsm.kri::Widget_GroupOverview
+  #  params:
+  #    dfResults: Reporting_Results_Site
+  #    dfMetrics: Reporting_Metrics_Site
+  #    dfGroups: Reporting_Groups
+  #    strGroupLevel: Site
+  #    resultTooltipKeys:
+  #      - ExpectedNumerator
+  #      - Numerator
+  #      - Denominator
+  #      - Metric
+  #      - Score
+  - output: lReport
+    name: gsm.kri::Report_KRI
+    params:
+      lCharts: lCharts_Site
+      dfResults: Reporting_Results_Site
+      dfGroups: Reporting_Groups
+      dfMetrics: Reporting_Metrics_Site
+

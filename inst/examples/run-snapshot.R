@@ -3,7 +3,7 @@ library(purrr)
 library(dplyr)
 library(gsm.core)
 library(gsm.mapping)
-library(gsm.kri)
+load_all('../gsm.kri') # library(gsm.kri)
 library(gsm.reporting)
 load_all()
 
@@ -79,13 +79,12 @@ lReportingData <- lReportingWorkflows %>%
 # 4. Output
 # ----
 
-load_all()
 lModuleWorkflows <- gsm.core::MakeWorkflowList(
   strPath = system.file('workflow', '4_modules', package = 'gsm.simaerep'),
   strPackage = NULL
 )
 
-gsm.core::RunWorkflows(
+lModuleOutputs <- gsm.core::RunWorkflows(
   lModuleWorkflows,
   lReportingData
 )

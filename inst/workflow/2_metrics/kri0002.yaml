@@ -5,15 +5,13 @@ meta:
   Abbreviation: SAE
   Metric: Serious Adverse Event Rate
   Numerator: Serious Adverse Events
-  Denominator: Visit
+  Denominator: Visits
   Model: bootstrap-simaerep
   Score: Over/Under-Reporting Probability
   ExpectedNumerator: Expected SAEs
   AnalysisType: identity
   Threshold: -0.99, -0.95, 0.95, 0.99
   nMinDenominator: 1
-  ChartsMetricFunction: ChartsMetricSimaerep
-  ChartsContinousFuntion: ChartsContinousDefault
 spec:
   Mapped_AE:
     subjid:
