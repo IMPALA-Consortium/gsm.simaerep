@@ -85,40 +85,31 @@ jobs:
 
           lAnalyzed <- gsm.core::RunWorkflows(lWorkflows = metrics_wf, lData = lMapped)
 
-          dfResults <- gsm.reporting::BindResults(lAnalysis = lAnalyzed,
-                                   strName = "Analysis_Summary",
-                                   dSnapshotDate = Sys.Date(),
-                                   strStudyID = "ABC-123")
+reporting_wf <- gsm.core::MakeWorkflowList(
+  strNames = NULL,
+  strPath = system.file("workflow/3_reporting", package = "gsm.simaerep"),
+  strPackage = NULL
+)
 
-          dfGroups <- dplyr::bind_rows(
-            lMapped$Mapped_STUDY,
-            lMapped$Mapped_SITE,
-            lMapped$Country
-          )
 
-          dfBounds <- gsm.reporting::MakeBounds(
-            dfResults = dfResults,
-            dfMetrics = dfMetrics
-          )
+lReport <- gsm.core::RunWorkflows(
+  lWorkflows = reporting_wf,
+  lData = c(
+    lMapped,
+    list(
+      lAnalyzed = lAnalyzed,
+      lWorkflows = metrics_wf
+    )
+  )
+)
 
-          lCharts <- gsm.kri::MakeCharts(
-            dfResults = dfResults %>%
-              filter(GroupLevel == 'Site'),
-            dfMetrics = dfMetrics %>%
-              filter(GroupLevel == 'Site'),
-            dfGroups = dfGroups,
-            dfBounds = dfBounds
-          )
+module_wf_gsm <- gsm.core::MakeWorkflowList(
+  strNames = NULL,
+  strPath = system.file("workflow/4_modules", package = "gsm.simaerep"),
+  strPackage = NULL
+)
 
-          gsm.kri::Report_KRI(
-            lCharts = lCharts,
-            dfResults =  dfResults,
-            dfGroups =  dfGroups,
-            dfMetrics = dfMetrics,
-            strOutputDir = here::here("pkgdown", "assets"),
-            strOutputFile = "report_kri_site.html",
-            strRmdInputPath = system.file("report", "Report_KRI.Rmd", package = "gsm.simaerep")
-          )
+lModule <- gsm.core::RunWorkflows(module_wf_gsm, lReport)
 
       - name: Build site
         run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)

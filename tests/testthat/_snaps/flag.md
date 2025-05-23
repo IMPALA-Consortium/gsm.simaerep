@@ -1,4 +1,4 @@
-# test Flag_Simaerep result compatible with gsm::Summarize
+# test Flag_Simaerep result compatible with gsm.core::Summarize
 
     Code
       dfSummarize <- gsm.core::Summarize(dfFlagged, nMinDenominator = 1)

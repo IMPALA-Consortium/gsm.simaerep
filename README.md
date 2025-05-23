@@ -118,13 +118,6 @@ Cookbook](https://impala-consortium.github.io/gsm.simaerep/articles/Cookbook.htm
 ``` r
 library(gsm.simaerep)
 library(gsm.kri)
-#> 
-#> Attaching package: 'gsm.kri'
-#> The following objects are masked from 'package:gsm.simaerep':
-#> 
-#>     renderWidget_GroupOverview, renderWidget_ScatterPlot,
-#>     Widget_GroupOverview, Widget_GroupOverviewOutput,
-#>     Widget_ScatterPlot, Widget_ScatterPlotOutput
 
 dfInput <- Input_CumCount(
   dfSubjects = clindata::rawplus_dm,

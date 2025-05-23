@@ -30,7 +30,10 @@ In order to familiarize yourself with the `gsm` package, please refer to the [gs
 ```{r cook2, eval=FALSE}
 install.packages("pak")
 pak::pak("Gilead-BioStats/clindata")
-pak::pak("Gilead-BioStats/gsm")
+pak::pak("Gilead-BioStats/gsm.core")
+pak::pak("Gilead-BioStats/gsm.mapping")
+pak::pak("Gilead-BioStats/gsm.kri")
+pak::pak("Gilead-BioStats/gsm.reporting")
 pak::pak("IMPALA-Consortium/gsm.simaerep")
 ```
 
@@ -71,7 +74,7 @@ dfInput %>%
 
 Now we can analyze the data using `Analyze_Simaerep()` and add flags with `Flag_Simaerep()` which adds a Score between -1 and 1. Positive values indicate the over-reporting probability and negative values indicate the under-reporting probability.
 
-ScoreExtra is the number of expected AEs for a site with the same patient configuration.
+ExpectedNumerator is the number of expected AEs for a site with the same patient configuration.
 
 ```{r cook5}
 dfAnalyzed <- Analyze_Simaerep(dfInput)
@@ -113,7 +116,7 @@ Widget_ScatterPlot(
 ```
 
 ```{r cook9}
-gsm.kri::Widget_BarChart(
+Widget_BarChart(
   dfFlagged
 )
 ```
@@ -132,18 +135,8 @@ lRaw <- list(
   Raw_VISIT = clindata::rawplus_visdt,
   Raw_PD = clindata::ctms_protdev,
   Raw_ENROLL = clindata::rawplus_enroll,
-  Raw_SITE = clindata::ctms_site %>%
-    rename(studyid = protocol) %>%
-    rename(invid = pi_number) %>%
-    rename(InvestigatorFirstName = pi_first_name) %>%
-    rename(InvestigatorLastName = pi_last_name) %>%
-    rename(City = city) %>%
-    rename(State = state) %>%
-    rename(Country = country) %>%
-    rename(Status = site_status),
-  Raw_STUDY = clindata::ctms_study %>%
-    rename(studyid = protocol_number) %>%
-    rename(Status = status)
+  Raw_SITE = clindata::ctms_site,
+  Raw_STUDY = clindata::ctms_study 
 )
 
 mapping_wf <- gsm.core::MakeWorkflowList(
@@ -152,7 +145,9 @@ mapping_wf <- gsm.core::MakeWorkflowList(
   strPackage = NULL
 )
 
-lMapped <- gsm.core::RunWorkflows(lWorkflows = mapping_wf, lData = lRaw)
+lIngest <- gsm.mapping::Ingest(lRaw, gsm.mapping::CombineSpecs(mapping_wf))
+
+lMapped <- gsm.core::RunWorkflows(lWorkflows = mapping_wf, lData = lIngest)
 ```
 
 ## Metrics
@@ -169,19 +164,37 @@ lAnalyzed <- gsm.core::RunWorkflows(lWorkflows = metrics_wf, lData = lMapped)
 
 ## Report Generation - Workflow
 
-This part is identical with `gsm`.
 
 ```{r cook12, message=FALSE}
-reporting_wf <- gsm.core::MakeWorkflowList(strPath = "workflow/3_reporting", strPackage = "gsm.reporting")
 
-lReport <- gsm.core::RunWorkflows(reporting_wf, c(lMapped, list(
-  lAnalyzed = lAnalyzed,
-  lWorkflows = metrics_wf
-)))
+reporting_wf <- gsm.core::MakeWorkflowList(
+  strNames = NULL,
+  strPath = system.file("workflow/3_reporting", package = "gsm.simaerep"),
+  strPackage = NULL
+)
 
-module_wf_gsm <- gsm.core::MakeWorkflowList(strPath = "workflow/4_modules", strPackage = "gsm.kri", strNames = "report_kri_site.yaml")
 
-module_wf_gsm$report_kri_site$steps[[4]]$params$strRmdInputPath <- system.file("report/Report_KRI.Rmd", package = "gsm.simaerep")
+lReport <- gsm.core::RunWorkflows(
+  lWorkflows = reporting_wf, 
+  lData = c(
+    lMapped,
+    list(
+      lAnalyzed = lAnalyzed,
+      lWorkflows = metrics_wf
+    )
+  )
+)
+
+module_wf_gsm <- gsm.core::MakeWorkflowList(
+  strNames = NULL,
+  strPath = system.file("workflow/4_modules", package = "gsm.simaerep"),
+  strPackage = NULL
+)
+
+# we cannot set a dynamic link to the report path in the yaml files
+report_path <- system.file("report", "Report_KRI.Rmd", package = "gsm.simaerep")
+n_steps <- length(module_wf_gsm$report_kri_site$steps)
+module_wf_gsm$report_kri_site$steps[[n_steps]]$params$strInputPath <- report_path
 
 lModule <- gsm.core::RunWorkflows(module_wf_gsm, lReport)
 ```
@@ -213,14 +226,37 @@ dfBounds <- gsm.reporting::MakeBounds(
   dfMetrics = dfMetrics
 )
 
-lCharts <- gsm.kri::MakeCharts(
+# we use a different tooltip for the simaerep charts
+lCharts_Identity <- gsm.kri::MakeCharts(
   dfResults = dfResults %>%
     filter(GroupLevel == "Site"),
   dfMetrics = dfMetrics %>%
+    filter(GroupLevel == "Site", AnalysisType == "identity"),
+  dfGroups = dfGroups,
+  dfBounds = NULL,
+  bDebug = FALSE,
+  resultTooltipKeys = c(
+        "ExpectedNumerator",
+        "Score",
+        "Metric",
+        "Numerator",
+        "Denominator"
+  )
+)
+
+lCharts_Rate <- gsm.kri::MakeCharts(
+  dfResults = dfResults %>%
     filter(GroupLevel == "Site"),
+  dfMetrics = dfMetrics %>%
+    filter(GroupLevel == "Site", AnalysisType == "rate"),
   dfGroups = dfGroups,
   dfBounds = dfBounds,
   bDebug = FALSE
+)
+
+lCharts <- c(
+  lCharts_Identity,
+  lCharts_Rate
 )
 
 gsm.kri::Report_KRI(
@@ -229,7 +265,7 @@ gsm.kri::Report_KRI(
   dfGroups = dfGroups,
   dfMetrics = dfMetrics,
   strOutputFile = "report_kri_site.html",
-  strRmdInputPath = system.file("report", "Report_KRI.Rmd", package = "gsm.simaerep")
+  strInputPath = system.file("report", "Report_KRI.Rmd", package = "gsm.simaerep")
 )
 ```
 

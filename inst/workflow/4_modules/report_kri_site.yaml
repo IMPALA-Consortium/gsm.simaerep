@@ -35,11 +35,21 @@ steps:
     params:
       df: Reporting_Metrics
       strQuery: "SELECT * FROM df WHERE GroupLevel == 'Site'"
-  - output: lCharts_Site
+  - output: Reporting_Metrics_Site_Identity
+    name: gsm.core::RunQuery
+    params:
+      df: Reporting_Metrics_Site
+      strQuery: "SELECT * FROM df WHERE LOWER(AnalysisType) == 'identity'"
+  - output: Reporting_Metrics_Site_Rate
+    name: gsm.core::RunQuery
+    params:
+      df: Reporting_Metrics_Site
+      strQuery: "SELECT * FROM df WHERE LOWER(AnalysisType) == 'rate'"
+  - output: lCharts_Site_Identity
     name: gsm.kri::MakeCharts
     params:
       dfResults: Reporting_Results_Site
-      dfMetrics: Reporting_Metrics_Site
+      dfMetrics: Reporting_Metrics_Site_Identity
       dfGroups: Reporting_Groups
       dfBounds: null
       resultTooltipKeys:
@@ -48,6 +58,33 @@ steps:
         - Metric
         - Numerator
         - Denominator
+      Analysis_kri0002:
+        Widget_ScatterPlot:
+          xType: logarithmic
+  - output: lCharts_Site_Rate
+    name: gsm.kri::MakeCharts
+    params:
+      dfResults: Reporting_Results_Site
+      dfMetrics: Reporting_Metrics_Site_Rate
+      dfGroups: Reporting_Groups
+      dfBounds: Reporting_Bounds
+      Widget_ScatterPlot:
+        yType: logarithmic
+      resultTooltipKeys:
+        - Score
+        - Metric
+        - Numerator
+        - Denominator
+  - output: lCharts
+    name: BindLists
+    params:
+      a: lCharts_Site_Identity
+      b: lCharts_Site_Rate
+  # - output: lCharts
+  #   name: lapply
+  #   params:
+  #     X: lChartsNamed
+  #     FUN: unname
   # TODO: pull `Widget_GroupOverview` out of `Report_KRI` to allow customization
   #- output: lGroupOverview_Site
   #  name: gsm.kri::Widget_GroupOverview
@@ -65,8 +102,9 @@ steps:
   - output: lReport
     name: gsm.kri::Report_KRI
     params:
-      lCharts: lCharts_Site
+      lCharts: lCharts
       dfResults: Reporting_Results_Site
       dfGroups: Reporting_Groups
       dfMetrics: Reporting_Metrics_Site
+      strInputPath: inst/report/Report_KRI.Rmd
 

@@ -7,7 +7,7 @@ expected_cols <- c(
   "OverReportingProbability",
   "UnderReportingProbability",
   "Score",
-  "ScoreExtra"
+  "ExpectedNumerator"
 )
 
 

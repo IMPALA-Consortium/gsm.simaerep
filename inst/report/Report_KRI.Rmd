@@ -79,7 +79,7 @@ if(setup$GroupLevel == "Site"){
 # subset data on latest snapshot date
 dfResults_current <- FilterByLatestSnapshotDate(params$dfResults)
 
-GroupOverViz <- gsm.simaerep::Widget_GroupOverview(
+GroupOverViz <- gsm.kri::Widget_GroupOverview(
   dfResults = dfResults_current,
   dfGroups = params$dfGroups,
   dfMetrics = params$dfMetrics,
@@ -127,7 +127,7 @@ if(length(unique((params$dfResults)$SnapshotDate)) > 1){
   attr(overview_viz$flagOverTime, "chart_name") <- flagOverTimeName  
 }
 
-Report_MetricCharts(overview_viz, overview = TRUE)
+Report_MetricCharts(overview_viz)
 ```
 
 :::
@@ -154,8 +154,7 @@ for (i in unique(params$dfResults$MetricID)) {
   
   Report_MetricCharts(
     lCharts = params$lCharts[[lMetric$MetricID]],
-    strMetricID = lMetric$MetricID,
-    overview = FALSE
+    strMetricID = lMetric$MetricID
   )
   
   print(htmltools::tags$br())
