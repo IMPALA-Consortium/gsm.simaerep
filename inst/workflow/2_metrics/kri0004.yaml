@@ -2,14 +2,15 @@ meta:
   Type: Analysis
   ID: kri0004
   GroupLevel: Site
-  Abbreviation: PD-ZScore
-  Metric: Protocol Deviation Rate ZScore
-  Numerator: Protocol Deviation
-  Denominator: Visit
-  Model: Normal Approximation
-  Score: Adjusted Z-Score
-  AnalysisType: rate
-  Threshold: -2,-1,2,3
+  Abbreviation: IPD
+  Metric: Important Protocol Deviation Rate
+  Numerator: Important Protocol Deviations
+  Denominator: Visits
+  Model: bootstrap-simaerep
+  Score: Over/Under-Reporting Probability
+  ExpectedNumerator: Expected IPDs
+  AnalysisType: identity
+  Threshold: -0.99, -0.95, 0.95, 0.99
   nMinDenominator: 1
 spec:
   Mapped_PD:
@@ -17,6 +18,8 @@ spec:
       type: character
     deviationdate:
       type: Date
+    deemedimportant:
+      type: character
   Mapped_SUBJ:
     subjid:
       type: character
@@ -28,33 +31,34 @@ spec:
     visit_dt:
       type: Date
 steps:
+  - output: Mapped_IPD
+    name: gsm.core::RunQuery
+    params:
+      df: Mapped_PD
+      strQuery: |
+        SELECT *
+        FROM df
+        WHERE deemedimportant = 'Yes'
+  - output: Analysis_Input
+    name: Input_CumCount
+    params:
+      dfSubjects: Mapped_SUBJ
+      dfNumerator: Mapped_IPD
+      dfDenominator: Mapped_VISIT
+      strSubjectCol: subjid
+      strGroupCol: invid
+      strGroupLevel: Site
+      strNumeratorDateCol: deviationdate
+      strDenominatorDateCol: visit_dt
+      strOrphanedMethod: filter
+  - output: Analysis_Analyzed
+    name: Analyze_Simaerep
+    params:
+      dfInput: Analysis_Input
   - output: vThreshold
     name: ParseThreshold
     params:
       strThreshold: Threshold
-  - output: Filtered_PD
-    name: RunQuery
-    params:
-      df: Mapped_PD
-      strQuery: "SELECT * FROM df WHERE deviationdate IS NOT NULL"
-  - output: Analysis_Input
-    name: Input_Rate
-    params:
-      dfSubjects: Mapped_SUBJ
-      dfNumerator: Filtered_PD
-      dfDenominator: Mapped_VISIT
-      strSubjectCol: subjid
-      strGroupCol: invid
-      strGroupLevel: GroupLevel
-  - output: Analysis_Transformed
-    name: Transform_Rate
-    params:
-      dfInput: Analysis_Input
-  - output: Analysis_Analyzed
-    name: Analyze_NormalApprox
-    params:
-      dfTransformed: Analysis_Transformed
-      strType: AnalysisType
   - output: Analysis_Flagged
     name: Flag_Simaerep
     params:
@@ -70,7 +74,6 @@ steps:
     params:
       ID: ID
       Analysis_Input: Analysis_Input
-      Analysis_Transformed: Analysis_Transformed
       Analysis_Analyzed: Analysis_Analyzed
       Analysis_Flagged: Analysis_Flagged
       Analysis_Summary: Analysis_Summary

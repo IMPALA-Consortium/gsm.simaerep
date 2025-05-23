@@ -2,18 +2,16 @@ meta:
   Type: Analysis
   ID: kri0003
   GroupLevel: Site
-  Abbreviation: PD-Simaerep
+  Abbreviation: PD
   Metric: Protocol Deviation Rate
-  Numerator: Protocol Deviation Simaerep
-  Denominator: Visit
+  Numerator: Protocol Deviations
+  Denominator: Visits
   Model: bootstrap-simaerep
   Score: Over/Under-Reporting Probability
-  ScoreExtra: N Expected PD's
+  ExpectedNumerator: Expected PDs
   AnalysisType: identity
   Threshold: -0.99, -0.95, 0.95, 0.99
   nMinDenominator: 1
-  ChartsMetricFunction: ChartsMetricSimaerep
-  ChartsContinousFuntion: ChartsContinousDefault
 spec:
   Mapped_PD:
     subjid:
@@ -31,10 +29,6 @@ spec:
     visit_dt:
       type: Date
 steps:
-  - output: vThreshold
-    name: ParseThreshold
-    params:
-      strThreshold: Threshold
   - output: Analysis_Input
     name: Input_CumCount
     params:
@@ -51,6 +45,10 @@ steps:
     name: Analyze_Simaerep
     params:
       dfInput: Analysis_Input
+  - output: vThreshold
+    name: ParseThreshold
+    params:
+      strThreshold: Threshold
   - output: Analysis_Flagged
     name: Flag_Simaerep
     params:
@@ -61,15 +59,6 @@ steps:
     params:
       dfFlagged: Analysis_Flagged
       nMinDenominator: nMinDenominator
-      vColumns:
-        - GroupID
-        - GroupLevel
-        - Numerator
-        - Denominator
-        - Metric
-        - Score
-        - ScoreExtra
-        - Flag
   - output: lAnalysis
     name: list
     params:
@@ -78,3 +67,4 @@ steps:
       Analysis_Analyzed: Analysis_Analyzed
       Analysis_Flagged: Analysis_Flagged
       Analysis_Summary: Analysis_Summary
+
