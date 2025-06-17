@@ -85,40 +85,40 @@ jobs:
 
           lAnalyzed <- gsm.core::RunWorkflows(lWorkflows = metrics_wf, lData = lMapped)
 
-reporting_wf <- gsm.core::MakeWorkflowList(
-  strNames = NULL,
-  strPath = system.file("workflow/3_reporting", package = "gsm.simaerep"),
-  strPackage = NULL
-)
+          reporting_wf <- gsm.core::MakeWorkflowList(
+            strNames = NULL,
+            strPath = system.file("workflow/3_reporting", package = "gsm.simaerep"),
+            strPackage = NULL
+          )
 
 
-lReport <- gsm.core::RunWorkflows(
-  lWorkflows = reporting_wf,
-  lData = c(
-    lMapped,
-    list(
-      lAnalyzed = lAnalyzed,
-      lWorkflows = metrics_wf
-    )
-  )
-)
+          lReport <- gsm.core::RunWorkflows(
+            lWorkflows = reporting_wf,
+            lData = c(
+              lMapped,
+              list(
+                lAnalyzed = lAnalyzed,
+                lWorkflows = metrics_wf
+              )
+            )
+          )
 
-module_wf_gsm <- gsm.core::MakeWorkflowList(
-  strNames = NULL,
-  strPath = system.file("workflow/4_modules", package = "gsm.simaerep"),
-  strPackage = NULL
-)
+          module_wf_gsm <- gsm.core::MakeWorkflowList(
+            strNames = NULL,
+            strPath = system.file("workflow/4_modules", package = "gsm.simaerep"),
+            strPackage = NULL
+          )
 
-lModule <- gsm.core::RunWorkflows(module_wf_gsm, lReport)
+          lModule <- gsm.core::RunWorkflows(module_wf_gsm, lReport)
 
-      - name: Build site
-        run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
-        shell: Rscript {0}
+                - name: Build site
+                  run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
+                  shell: Rscript {0}
 
-      - name: Deploy to GitHub pages 🚀
-        if: github.event_name != 'pull_request'
-        uses: JamesIves/github-pages-deploy-action@v4.5.0
-        with:
-          clean: false
-          branch: gh-pages
-          folder: docs
+                - name: Deploy to GitHub pages 🚀
+                  if: github.event_name != 'pull_request'
+                  uses: JamesIves/github-pages-deploy-action@v4.5.0
+                  with:
+                    clean: false
+                    branch: gh-pages
+                    folder: docs
