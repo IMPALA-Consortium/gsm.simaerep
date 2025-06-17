@@ -73,9 +73,9 @@ You can install the development version of gsm.simaerep from [GitHub](https://gi
 # install.packages("remotes")
 remotes::install_github("Gilead-BioStats/clindata")
 
-remotes::install_github("IMPALA-Consortium/gsm.core@dev")
+remotes::install_github("Gilead-BioStats/gsm.core@dev")
 remotes::install_github("Gilead-BioStats/gsm.mapping@v1.0.0")
-remotes::install_github("IMPALA-Consortium/gsm.kri@dev")
+remotes::install_github("Gilead-BioStats/gsm.kri@dev")
 remotes::install_github("Gilead-BioStats/gsm.reporting@v1.0.0")
 
 remotes::install_github("IMPALA-Consortium/gsm.simaerep")
