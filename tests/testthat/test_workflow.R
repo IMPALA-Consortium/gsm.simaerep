@@ -11,21 +11,13 @@ test_that("yaml workflow produces same table as R function", {
     Raw_VISIT = clindata::rawplus_visdt,
     Raw_PD = clindata::ctms_protdev,
     Raw_ENROLL = clindata::rawplus_enroll,
-    Raw_SITE = clindata::ctms_site %>%
-      rename(studyid = protocol) %>%
-      rename(invid = pi_number) %>%
-      rename(InvestigatorFirstName = pi_first_name) %>%
-      rename(InvestigatorLastName = pi_last_name) %>%
-      rename(City = city) %>%
-      rename(State = state) %>%
-      rename(Country = country) %>%
-      rename(Status = site_status),
-    Raw_STUDY = clindata::ctms_study %>%
-      rename(studyid = protocol_number) %>%
-      rename(Status = status)
+    Raw_SITE = clindata::ctms_site,
+    Raw_STUDY = clindata::ctms_study
   )
 
-  lMapped <- gsm.core::RunWorkflows(lWorkflows = mapping, lData = lRaw)
+  lIngest <- gsm.mapping::Ingest(lRaw, gsm.mapping::CombineSpecs(mapping))
+
+  lMapped <- gsm.core::RunWorkflows(lWorkflows = mapping, lData = lIngest)
 
   kri_wf <- gsm.core::MakeWorkflowList(
     strNames = NULL,
@@ -69,18 +61,18 @@ test_that("yaml workflow produces same table as R function", {
 
   # we can only check the non-random elements for equality
   expect_equal(
-    select(dfAnalyzedAE, -MetricExpected, -OverReportingProbability, -UnderReportingProbability, -Score),
+    select(dfAnalyzedAE, -ExpectedNumerator, -OverReportingProbability, -UnderReportingProbability, -Score),
     select(
       lAnalysis$Analysis_kri0001$Analysis_Analyzed,
-      -MetricExpected, -OverReportingProbability, -UnderReportingProbability, -Score
+      -ExpectedNumerator, -OverReportingProbability, -UnderReportingProbability, -Score
     )
   )
 
   expect_equal(
-    select(dfAnalyzedPD, -MetricExpected, -OverReportingProbability, -UnderReportingProbability, -Score),
+    select(dfAnalyzedPD, -ExpectedNumerator, -OverReportingProbability, -UnderReportingProbability, -Score),
     select(
       lAnalysis$Analysis_kri0003$Analysis_Analyzed,
-      -MetricExpected, -OverReportingProbability, -UnderReportingProbability, -Score
+      -ExpectedNumerator, -OverReportingProbability, -UnderReportingProbability, -Score
     )
   )
 

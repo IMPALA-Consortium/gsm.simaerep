@@ -1,0 +1,110 @@
+meta:
+  Type: Report
+  ID: report_kri_site
+  Output: html
+  Name: Site-Level Key Risk Indicator Report
+  Description: A report summarizing key risk indicators at the site level
+spec:
+  Reporting_Results:
+    _all:
+      required: true
+    Numerator:
+      type: numeric
+    Denominator:
+      type: numeric
+    Metric:
+      type: numeric
+    Score:
+      type: numeric
+    Flag:
+      type: numeric
+  Reporting_Metrics:
+    _all:
+      required: true
+  Reporting_Groups:
+    _all:
+      required: true
+steps:
+  - output: Reporting_Results_Site
+    name: gsm.core::RunQuery
+    params:
+      df: Reporting_Results
+      strQuery: "SELECT * FROM df WHERE GroupLevel == 'Site'"
+  - output: Reporting_Metrics_Site
+    name: gsm.core::RunQuery
+    params:
+      df: Reporting_Metrics
+      strQuery: "SELECT * FROM df WHERE GroupLevel == 'Site'"
+  - output: Reporting_Metrics_Site_Identity
+    name: gsm.core::RunQuery
+    params:
+      df: Reporting_Metrics_Site
+      strQuery: "SELECT * FROM df WHERE LOWER(AnalysisType) == 'identity'"
+  - output: Reporting_Metrics_Site_Rate
+    name: gsm.core::RunQuery
+    params:
+      df: Reporting_Metrics_Site
+      strQuery: "SELECT * FROM df WHERE LOWER(AnalysisType) == 'rate'"
+  - output: lCharts_Site_Identity
+    name: gsm.kri::MakeCharts
+    params:
+      dfResults: Reporting_Results_Site
+      dfMetrics: Reporting_Metrics_Site_Identity
+      dfGroups: Reporting_Groups
+      dfBounds: null
+      resultTooltipKeys:
+        - ExpectedNumerator
+        - Score
+        - Metric
+        - Numerator
+        - Denominator
+      Analysis_kri0002:
+        Widget_ScatterPlot:
+          xType: logarithmic
+  - output: lCharts_Site_Rate
+    name: gsm.kri::MakeCharts
+    params:
+      dfResults: Reporting_Results_Site
+      dfMetrics: Reporting_Metrics_Site_Rate
+      dfGroups: Reporting_Groups
+      dfBounds: Reporting_Bounds
+      Widget_ScatterPlot:
+        yType: logarithmic
+      resultTooltipKeys:
+        - Score
+        - Metric
+        - Numerator
+        - Denominator
+  - output: lCharts
+    name: BindLists
+    params:
+      a: lCharts_Site_Identity
+      b: lCharts_Site_Rate
+  # - output: lCharts
+  #   name: lapply
+  #   params:
+  #     X: lChartsNamed
+  #     FUN: unname
+  # TODO: pull `Widget_GroupOverview` out of `Report_KRI` to allow customization
+  #- output: lGroupOverview_Site
+  #  name: gsm.kri::Widget_GroupOverview
+  #  params:
+  #    dfResults: Reporting_Results_Site
+  #    dfMetrics: Reporting_Metrics_Site
+  #    dfGroups: Reporting_Groups
+  #    strGroupLevel: Site
+  #    resultTooltipKeys:
+  #      - ExpectedNumerator
+  #      - Numerator
+  #      - Denominator
+  #      - Metric
+  #      - Score
+  - output: lReport
+    name: gsm.kri::Report_KRI
+    params:
+      lCharts: lCharts
+      dfResults: Reporting_Results_Site
+      dfGroups: Reporting_Groups
+      dfMetrics: Reporting_Metrics_Site
+      strInputPath: inst/report/Report_KRI.Rmd
+

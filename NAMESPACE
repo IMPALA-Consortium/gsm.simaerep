@@ -2,6 +2,7 @@
 
 export("%>%")
 export(Analyze_Simaerep)
+export(BindLists)
 export(Flag_Simaerep)
 export(Input_CumCount)
 importFrom(dbplyr,window_order)

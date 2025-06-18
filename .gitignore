@@ -6,3 +6,6 @@ docs
 inst/doc
 .DS_Store
 *.html
+.Renviron
+/doc/
+/Meta/

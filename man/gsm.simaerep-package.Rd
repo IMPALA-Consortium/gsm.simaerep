@@ -4,7 +4,7 @@
 \name{gsm.simaerep-package}
 \alias{gsm.simaerep}
 \alias{gsm.simaerep-package}
-\title{gsm.simaerep: What the Package Does (One Line, Title Case)}
+\title{gsm.simaerep: Add simaerep KRI to gsm}
 \description{
 This is a simaerep extension for the gsm package.
 }

@@ -5,13 +5,17 @@ meta:
   Priority: 1
 spec:
   Raw_PD:
-    subjectenrollmentnumber:
+    subjid:
       type: character
+      source_col: subjectenrollmentnumber
     deviationdate:
       type: Date
+    deemedimportant:
+      type: character
 steps:
   - output: Mapped_PD
-    name: RunQuery
+    name: =
     params:
-      df: Raw_PD
-      strQuery: "SELECT subjectenrollmentnumber AS subjid, deviationdate FROM df"
+      lhs: Mapped_PD
+      rhs: Raw_PD
+

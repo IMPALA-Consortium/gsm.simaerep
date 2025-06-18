@@ -35,13 +35,22 @@ required module configuration files:
 
 - `inst/workflow/1_mappings`
 - `inst/workflow/2_metrics`
+- `inst/workflow/3_reporting`
+- `inst/workflow/2_modules`
+
+customized Rmd report template
+
+- `inst/report/Report_KRI.Rmd`
+
 
 KRI:
 
 - AE Over/Under- Reporting Probability
+- SAE Over/Under- Reporting Probability
 - PD Over/Under- Reporting Probability
-- AE Z-Score
-- PD Z-Score
+- Important PD Over/Under- Reporting Probability
+- AE-Zscore
+
 
 ## Why use {simaerep}?
 
@@ -61,9 +70,9 @@ You can install the development version of gsm.simaerep from [GitHub](https://gi
 # install.packages("remotes")
 remotes::install_github("Gilead-BioStats/clindata")
 
-remotes::install_github("Gilead-BioStats/gsm.core@v1.0.0")
+remotes::install_github("Gilead-BioStats/gsm.core@dev")
 remotes::install_github("Gilead-BioStats/gsm.mapping@v1.0.0")
-remotes::install_github("Gilead-BioStats/gsm.kri@v1.0.0")
+remotes::install_github("Gilead-BioStats/gsm.kri@dev")
 remotes::install_github("Gilead-BioStats/gsm.reporting@v1.0.0")
 
 remotes::install_github("IMPALA-Consortium/gsm.simaerep")

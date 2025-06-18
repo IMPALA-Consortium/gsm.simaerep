@@ -48,32 +48,24 @@ jobs:
           dir.create(here::here("pkgdown", "assets"), recursive = TRUE)
 
           lRaw <- list(
-                  Raw_SUBJ = clindata::rawplus_dm,
-                  Raw_AE = clindata::rawplus_ae,
-                  Raw_VISIT = clindata::rawplus_visdt,
-                  Raw_PD = clindata::ctms_protdev,
-                  Raw_ENROLL = clindata::rawplus_enroll,
-                  Raw_SITE = clindata::ctms_site  %>%
-                    rename(studyid = protocol) %>%
-                    rename(invid = pi_number) %>%
-                    rename(InvestigatorFirstName = pi_first_name) %>%
-                    rename(InvestigatorLastName = pi_last_name) %>%
-                    rename(City = city) %>%
-                    rename(State = state) %>%
-                    rename(Country = country) %>%
-                    rename(Status = site_status),
-                  Raw_STUDY = clindata::ctms_study %>%
-                    rename(studyid = protocol_number) %>%
-                    rename(Status = status)
-              )
-
-          mapping_wf <- gsm.core::MakeWorkflowList(
-              strNames = NULL,
-              strPath = system.file("workflow/1_mappings", package = "gsm.simaerep"),
-              strPackage = NULL
+            Raw_SUBJ = clindata::rawplus_dm,
+            Raw_AE = clindata::rawplus_ae,
+            Raw_VISIT = clindata::rawplus_visdt,
+            Raw_PD = clindata::ctms_protdev,
+            Raw_ENROLL = clindata::rawplus_enroll,
+            Raw_SITE = clindata::ctms_site,
+            Raw_STUDY = clindata::ctms_study
           )
 
-          lMapped <- gsm.core::RunWorkflows(lWorkflows = mapping_wf, lData = lRaw)
+          mapping_wf <- gsm.core::MakeWorkflowList(
+            strNames = NULL,
+            strPath = system.file("workflow/1_mappings", package = "gsm.simaerep"),
+            strPackage = NULL
+          )
+
+          lIngest <- gsm.mapping::Ingest(lRaw, gsm.mapping::CombineSpecs(mapping_wf))
+
+          lMapped <- gsm.core::RunWorkflows(lWorkflows = mapping_wf, lData = lIngest)
 
           metrics_wf <- gsm.core::MakeWorkflowList(
                   strNames = NULL,
@@ -85,39 +77,31 @@ jobs:
 
           lAnalyzed <- gsm.core::RunWorkflows(lWorkflows = metrics_wf, lData = lMapped)
 
-          dfResults <- gsm.reporting::BindResults(lAnalysis = lAnalyzed,
-                                   strName = "Analysis_Summary",
-                                   dSnapshotDate = Sys.Date(),
-                                   strStudyID = "ABC-123")
-
-          dfGroups <- dplyr::bind_rows(
-            lMapped$Mapped_STUDY,
-            lMapped$Mapped_SITE,
-            lMapped$Country
+          reporting_wf <- gsm.core::MakeWorkflowList(
+            strNames = NULL,
+            strPath = system.file("workflow/3_reporting", package = "gsm.simaerep"),
+            strPackage = NULL
           )
 
-          dfBounds <- gsm.reporting::MakeBounds(
-            dfResults = dfResults,
-            dfMetrics = dfMetrics
+
+          lReport <- gsm.core::RunWorkflows(
+            lWorkflows = reporting_wf,
+            lData = c(
+              lMapped,
+              list(
+                lAnalyzed = lAnalyzed,
+                lWorkflows = metrics_wf
+              )
+            )
           )
 
-          lCharts <- gsm.kri::MakeCharts(
-            dfResults = dfResults %>%
-              filter(GroupLevel == 'Site'),
-            dfMetrics = dfMetrics %>%
-              filter(GroupLevel == 'Site'),
-            dfGroups = dfGroups,
-            dfBounds = dfBounds
+          module_wf_gsm <- gsm.core::MakeWorkflowList(
+            strNames = NULL,
+            strPath = system.file("workflow/4_modules", package = "gsm.simaerep"),
+            strPackage = NULL
           )
 
-          gsm.kri::Report_KRI(
-            lCharts = lCharts,
-            dfResults =  dfResults,
-            dfGroups =  dfGroups,
-            dfMetrics = dfMetrics,
-            strOutputDir = here::here("pkgdown", "assets"),
-            strOutputFile = "report_kri_site.html"
-          )
+          lModule <- gsm.core::RunWorkflows(module_wf_gsm, lReport)
 
       - name: Build site
         run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)

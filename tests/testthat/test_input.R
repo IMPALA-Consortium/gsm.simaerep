@@ -357,7 +357,7 @@ test_that("AssignOrphans used with lazy_tbl ", {
     arrange(GroupID, SubjectID, Denominator)
 
   # it is okay when not 100% of all orphaned numerators are assigned when they did not
-  # occurr between first and last + 30 days denominator event
+  # occur between first and last + 30 days denominator event
   expect_true(
     dplyr::between(
       sum(dfCumCountOrphans_duckdb$Numerator),
