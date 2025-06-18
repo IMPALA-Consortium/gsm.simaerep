@@ -101,6 +101,12 @@ jobs:
             strPackage = NULL
           )
 
+          report_path <- system.file("report", "Report_KRI.Rmd", package = "gsm.simaerep")
+          n_steps <- length(module_wf_gsm$report_kri_site$steps)
+          module_wf_gsm$report_kri_site$steps[[n_steps]]$params$strInputPath <- report_path
+          module_wf_gsm$report_kri_site$steps[[n_steps]]$params$strOutputFile <- "report_kri_site.html"
+          module_wf_gsm$report_kri_site$steps[[n_steps]]$params$strOutputDir <- here::here("docs")
+
           lModule <- gsm.core::RunWorkflows(module_wf_gsm, lReport)
 
       - name: Build site
