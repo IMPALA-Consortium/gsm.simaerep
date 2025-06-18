@@ -20,19 +20,13 @@ The package provides:
 - `Input_CumCount()` patient-level cumulative count from source data
 - `Analyze_Simaerep()` will execute `simaerep`
 - `Flag_Simaerep()` alias of `gsm.core::Flag`
-- `ChartsMetricsSimaerep()`create `simaerep` specific charts as html
-  widgets
-- `Widget_ScatterPlot()` html widget for scatter plot
-- `Widget_GroupOverview` html widget for group overview
 
 required module configuration files:
 
 - `inst/workflow/1_mappings`
 - `inst/workflow/2_metrics`
-
-customized `gsm.viz` js library
-
-- `inst/htmlwidgets/lib/gsm.viz-2.2.0`
+- `inst/workflow/3_reporting`
+- `inst/workflow/2_modules`
 
 customized Rmd report template
 
@@ -41,9 +35,10 @@ customized Rmd report template
 KRI:
 
 - AE Over/Under- Reporting Probability
+- SAE Over/Under- Reporting Probability
 - PD Over/Under- Reporting Probability
-- AE Z-Score
-- PD Z-Score
+- Important PD Over/Under- Reporting Probability
+- AE-Zscore
 
 ## Why use {simaerep}?
 

@@ -19,8 +19,4 @@ reference:
   - Input_CumCount
   - Analyze_Simaerep
   - Flag_Simaerep
-  - ChartsMetricSimaerep
-  - Widget_ScatterPlot
-  - Widget_ScatterPlot-shiny
-  - Widget_GroupOverview
-  - Widget_GroupOverview-shiny
+  - BindLists
