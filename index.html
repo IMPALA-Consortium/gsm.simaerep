@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">gsm.simaerep</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -80,13 +80,20 @@
 <ul>
 <li><code>inst/workflow/1_mappings</code></li>
 <li><code>inst/workflow/2_metrics</code></li>
+<li><code>inst/workflow/3_reporting</code></li>
+<li><code>inst/workflow/2_modules</code></li>
+</ul>
+<p>customized Rmd report template</p>
+<ul>
+<li><code>inst/report/Report_KRI.Rmd</code></li>
 </ul>
 <p>KRI:</p>
 <ul>
 <li>AE Over/Under- Reporting Probability</li>
+<li>SAE Over/Under- Reporting Probability</li>
 <li>PD Over/Under- Reporting Probability</li>
-<li>AE Z-Score</li>
-<li>PD Z-Score</li>
+<li>Important PD Over/Under- Reporting Probability</li>
+<li>AE-Zscore</li>
 </ul>
 <div class="section level2">
 <h2 id="why-use-simaerep">Why use {simaerep}?<a class="anchor" aria-label="anchor" href="#why-use-simaerep"></a>
@@ -108,9 +115,9 @@
 <code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"Gilead-BioStats/clindata"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"Gilead-BioStats/gsm.core@v1.0.0"</span><span class="op">)</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"Gilead-BioStats/gsm.core@dev"</span><span class="op">)</span></span>
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"Gilead-BioStats/gsm.mapping@v1.0.0"</span><span class="op">)</span></span>
-<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"Gilead-BioStats/gsm.kri@v1.0.0"</span><span class="op">)</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"Gilead-BioStats/gsm.kri@dev"</span><span class="op">)</span></span>
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"Gilead-BioStats/gsm.reporting@v1.0.0"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"IMPALA-Consortium/gsm.simaerep"</span><span class="op">)</span></span></code></pre></div>
@@ -216,7 +223,7 @@
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>Björn Koneswarakantha <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0003-4585-7799" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>Björn Koneswarakantha <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0003-4585-7799" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 </ul>
 </div>
 
@@ -236,7 +243,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer>

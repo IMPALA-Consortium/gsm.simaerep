@@ -17,7 +17,7 @@ between 0 and 1, where 0 is under-reporting and 1 is over-reporting."></head><bo
 
     <a class="navbar-brand me-2" href="../index.html">gsm.simaerep</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -81,7 +81,7 @@ many rows as desired repetitions. Default: 1000.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p><code>data.frame</code> with the following specification:</p><table class="table table"><tr><td>Column Name</td><td>Description</td><td>Type</td></tr><tr><td>GroupID</td><td>The group ID</td><td>Character</td></tr><tr><td>GroupLevel</td><td>The group level</td><td>Character</td></tr><tr><td>Numerator</td><td>Numerator events</td><td>Numeric</td></tr><tr><td>Denominator</td><td>Denominator events</td><td>Numeric</td></tr><tr><td>MetricExpected</td><td>Expected ratio from simulations</td><td>Numeric</td></tr><tr><td>Metric</td><td>Ratio all subjects in GroupID</td><td>Numeric</td></tr><tr><td>OverReportingProbability</td><td>Probability over-reporting numerator events</td><td>Numeric</td></tr><tr><td>UnderReportingProbability</td><td>Probability under-reporting numerator events</td><td>Numeric</td></tr><tr><td>Score</td><td>Combined Score between</td><td>Numeric</td></tr></table></div>
+    <p><code>data.frame</code> with the following specification:</p><table class="table table"><tr><td>Column Name</td><td>Description</td><td>Type</td></tr><tr><td>GroupID</td><td>The group ID</td><td>Character</td></tr><tr><td>GroupLevel</td><td>The group level</td><td>Character</td></tr><tr><td>Numerator</td><td>Numerator events</td><td>Numeric</td></tr><tr><td>Denominator</td><td>Denominator events</td><td>Numeric</td></tr><tr><td>Metric</td><td>Ratio all subjects in GroupID</td><td>Numeric</td></tr><tr><td>OverReportingProbability</td><td>Probability over-reporting numerator events</td><td>Numeric</td></tr><tr><td>UnderReportingProbability</td><td>Probability under-reporting numerator events</td><td>Numeric</td></tr><tr><td>Score</td><td>Combined Score between</td><td>Numeric</td></tr><tr><td>ExpectedNumerator</td><td>Count of Expected Numerator Events</td><td>Numeric</td></tr></table></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="https://openpharma.github.io/simaerep/reference/simaerep.html" class="external-link">simaerep::simaerep()</a></code>, <code><a href="Input_CumCount.html">Input_CumCount()</a></code></p></div>
@@ -103,21 +103,21 @@ many rows as desired repetitions. Default: 1000.</p></dd>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">Analyze_Simaerep</span><span class="op">(</span><span class="va">dfInput</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 176 × 9</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    GroupID GroupLevel Numerator Denominator MetricExpected Metric</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> 10      Site               8         390          0.162 0.020<span style="text-decoration: underline;">5</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> 100     Site               6          41          0.158 0.146 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> 101     Site               4          64          0.165 0.062<span style="text-decoration: underline;">5</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> 102     Site               8          69          0.178 0.116 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> 103     Site               8          86          0.163 0.093<span style="text-decoration: underline;">0</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> 104     Site              25         182          0.171 0.137 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> 105     Site              24          65          0.165 0.369 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> 106     Site               7          69          0.169 0.101 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> 107     Site              14          63          0.161 0.222 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> 109     Site               8          89          0.167 0.089<span style="text-decoration: underline;">9</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    GroupID GroupLevel Numerator Denominator Metric OverReportingProbability</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>                    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> 10      Site               8         390 0.020<span style="text-decoration: underline;">5</span>                    0    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> 100     Site               6          41 0.146                     0.621</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> 101     Site               4          64 0.062<span style="text-decoration: underline;">5</span>                    0.18 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> 102     Site               8          69 0.116                     0.336</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> 103     Site               8          86 0.093<span style="text-decoration: underline;">0</span>                    0.256</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> 104     Site              25         182 0.137                     0.362</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> 105     Site              24          65 0.369                     0.952</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> 106     Site               7          69 0.101                     0.32 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> 107     Site              14          63 0.222                     0.776</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> 109     Site               8          89 0.089<span style="text-decoration: underline;">9</span>                    0.218</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 166 more rows</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 3 more variables: OverReportingProbability &lt;dbl&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   UnderReportingProbability &lt;dbl&gt;, Score &lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 3 more variables: UnderReportingProbability &lt;dbl&gt;, Score &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   ExpectedNumerator &lt;dbl&gt;</span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
@@ -130,7 +130,7 @@ many rows as desired repetitions. Default: 1000.</p></dd>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer></div>
