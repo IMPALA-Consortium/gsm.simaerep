@@ -105,7 +105,7 @@ jobs:
           n_steps <- length(module_wf_gsm$report_kri_site$steps)
           module_wf_gsm$report_kri_site$steps[[n_steps]]$params$strInputPath <- report_path
           module_wf_gsm$report_kri_site$steps[[n_steps]]$params$strOutputFile <- "report_kri_site.html"
-          module_wf_gsm$report_kri_site$steps[[n_steps]]$params$strOutputDir <- here::here("docs")
+          module_wf_gsm$report_kri_site$steps[[n_steps]]$params$strOutputDir <- here::here("pkgdown", "assets")
 
           lModule <- gsm.core::RunWorkflows(module_wf_gsm, lReport)
 

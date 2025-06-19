@@ -1,4 +1,4 @@
-# gsm.simaerep 0.1.0
+# gsm.simaerep 0.1.1
 
 - fix sample report https://github.com/IMPALA-Consortium/gsm.simaerep/issues/20
 
