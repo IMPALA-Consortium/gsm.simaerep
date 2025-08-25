@@ -61,18 +61,18 @@ test_that("yaml workflow produces same table as R function", {
 
   # we can only check the non-random elements for equality
   expect_equal(
-    select(dfAnalyzedAE, -ExpectedNumerator, -OverReportingProbability, -UnderReportingProbability, -Score),
+    select(dfAnalyzedAE, -ExpectedNumerator, -Score, -ScoreMult),
     select(
       lAnalysis$Analysis_kri0001$Analysis_Analyzed,
-      -ExpectedNumerator, -OverReportingProbability, -UnderReportingProbability, -Score
+      -ExpectedNumerator, -Score, -ScoreMult
     )
   )
 
   expect_equal(
-    select(dfAnalyzedPD, -ExpectedNumerator, -OverReportingProbability, -UnderReportingProbability, -Score),
+    select(dfAnalyzedPD, -ExpectedNumerator, -Score, -ScoreMult),
     select(
       lAnalysis$Analysis_kri0003$Analysis_Analyzed,
-      -ExpectedNumerator, -OverReportingProbability, -UnderReportingProbability, -Score
+      -ExpectedNumerator, -Score, -ScoreMult
     )
   )
 

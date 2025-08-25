@@ -10,4 +10,8 @@
 #'
 #' @export
 
-Flag_Simaerep <- gsm.core::Flag
+Flag_Simaerep <- function(...) {
+
+  gsm.core::Flag(...)
+
+}
