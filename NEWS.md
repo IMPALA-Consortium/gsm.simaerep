@@ -1,3 +1,7 @@
+# gsm.simaerep 0.2.0
+- adapt to simaerep 1.0 https://github.com/IMPALA-Consortium/gsm.simaerep/issues/23
+- add binary events
+
 # gsm.simaerep 0.1.1
 
 - fix sample report https://github.com/IMPALA-Consortium/gsm.simaerep/issues/20

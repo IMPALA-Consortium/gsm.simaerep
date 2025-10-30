@@ -74,7 +74,8 @@ dfInput %>%
 
 Now we can analyze the data using `Analyze_Simaerep()` and add flags with `Flag_Simaerep()` which adds a Score between -1 and 1. Positive values indicate the over-reporting probability and negative values indicate the under-reporting probability.
 
-ExpectedNumerator is the number of expected AEs for a site with the same patient configuration.
+`ExpectedNumerator` is the number of expected AEs for a site with the same patient configuration.
+`ScoreMult` is Score with applied multiplicity correction.
 
 ```{r cook5}
 dfAnalyzed <- Analyze_Simaerep(dfInput)
@@ -83,7 +84,7 @@ dfFlagged <- Flag_Simaerep(dfAnalyzed, vThreshold = c(-0.99, -0.95, 0.95, 0.99))
 
 dfFlagged %>%
   arrange(Score) %>%
-  head(5) %>%
+  head(25) %>%
   knitr::kable()
 ```
 
@@ -120,6 +121,22 @@ Widget_BarChart(
   dfFlagged
 )
 ```
+
+To compare we can also use the Score with applied multiplicity correction. For this we need to lower the threshold to be less sensitive to get a similar readout. Here we can see that overall the multiplicity correction dampens the score values and reduces the number of flagged sites. Simulation studies with {simaerep} have shown that multiplicity correction decreases detection rates. Nevertheless when monitoring a limited number of studies with many sites a sharper signal might be preferred.
+
+```{r cook9a}
+dfFlagged_Mult <- Flag_Simaerep(
+  dfAnalyzed %>%
+    mutate(Score = ScoreMult),
+  vThreshold = c(-0.95, -0.75, 0.75, 0.95)
+  )
+
+Widget_BarChart(
+  dfFlagged_Mult
+)
+
+```
+
 
 
 # Report Building

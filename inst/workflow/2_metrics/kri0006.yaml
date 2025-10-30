@@ -1,15 +1,16 @@
 meta:
   Type: Analysis
-  ID: kri0005
+  ID: kri0006
   GroupLevel: Site
-  Abbreviation: AE-ZScore
-  Metric: Adverse Event Rate ZScore
+  Abbreviation: AE Mult
+  Metric: Adverse Event Rate MultCorr
   Numerator: Adverse Events
-  Denominator: Visit
-  Model: Normal Approximation
-  Score: Adjusted Z-Score
-  AnalysisType: rate
-  Threshold: -2,-1,2,3
+  Denominator: Visits
+  Model: bootstrap-simaerep
+  Score: Over/Under-Reporting Probability
+  ExpectedNumerator: Expected AEs
+  AnalysisType: identity
+  Threshold: -0.95, -0.75, 0.75, 0.95
   nMinDenominator: 1
 spec:
   Mapped_AE:
@@ -28,32 +29,44 @@ spec:
     visit_dt:
       type: Date
 steps:
-  - output: vThreshold
-    name: ParseThreshold
-    params:
-      strThreshold: Threshold
   - output: Analysis_Input
-    name: Input_Rate
+    name: Input_CumCount
     params:
       dfSubjects: Mapped_SUBJ
       dfNumerator: Mapped_AE
       dfDenominator: Mapped_VISIT
       strSubjectCol: subjid
       strGroupCol: invid
-      strGroupLevel: GroupLevel
-  - output: Analysis_Transformed
-    name: Transform_Rate
+      strGroupLevel: Site
+      strNumeratorDateCol: aest_dt
+      strDenominatorDateCol: visit_dt
+      strOrphanedMethod: filter
+  - output: Analysis_Analyzed
+    name: Analyze_Simaerep
     params:
       dfInput: Analysis_Input
-  - output: Analysis_Analyzed
-    name: Analyze_NormalApprox
+  - output: vThreshold
+    name: ParseThreshold
     params:
-      dfTransformed: Analysis_Transformed
-      strType: AnalysisType
+      strThreshold: Threshold
+  - output: Analysis_Analyzed_Mult
+    name: gsm.core::RunQuery
+    params:
+      df: Analysis_Analyzed
+      strQuery: |
+        SELECT
+          GroupID,
+          GroupLevel,
+          Numerator,
+          Denominator,
+          Metric,
+          ScoreMult AS Score,
+          ExpectedNumerator
+        FROM df
   - output: Analysis_Flagged
     name: Flag_Simaerep
     params:
-      dfAnalyzed: Analysis_Analyzed
+      dfAnalyzed: Analysis_Analyzed_Mult
       vThreshold: vThreshold
   - output: Analysis_Summary
     name: gsm.core::Summarize
@@ -65,7 +78,7 @@ steps:
     params:
       ID: ID
       Analysis_Input: Analysis_Input
-      Analysis_Transformed: Analysis_Transformed
-      Analysis_Analyzed: Analysis_Analyzed
+      Analysis_Analyzed: Analysis_Analyzed_Mult
       Analysis_Flagged: Analysis_Flagged
       Analysis_Summary: Analysis_Summary
+

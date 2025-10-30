@@ -6,8 +6,13 @@
 #' Alias for `gsm.core::Flag()`
 #'
 #' @inheritParams gsm.core::Flag
+#' @param ... arguments passed to `gsm.core::Flag()`
 #' @seealso [gsm.core::Flag()]
 #'
 #' @export
 
-Flag_Simaerep <- gsm.core::Flag
+Flag_Simaerep <- function(...) {
+
+  gsm.core::Flag(...)
+
+}

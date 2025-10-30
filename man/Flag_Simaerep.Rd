@@ -4,30 +4,10 @@
 \alias{Flag_Simaerep}
 \title{Flag_Simaerep}
 \usage{
-Flag_Simaerep(
-  dfAnalyzed,
-  strColumn = "Score",
-  vThreshold = c(-3, -2, 2, 3),
-  vFlag = c(-2, -1, 0, 1, 2),
-  vFlagOrder = c(2, -2, 1, -1, 0),
-  nAccrualThreshold = NULL,
-  strAccrualMetric = NULL
-)
+Flag_Simaerep(...)
 }
 \arguments{
-\item{dfAnalyzed}{\code{data.frame} where flags should be added.}
-
-\item{strColumn}{\code{character} Name of the column to use for thresholding. Default: \code{"Score"}}
-
-\item{vThreshold}{\code{numeric} Vector of numeric values representing threshold values. Default is \code{c(-3,-2,2,3)} which is typical for z-scores.}
-
-\item{vFlag}{\code{numeric} Vector of flag values. There must be one more item in Flag than thresholds - that is \code{length(vThreshold)+1 == length(vFlagValues)}. Default is \code{c(-2,-1,0,1,2)}, which is typical for z-scores.}
-
-\item{vFlagOrder}{\code{numeric} Vector of ordered flag values. Output data.frame will be sorted based on flag column using the order provided. NULL (or values that don't match vFlag) will leave the data unsorted. Must have identical values to vFlag. Default is \code{c(2,-2,1,-1,0)} which puts largest z-score outliers first in the data set.}
-
-\item{nAccrualThreshold}{\code{numeric} Specifies the minimum value required to return a \code{score} and calculate a \code{flag}. Default: NULL}
-
-\item{strAccrualMetric}{\code{character} Specifies the Metric to apply \code{nAccrualThreshold} to in order to determine the validity of a flag. Options are "Numerator", "Denominator" or "Difference". If "Difference" is specified, the threshold is based on the difference between the Denominator and the Numerator for a given Group. Default: \code{NULL}.}
+\item{...}{arguments passed to \code{gsm.core::Flag()}}
 }
 \description{
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}

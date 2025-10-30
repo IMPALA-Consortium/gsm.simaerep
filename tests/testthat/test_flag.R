@@ -4,9 +4,8 @@ expected_cols <- c(
   "Numerator",
   "Denominator",
   "Metric",
-  "OverReportingProbability",
-  "UnderReportingProbability",
   "Score",
+  "ScoreMult",
   "ExpectedNumerator",
   "Flag"
 )

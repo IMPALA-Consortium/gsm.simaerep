@@ -60,7 +60,7 @@ steps:
         - Denominator
       Analysis_kri0002:
         Widget_ScatterPlot:
-          xType: logarithmic
+          yType: logarithmic
   - output: lCharts_Site_Rate
     name: gsm.kri::MakeCharts
     params:

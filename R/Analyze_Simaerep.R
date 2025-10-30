@@ -23,9 +23,8 @@
 #' | Numerator                 | Numerator events                             | Numeric  |
 #' | Denominator               | Denominator events                           | Numeric  |
 #' | Metric                    | Ratio all subjects in GroupID                | Numeric  |
-#' | OverReportingProbability  | Probability over-reporting numerator events  | Numeric  |
-#' | UnderReportingProbability | Probability under-reporting numerator events | Numeric  |
-#' | Score                     | Combined Score between                       | Numeric  |
+#' | Score                     | Reporting Score                              | Numeric  |
+#' | ScoreMult                 | Reporting Score with Multiplicity Correction | Numeric  |
 #' | ExpectedNumerator         | Count of Expected Numerator Events           | Numeric  |
 #'
 #' @seealso [simaerep::simaerep()], [Input_CumCount()]
@@ -56,27 +55,21 @@ Analyze_Simaerep <- function(dfInput, r = 1000) {
   )
 
   colmaps <- c(
-    site_number = "GroupID",
+    study_id = "StudyID",
+    site_id = "GroupID",
     GroupLevel = "GroupLevel",
-    patnum = "SubjectID",
-    n_ae = "Numerator",
-    visit = "Denominator",
-    events_per_visit_site = "Metric"
+    patient_id = "SubjectID",
+    n_event = "Numerator",
+    visit = "Denominator"
   )
 
   grouplvl <- dfInput %>%
     pull(.data$GroupLevel) %>%
     unique()
 
-  colmaps_inverse <- names(colmaps)
-  names(colmaps_inverse) <- colmaps
-
   eventrep <- dfInput %>%
-    rename(
-      any_of(colmaps)
-    ) %>%
     mutate(
-      study_id = "A"
+      StudyID = "A"
     ) %>%
     simaerep::simaerep(
       r = r,
@@ -84,8 +77,9 @@ Analyze_Simaerep <- function(dfInput, r = 1000) {
       under_only = FALSE,
       visit_med75 = FALSE,
       inframe = TRUE,
-      mult_corr = FALSE,
-      progress = TRUE
+      mult_corr = TRUE,
+      progress = TRUE,
+      col_names = colmaps
     )
 
   dfInputCount <- dfInput %>%
@@ -94,39 +88,31 @@ Analyze_Simaerep <- function(dfInput, r = 1000) {
       .by = c("GroupID", "SubjectID")
     ) %>%
     summarize(
-      visit = sum(.data$Denominator, na.rm = TRUE),
-      n_ae = sum(.data$Numerator, na.rm = TRUE),
+      Denominator = sum(.data$Denominator, na.rm = TRUE),
+      Numerator = sum(.data$Numerator, na.rm = TRUE),
       .by = c("GroupID")
     )
 
   dfAnalyze <- eventrep$df_eval %>%
     left_join(
       dfInputCount,
-      by = c(site_number = "GroupID")
+      by = c(GroupID = "GroupID")
     ) %>%
     mutate(
       GroupLevel = .env$grouplvl,
-      OverReportingProbability = 1 - .data$prob_high,
-      UnderReportingProbability = 1 - .data$prob_low,
-      Score = case_when(
-        .data$OverReportingProbability + .data$UnderReportingProbability == 1 ~ .data$OverReportingProbability,
-        .data$OverReportingProbability >= .data$UnderReportingProbability ~ .data$OverReportingProbability,
-        .data$OverReportingProbability < .data$UnderReportingProbability ~ 1 - .data$UnderReportingProbability
-      ),
-      Score = ifelse(
-        .data$OverReportingProbability >= .data$UnderReportingProbability,
-        .data$OverReportingProbability,
-        -.data$UnderReportingProbability
-      ),
-      ExpectedNumerator = .data$events_per_visit_study * .data$visit
+      Metric = .data$event_per_visit_site,
+      Score = .data$event_prob_no_mult,
+      ScoreMult = .data$event_prob,
+      ExpectedNumerator = .data$event_delta
     ) %>%
     select(any_of(c(
-      colmaps_inverse,
-      "OverReportingProbability",
-      "UnderReportingProbability",
+      unname(colmaps),
+      "Metric",
       "Score",
+      "ScoreMult",
       "ExpectedNumerator"
     ))) %>%
+    select(- "StudyID") %>%
     collect() %>%
     arrange(.data$GroupID)
 

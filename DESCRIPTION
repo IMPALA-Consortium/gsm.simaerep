@@ -40,5 +40,5 @@ Remotes:
     clindata=Gilead-BioStats/clindata,
     gsm.core=Gilead-BioStats/gsm.core@main,
     gsm.mapping=Gilead-BioStats/gsm.mapping@main,
-    gsm.kri=Gilead-BioStats/gsm.kri@dev,
+    gsm.kri=Gilead-BioStats/gsm.kri@main,
     gsm.reporting=Gilead-BioStats/gsm.reporting@dev
