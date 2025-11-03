@@ -17,7 +17,7 @@ spec:
       type: timestamp
 steps:
   - output: Mapped_SDRGCOMP
-    name: =
+    name: RunQuery
     params:
-      lhs: Mapped_SDRGCOMP
-      rhs: Raw_SDRGCOMP
+      df: Raw_SDRGCOMP
+      strQuery: "SELECT studyid, subjid, sdrgyn, phase, TRY_CAST(mincreated_dts AS Date) AS  mincreated_dts FROM df"

@@ -8,7 +8,7 @@ meta:
   Denominator: Visits
   Model: bootstrap-simaerep
   Score: Over/Under-Reporting Probability
-  ExpectedNumerator: Expected AEs
+  ExpectedNumerator: Delta Expected AEs
   AnalysisType: identity
   Threshold: -0.95, -0.75, 0.75, 0.95
   nAccrualThreshold: 1

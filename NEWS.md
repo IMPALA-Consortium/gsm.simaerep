@@ -1,6 +1,6 @@
 # gsm.simaerep 0.2.0
 - adapt to simaerep 1.0 https://github.com/IMPALA-Consortium/gsm.simaerep/issues/23
-- add binary events
+- add binary events e.g. subject discontinuations
 
 # gsm.simaerep 0.1.1
 

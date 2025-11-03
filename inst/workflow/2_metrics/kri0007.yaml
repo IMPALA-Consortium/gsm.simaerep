@@ -2,8 +2,8 @@ meta:
   Type: Analysis
   ID: kri0007
   GroupLevel: Site
-  Abbreviation: TDSC
-  Metric: Treatment Discontinuation Rate
+  Abbreviation: TDSC-ZScore
+  Metric: Treatment Discontinuation Rate - ZScore
   Numerator: Subjects Discontinued - Treatment
   Denominator: Enrolled Subjects
   Model: Normal Approximation
