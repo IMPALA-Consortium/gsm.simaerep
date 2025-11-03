@@ -11,7 +11,7 @@ meta:
   ExpectedNumerator: Expected AEs
   AnalysisType: identity
   Threshold: -0.95, -0.75, 0.75, 0.95
-  nMinDenominator: 1
+  nAccrualThreshold: 1
 spec:
   Mapped_AE:
     subjid:
@@ -72,7 +72,6 @@ steps:
     name: gsm.core::Summarize
     params:
       dfFlagged: Analysis_Flagged
-      nMinDenominator: nMinDenominator
   - output: lAnalysis
     name: list
     params:

@@ -153,8 +153,10 @@ lRaw <- list(
   Raw_PD = clindata::ctms_protdev,
   Raw_ENROLL = clindata::rawplus_enroll,
   Raw_SITE = clindata::ctms_site,
-  Raw_STUDY = clindata::ctms_study 
+  Raw_STUDY = clindata::ctms_study,
+  Raw_SDRGCOMP = clindata::rawplus_sdrgcomp
 )
+
 
 mapping_wf <- gsm.core::MakeWorkflowList(
   strNames = NULL,
@@ -248,7 +250,7 @@ lCharts_Identity <- gsm.kri::MakeCharts(
   dfResults = dfResults %>%
     filter(GroupLevel == "Site"),
   dfMetrics = dfMetrics %>%
-    filter(GroupLevel == "Site", AnalysisType == "identity"),
+    filter(GroupLevel == "Site", AnalysisType %in% c("identity", "binary")),
   dfGroups = dfGroups,
   dfBounds = NULL,
   bDebug = FALSE,
