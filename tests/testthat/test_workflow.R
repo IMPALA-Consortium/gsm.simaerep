@@ -12,7 +12,8 @@ test_that("yaml workflow produces same table as R function", {
     Raw_PD = clindata::ctms_protdev,
     Raw_ENROLL = clindata::rawplus_enroll,
     Raw_SITE = clindata::ctms_site,
-    Raw_STUDY = clindata::ctms_study
+    Raw_STUDY = clindata::ctms_study,
+    Raw_SDRGCOMP = clindata::rawplus_sdrgcomp
   )
 
   lIngest <- gsm.mapping::Ingest(lRaw, gsm.mapping::CombineSpecs(mapping))

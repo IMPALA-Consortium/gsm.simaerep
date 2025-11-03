@@ -5,7 +5,6 @@
 #'
 #' Alias for `gsm.core::Flag()`
 #'
-#' @inheritParams gsm.core::Flag
 #' @param ... arguments passed to `gsm.core::Flag()`
 #' @seealso [gsm.core::Flag()]
 #'

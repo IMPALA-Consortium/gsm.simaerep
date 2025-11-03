@@ -21,7 +21,9 @@ Imports:
     dbplyr,
     utils,
     gsm.core,
-    simaerep (>= 0.6.0),
+    simaerep (>= 1.0.0),
+    stringr,
+    glue
 Suggests:
     knitr,
     rmarkdown,

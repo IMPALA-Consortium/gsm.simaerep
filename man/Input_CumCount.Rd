@@ -15,7 +15,10 @@ Input_CumCount(
   strDenominatorCol = NULL,
   strNumeratorDateCol,
   strDenominatorDateCol,
-  strOrphanedMethod = c("filter", "assign")
+  strOrphanedMethod = c("filter", "assign"),
+  strInstanceNameCol = NULL,
+  vLikePatternInstanceName = c("\%unsch\%", "\%disc\%"),
+  nMinSubjectRatioInstance = 0.7
 )
 }
 \arguments{
@@ -41,6 +44,15 @@ Input_CumCount(
 
 \item{strOrphanedMethod}{\code{character} one_of("filter", "assign") filter orphaned numerator events or assign
 to random patient enrolled at site the time of event. Default: "filter"}
+
+\item{strInstanceNameCol}{\code{character} When provided will extrapolate planned Numerator events e.g. visits. Use
+for terminal binary events such as patient discontinuations to avoid survival bias. Default: NULL}
+
+\item{vLikePatternInstanceName}{\verb{character vector} vector of sql like patterns to filter instance names for
+extrapolation. Default: c("\%unsch\%", "\%disc\%")}
+
+\item{nMinSubjectRatioInstance}{numeric, minimum subject ratio per instance name to consider for extrapolation.
+Default: 0.7}
 }
 \value{
 \code{data.frame} with the following specification:\tabular{lll}{
@@ -79,6 +91,10 @@ without GroupID and subjects without denominator or numerator event will be drop
 
 Numerator events with no SubjectID but with GroupID can get assigned to a random enrolled subject
 of the same GroupID
+
+For terminal events such as discontinuations pass planned visits instead of actual visits as dfDenominator
+to avoid survivor-bias. strInstanceNameCol, vLikePatternInstanceName, and nMinSubjectRatioInstance can be used
+to attempt to extrapolate planned visits. See ExtrapolateDenominator() for details.
 }
 \examples{
 
