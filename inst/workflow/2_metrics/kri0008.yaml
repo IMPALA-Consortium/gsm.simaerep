@@ -1,23 +1,18 @@
 meta:
   Type: Analysis
-  ID: kri0001
+  ID: kri0008
   GroupLevel: Site
-  Abbreviation: AE
-  Metric: Adverse Event Rate
-  Numerator: Adverse Events
+  Abbreviation: TDSC
+  Metric: Treatment Discontinuation Rate
+  Numerator: Subjects Discontinued - Treatment
   Denominator: Visits
   Model: bootstrap-simaerep
   Score: Over/Under-Reporting Probability
-  ExpectedNumerator: Delta Expected AEs
+  ExpectedNumerator: Expected Discontinuations
   AnalysisType: identity
   Threshold: -0.99, -0.95, 0.95, 0.99
   nAccrualThreshold: 1
 spec:
-  Mapped_AE:
-    subjid:
-      type: character
-    aest_dt:
-      type: Date
   Mapped_SUBJ:
     subjid:
       type: character
@@ -28,19 +23,38 @@ spec:
       type: character
     visit_dt:
       type: Date
+  Mapped_SDRGCOMP:
+    subjid:
+      type: character
+    sdrgyn:
+      type: character
+    phase:
+      type: character
+    mincreated_dts:
+      type: Date
 steps:
+  - output: Temp_DISCONTINUED
+    name: RunQuery
+    params:
+      df: Mapped_SDRGCOMP
+      strQuery: "SELECT * FROM df WHERE sdrgyn = 'N'"
   - output: Analysis_Input
     name: Input_CumCount
     params:
       dfSubjects: Mapped_SUBJ
-      dfNumerator: Mapped_AE
+      dfNumerator: Temp_DISCONTINUED
       dfDenominator: Mapped_VISIT
       strSubjectCol: subjid
       strGroupCol: invid
       strGroupLevel: Site
-      strNumeratorDateCol: aest_dt
+      strNumeratorDateCol: mincreated_dts
       strDenominatorDateCol: visit_dt
       strOrphanedMethod: filter
+      strInstanceNameCol: instancename
+      vLikePatternInstanceName:
+        - "%unsch%"
+        - "%visit%"
+      nMinSubjectRatioInstance: 0.7
   - output: Analysis_Analyzed
     name: Analyze_Simaerep
     params:
@@ -66,4 +80,5 @@ steps:
       Analysis_Analyzed: Analysis_Analyzed
       Analysis_Flagged: Analysis_Flagged
       Analysis_Summary: Analysis_Summary
+
 

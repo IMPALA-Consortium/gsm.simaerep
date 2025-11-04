@@ -342,16 +342,16 @@ test_that("AssignOrphans used with lazy_tbl ", {
   duckdb::dbWriteTable(db, "pd", dfNumerator)
 
   dfCumCountOrphans_duckdb <- Input_CumCount(
-    dfSubjects = dplyr::tbl(db, "dm"),
-    dfNumerator = dplyr::tbl(db, "pd"),
-    dfDenominator = dplyr::tbl(db, "visit") %>% mutate(visit_dt = sql("TRY_CAST(visit_dt AS DATE)")),
-    strSubjectCol = "subjid",
-    strGroupCol = "siteid",
-    strGroupLevel = "Site",
-    strNumeratorDateCol = "deviationdate",
-    strDenominatorDateCol = "visit_dt",
-    strOrphanedMethod = "assign"
-  ) %>%
+      dfSubjects = dplyr::tbl(db, "dm"),
+      dfNumerator = dplyr::tbl(db, "pd"),
+      dfDenominator = dplyr::tbl(db, "visit") %>% mutate(visit_dt = sql("TRY_CAST(visit_dt AS DATE)")),
+      strSubjectCol = "subjid",
+      strGroupCol = "siteid",
+      strGroupLevel = "Site",
+      strNumeratorDateCol = "deviationdate",
+      strDenominatorDateCol = "visit_dt",
+      strOrphanedMethod = "assign"
+    ) %>%
     filter(Denominator == max(Denominator, na.rm = TRUE), .by = c(SubjectID)) %>%
     dplyr::collect() %>%
     arrange(GroupID, SubjectID, Denominator)

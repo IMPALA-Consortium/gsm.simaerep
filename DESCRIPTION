@@ -1,6 +1,6 @@
 Package: gsm.simaerep
 Title: Add simaerep KRI to gsm
-Version: 0.1.1
+Version: 0.2.0
 Authors@R: 
     person("Björn", "Koneswarakantha", , "bjoern.koneswarakantha@roche.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-4585-7799"))
@@ -21,7 +21,9 @@ Imports:
     dbplyr,
     utils,
     gsm.core,
-    simaerep (>= 0.6.0),
+    simaerep (>= 1.0.0),
+    stringr,
+    glue
 Suggests:
     knitr,
     rmarkdown,

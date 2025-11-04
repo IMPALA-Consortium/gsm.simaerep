@@ -39,6 +39,10 @@ KRI:
 - PD Over/Under- Reporting Probability
 - Important PD Over/Under- Reporting Probability
 - AE-Zscore
+- AE Over/Under- Reporting Probability with Multiplicity Correction
+- Subject Study Treatment Discontinuation Zscore
+- Subject Study Treatment Discontinuation AE Over/Under- Reporting
+  Probability
 
 ## Why use {simaerep}?
 

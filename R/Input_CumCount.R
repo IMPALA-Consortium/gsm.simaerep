@@ -27,6 +27,10 @@
 #' Numerator events with no SubjectID but with GroupID can get assigned to a random enrolled subject
 #' of the same GroupID
 #'
+#' For terminal events such as discontinuations pass planned visits instead of actual visits as dfDenominator
+#' to avoid survivor-bias. strInstanceNameCol, vLikePatternInstanceName, and nMinSubjectRatioInstance can be used
+#' to attempt to extrapolate planned visits. See ExtrapolateDenominator() for details.
+#'
 #' @param dfSubjects `data.frame` with columns for SubjectID and any other relevant subject information
 #' @param dfNumerator `data.frame` with a column for SubjectID and `strNumeratorDateCol`
 #' @param dfDenominator `data.frame` with a column for SubjectID and `strDenominatorDateCol`
@@ -39,6 +43,12 @@
 #' @param strDenominatorDateCol `character` Column name in `dfDenominator` to use for denominator calculation.
 #' @param strOrphanedMethod `character` one_of("filter", "assign") filter orphaned numerator events or assign
 #' to random patient enrolled at site the time of event. Default: "filter"
+#' @param strInstanceNameCol `character` When provided will extrapolate planned Numerator events e.g. visits. Use
+#' for terminal binary events such as patient discontinuations to avoid survival bias. Default: NULL
+#' @param vLikePatternInstanceName `character vector` vector of sql like patterns to filter instance names for
+#' extrapolation. Default: c("%unsch%", "%disc%")
+#' @param nMinSubjectRatioInstance numeric, minimum subject ratio per instance name to consider for extrapolation.
+#' Default: 0.7
 #'
 #' @return `data.frame` with the following specification:
 #'
@@ -124,7 +134,12 @@ Input_CumCount <- function(
     strDenominatorCol = NULL,
     strNumeratorDateCol,
     strDenominatorDateCol,
-    strOrphanedMethod = c("filter", "assign")) {
+    strOrphanedMethod = c("filter", "assign"),
+    strInstanceNameCol = NULL,
+    vLikePatternInstanceName = c("%unsch%", "%disc%"),
+    nMinSubjectRatioInstance = 0.7
+    ) {
+
   CheckDf(dfSubjects)
   CheckDf(dfDenominator)
   CheckDf(dfNumerator)
@@ -157,6 +172,18 @@ Input_CumCount <- function(
   CheckNotAllNA(dfDenominator, strDenominatorDateCol)
   CheckDataType(dfNumerator, strNumeratorDateCol, lubridate::is.instant)
   CheckDataType(dfDenominator, strDenominatorDateCol, lubridate::is.instant)
+
+  if (! is.null(strInstanceNameCol)) {
+    dfDenominator <- ExtrapolateDenominator(
+      dfDenominator = dfDenominator,
+      dfNumerator = dfNumerator,
+      strSubjectCol = strSubjectCol,
+      strDenominatorDateCol = strDenominatorDateCol,
+      strInstanceNameCol = strInstanceNameCol,
+      vLikePatternInstanceName = vLikePatternInstanceName,
+      nMinSubjectRatioInstance = nMinSubjectRatioInstance
+    )
+  }
 
   # If supplied strNumeratorCol and strDenominatorCol must be in dfNumerator and dfDenominator
   # and renamed to NumeratorID and DenominatorID. If not supplied use row_number() as default.
@@ -249,6 +276,7 @@ Input_CumCount <- function(
     ungroup() %>%
     filter(.data$Denominator > 0) %>%
     select(c("SubjectID", "GroupID", "GroupLevel", "Numerator", "Denominator"))
+
 
   return(dfCumCount)
 }

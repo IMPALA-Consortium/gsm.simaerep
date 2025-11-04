@@ -39,7 +39,7 @@ steps:
     name: gsm.core::RunQuery
     params:
       df: Reporting_Metrics_Site
-      strQuery: "SELECT * FROM df WHERE LOWER(AnalysisType) == 'identity'"
+      strQuery: "SELECT * FROM df WHERE LOWER(AnalysisType) IN ('identity', 'binary')"
   - output: Reporting_Metrics_Site_Rate
     name: gsm.core::RunQuery
     params:

@@ -8,10 +8,10 @@ meta:
   Denominator: Visits
   Model: bootstrap-simaerep
   Score: Over/Under-Reporting Probability
-  ExpectedNumerator: Expected PDs
+  ExpectedNumerator: Delta Expected PDs
   AnalysisType: identity
   Threshold: -0.99, -0.95, 0.95, 0.99
-  nMinDenominator: 1
+  nAccrualThreshold: 1
 spec:
   Mapped_PD:
     subjid:
@@ -58,7 +58,6 @@ steps:
     name: gsm.core::Summarize
     params:
       dfFlagged: Analysis_Flagged
-      nMinDenominator: nMinDenominator
   - output: lAnalysis
     name: list
     params:

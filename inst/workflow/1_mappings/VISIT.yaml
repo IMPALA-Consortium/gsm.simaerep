@@ -8,10 +8,12 @@ spec:
     subjid:
       type: character
     visit_dt:
+      type: Date
+    instancename:
       type: character
 steps:
   - output: Mapped_VISIT
     name: RunQuery
     params:
       df: Raw_VISIT
-      strQuery: "SELECT subjid, TRY_CAST(visit_dt AS Date) AS visit_dt FROM df"
+      strQuery: "SELECT subjid, instancename, TRY_CAST(visit_dt AS Date) AS visit_dt FROM df"
