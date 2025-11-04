@@ -17,7 +17,10 @@ dfDenominator: A data frame with a column for SubjectID and strDenominatorCol if
 All other columns are dropped from the output data frame. GroupIDs will be added via dfSubjects if not present events
 without GroupID and subjects without denominator or numerator event will be dropped.
 Numerator events with no SubjectID but with GroupID can get assigned to a random enrolled subject
-of the same GroupID'><meta property="og:description" content='
+of the same GroupID
+For terminal events such as discontinuations pass planned visits instead of actual visits as dfDenominator
+to avoid survivor-bias. strInstanceNameCol, vLikePatternInstanceName, and nMinSubjectRatioInstance can be used
+to attempt to extrapolate planned visits. See ExtrapolateDenominator() for details.'><meta property="og:description" content='
 Calculate a subject level cumulative numerator event count per denominator event count.
 This function takes in a list of data frames including dfSUBJ, dfNumerator, and dfDenominator,
 and calculates a subject level cumulative numerator count per cumulative denominator count. Numerator
@@ -35,7 +38,10 @@ dfDenominator: A data frame with a column for SubjectID and strDenominatorCol if
 All other columns are dropped from the output data frame. GroupIDs will be added via dfSubjects if not present events
 without GroupID and subjects without denominator or numerator event will be dropped.
 Numerator events with no SubjectID but with GroupID can get assigned to a random enrolled subject
-of the same GroupID'></head><body>
+of the same GroupID
+For terminal events such as discontinuations pass planned visits instead of actual visits as dfDenominator
+to avoid survivor-bias. strInstanceNameCol, vLikePatternInstanceName, and nMinSubjectRatioInstance can be used
+to attempt to extrapolate planned visits. See ExtrapolateDenominator() for details.'></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -43,7 +49,7 @@ of the same GroupID'></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">gsm.simaerep</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -55,6 +61,7 @@ of the same GroupID'></head><body>
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/ContributorGuidelines.html">ContributorGuidelines</a></li>
     <li><a class="dropdown-item" href="../articles/Cookbook.html">Cookbook</a></li>
+    <li><a class="dropdown-item" href="../articles/KRI.html">gsm.simaerep Details</a></li>
   </ul></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-sample-reports" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Sample Reports</button>
@@ -94,6 +101,9 @@ event if the date time columns imply that numerator event occurred after the den
 without GroupID and subjects without denominator or numerator event will be dropped.</p>
 <p>Numerator events with no SubjectID but with GroupID can get assigned to a random enrolled subject
 of the same GroupID</p>
+<p>For terminal events such as discontinuations pass planned visits instead of actual visits as dfDenominator
+to avoid survivor-bias. strInstanceNameCol, vLikePatternInstanceName, and nMinSubjectRatioInstance can be used
+to attempt to extrapolate planned visits. See ExtrapolateDenominator() for details.</p>
     </div>
 
     <div class="section level2">
@@ -109,7 +119,10 @@ of the same GroupID</p>
 <span>  strDenominatorCol <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">strNumeratorDateCol</span>,</span>
 <span>  <span class="va">strDenominatorDateCol</span>,</span>
-<span>  strOrphanedMethod <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"filter"</span>, <span class="st">"assign"</span><span class="op">)</span></span>
+<span>  strOrphanedMethod <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"filter"</span>, <span class="st">"assign"</span><span class="op">)</span>,</span>
+<span>  strInstanceNameCol <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  vLikePatternInstanceName <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"%unsch%"</span>, <span class="st">"%disc%"</span><span class="op">)</span>,</span>
+<span>  nMinSubjectRatioInstance <span class="op">=</span> <span class="fl">0.7</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -160,6 +173,21 @@ of the same GroupID</p>
 <dt id="arg-strorphanedmethod">strOrphanedMethod<a class="anchor" aria-label="anchor" href="#arg-strorphanedmethod"></a></dt>
 <dd><p><code>character</code> one_of("filter", "assign") filter orphaned numerator events or assign
 to random patient enrolled at site the time of event. Default: "filter"</p></dd>
+
+
+<dt id="arg-strinstancenamecol">strInstanceNameCol<a class="anchor" aria-label="anchor" href="#arg-strinstancenamecol"></a></dt>
+<dd><p><code>character</code> When provided will extrapolate planned Numerator events e.g. visits. Use
+for terminal binary events such as patient discontinuations to avoid survival bias. Default: NULL</p></dd>
+
+
+<dt id="arg-vlikepatterninstancename">vLikePatternInstanceName<a class="anchor" aria-label="anchor" href="#arg-vlikepatterninstancename"></a></dt>
+<dd><p><code>character vector</code> vector of sql like patterns to filter instance names for
+extrapolation. Default: c("%unsch%", "%disc%")</p></dd>
+
+
+<dt id="arg-nminsubjectratioinstance">nMinSubjectRatioInstance<a class="anchor" aria-label="anchor" href="#arg-nminsubjectratioinstance"></a></dt>
+<dd><p>numeric, minimum subject ratio per instance name to consider for extrapolation.
+Default: 0.7</p></dd>
 
 </dl></div>
     <div class="section level2">
