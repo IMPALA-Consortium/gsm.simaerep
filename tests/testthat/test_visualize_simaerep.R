@@ -5,7 +5,7 @@ test_that("Visualize_Simaerep()",{
     dfNumerator = clindata::rawplus_ae,
     dfDenominator = clindata::rawplus_visdt %>% dplyr::mutate(visit_dt = lubridate::ymd(visit_dt)),
     strSubjectCol = "subjid",
-    strGroupCol = "siteid",
+    strGroupCol = "invid",
     strGroupLevel = "Site",
     strNumeratorDateCol = "aest_dt",
     strDenominatorDateCol = "visit_dt"

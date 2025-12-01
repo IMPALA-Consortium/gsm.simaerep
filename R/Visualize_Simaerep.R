@@ -3,28 +3,28 @@
 
 #' Visualize Simaerep
 #' @description create a ggplot2 visualisation for a simaerep KRI
-#' @dfInput data.frame created by [Input_CumCount()]
-#' @dfFlagged data.frame created by [Flag_Simaerep()]
-#' @strStudyID character, study label, Default: "StudyID"
-#' @strScoreCol character, name of score column in dfFlagged, Default: "Score"
-#' @nSiteMax integer, maximum of flagged sites to plot, Default: 16
-#' @vColors vector, named hex values for every Flag value in dfFlagged$Flag, Default NULL
+#' @param dfInput data.frame created by [Input_CumCount()]
+#' @param dfFlagged data.frame created by [Flag_Simaerep()]
+#' @param strStudyID character, study label, Default: "StudyID"
+#' @param strScoreCol character, name of score column in dfFlagged, Default: "Score"
+#' @param nSiteMax integer, maximum of flagged sites to plot, Default: 16
+#' @param vColors vector, named hex values for every Flag value in dfFlagged$Flag, Default NULL
 #' @export
-#' @examples 
+#' @examples
 #'  dfInput <- Input_CumCount(
 #'    dfSubjects = clindata::rawplus_dm,
 #'    dfNumerator = clindata::rawplus_ae,
 #'    dfDenominator = clindata::rawplus_visdt %>% dplyr::mutate(visit_dt = lubridate::ymd(visit_dt)),
 #'    strSubjectCol = "subjid",
-#'    strGroupCol = "siteid",
+#'    strGroupCol = "invid",
 #'    strGroupLevel = "Site",
 #'    strNumeratorDateCol = "aest_dt",
 #'    strDenominatorDateCol = "visit_dt"
 #'  )
-#' 
+#'
 #'  dfAnalyzed <- Analyze_Simaerep(dfInput)
 #'  dfFlagged <- Flag_Simaerep(dfAnalyzed, vThreshold = c(-0.99, -0.95, 0.95, 0.99))
-#' 
+#'
 #'  Visualize_Simaerep(dfInput, dfFlagged)
 Visualize_Simaerep <- function(dfInput,
                                dfFlagged,
@@ -53,7 +53,7 @@ Visualize_Simaerep <- function(dfInput,
     p <- do.call(plot_simaerep, args)
 
     return(p)
-  
+
 }
 
 #' @keywords internal
@@ -64,6 +64,7 @@ prepare_visualization_data <- function(dfInput,
                                        vColors
                                        ) {
 
+
     # Handle Colors -----------------------------------------------------
     if (is.null(vColors)) {
       vColors <- scales::brewer_pal(type = "seq", "Blues")(n_distinct(abs(dfFlagged$Flag)))
@@ -73,7 +74,7 @@ prepare_visualization_data <- function(dfInput,
       mutate(
         Color = vColors[abs(.data$Flag) + 1]
       )
-      
+
     } else {
       stopifnot(
         "Provide name vColor for every value in Flag" = all(unique(dfFlagged$Flag) %in% names(vColors))
@@ -212,7 +213,7 @@ plot_simaerep <- function(df_mean_study,
 
   # we use ordered factors to ensure that sites are ordered by highest score and highest Expected Numerator
 
-  # we filter sites that are not plotted but re flagged  
+  # we filter sites that are not plotted but re flagged
   df_label_sites <- df_label_sites %>%
     filter(.data$GroupID %in% unique(df_visit$GroupID))
 
