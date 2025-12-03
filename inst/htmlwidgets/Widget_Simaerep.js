@@ -50,7 +50,8 @@ HTMLWidgets.widget({
                     df_mean_study: convertRDataFrame(data.df_mean_study),
                     df_mean_group_flagged: convertRDataFrame(data.df_mean_group_flagged),
                     df_mean_group_not_flagged: convertRDataFrame(data.df_mean_group_not_flagged),
-                    df_label_sites: convertRDataFrame(data.df_label_sites)
+                    df_label_sites: convertRDataFrame(data.df_label_sites),
+                    df_visit: convertRDataFrame(data.df_visit)
                 };
 
                 // Log what we received after conversion
@@ -59,6 +60,7 @@ HTMLWidgets.widget({
                 console.log("- df_mean_group_flagged points:", chartData.df_mean_group_flagged.length);
                 console.log("- df_mean_group_not_flagged points:", chartData.df_mean_group_not_flagged.length);
                 console.log("- df_label_sites:", chartData.df_label_sites.length);
+                console.log("- df_visit:", chartData.df_visit.length);
 
                 // Assign unique ID to element
                 el.id = `simaerep--${config.strStudyId}_${config.strScoreCol}`;

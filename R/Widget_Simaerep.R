@@ -93,7 +93,6 @@ Widget_Simaerep <- function(
     vColors = vColors
   )
 
-  # lsData$df_visit <- NULL
 
   if (is.data.frame(lMetric) && nrow(lMetric) == 1) {
     # convert to named vector to named list as the first item of a list

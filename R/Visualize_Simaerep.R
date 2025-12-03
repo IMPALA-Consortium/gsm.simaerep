@@ -66,9 +66,10 @@ prepare_visualization_data <- function(dfInput,
 
 
     # Handle Colors -----------------------------------------------------
+
     if (is.null(vColors)) {
       vColors <- scales::brewer_pal(type = "seq", "Blues")(n_distinct(abs(dfFlagged$Flag)))
-      names(vColors) <- sort(unique(abs(dfFlagged$Flag)))
+      names(vColors) <- sort(unique(abs(as.numeric(dfFlagged$Flag))))
 
     dfFlagged <- dfFlagged %>%
       mutate(
@@ -76,17 +77,24 @@ prepare_visualization_data <- function(dfInput,
       )
 
     } else {
-      stopifnot(
-        "Provide name vColor for every value in Flag" = all(unique(dfFlagged$Flag) %in% names(vColors))
-      )
+
       dfFlagged <- dfFlagged %>%
         mutate(
-          Color = vColors[as.character(.data$Flag)]
+          FlagStr = tidyr::replace_na(as.character(.data$Flag), "NA")
         )
 
+      stopifnot(
+        "Provide name vColor for every value in Flag" = all(as.character(unique(dfFlagged$FlagStr)) %in% names(vColors))
+      )
+
+      dfFlagged <- dfFlagged %>%
+        mutate(
+          FlagStr = tidyr::replace_na(as.character(.data$Flag), "NA"),
+          Color = vColors[as.character(.data$FlagStr)],
+        ) %>%
+        select(- .data$FlagStr)
+
     }
-
-
 
     # Get Mean Numerator Development ------------------------------------
 
@@ -122,9 +130,11 @@ prepare_visualization_data <- function(dfInput,
 
     # Determine Sites for Plotting ----------------------------------------
 
+    dfFlagged <- dfFlagged %>%
+      arrange(desc(abs(.data[[strScoreCol]])), desc(abs(.data$ExpectedNumerator)))
+
     df_flag_filt <- dfFlagged %>%
-        filter(.data$Flag != 0) %>%
-        arrange(desc(abs(.data[[strScoreCol]])), desc(abs(.data$ExpectedNumerator)))
+        filter(.data$Flag != 0)
 
     if (! is.null(nSiteMax)) {
       group_plot <- df_flag_filt %>%
@@ -153,7 +163,7 @@ prepare_visualization_data <- function(dfInput,
         filter(! .data$GroupID %in% df_flag_filt$GroupID)
 
 
-    df_label_sites <- df_flag_filt %>%
+    df_label_sites <- dfFlagged %>%
         left_join(
           df_visit %>%
             summarise(

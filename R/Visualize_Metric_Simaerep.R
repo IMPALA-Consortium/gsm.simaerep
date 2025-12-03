@@ -34,6 +34,7 @@ Visualize_Metric_Simaerep <- function(
   strMetricID = NULL,
   strSnapshotDate = NULL,
   bDebug = FALSE,
+  vColors = c("0" = "#9ED782", "1" = "#FEAA01", "2" = "#FF5858", "-1" = "#FEAA01", "-2" = "#FF5858", "NA" = "#a9a9a9"),
   ...
 ) {
   # Check for multiple snapshots --------------------------------------------
@@ -174,6 +175,7 @@ Visualize_Metric_Simaerep <- function(
         dfFlagged = dfFlagged_latest,
         dfGroups = dfGroups,
         lMetric = lMetric,
+        vColors = vColors,
         ...
       )
     )
