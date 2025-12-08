@@ -30,6 +30,7 @@ The package provides:
 - `Input_CumCount()` patient-level cumulative count from source data
 - `Analyze_Simaerep()` will execute `simaerep`
 - `Flag_Simaerep()` alias of `gsm.core::Flag`
+- `Visualize_Simaerep()` and `Widget_Simaerep()` for {simaerep}-style visualizations
 
 required module configuration files:
 
