@@ -50,8 +50,8 @@ test_that("ExtrapolateDenominator", {
       nrow()
 
     visit_count_no_num <- dfDenominator %>%
-      filter(! stringr::str_like(.data[[strInstanceNameCol]], "%unsch%")) %>%
-      filter(! stringr::str_like(.data[[strInstanceNameCol]], "%disc%")) %>%
+      filter(! stringr::str_like(tolower(.data[[strInstanceNameCol]]), "%unsch%")) %>%
+      filter(! stringr::str_like(tolower(.data[[strInstanceNameCol]]), "%disc%")) %>%
       anti_join(
         dfNumerator %>%
           distinct(subjid),

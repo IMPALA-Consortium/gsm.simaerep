@@ -18,7 +18,7 @@ test_that("Visualize_Simaerep()",{
 
     expect_s3_class(p, "ggplot")
 
-    vColors <- c("0" = "#DEEBF7", "1" = "#9ECAE1", "2" = "#3182BD", "-1" = "#9ECAE1", "-2" = "#3182BD")
+    vColors <- c("0" = "#3CAF04", "1" = "#FEAA01", "2" = "#FF5858", "-1" = "#FEAA01", "-2" = "#FF5858")
 
     p <- Visualize_Simaerep(dfInput, dfFlagged, vColors = vColors)
 

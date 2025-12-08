@@ -17,7 +17,7 @@ MakeCharts <- function(
   dfGroups,
   dfBounds,
   bDebug = FALSE,
-  strVisualizeFun = "gsm.kri::Visualize_Metric",
+  strVisualizeFun = "gsm.simaerep::Visualize_Metric_Simaerep",
   ...
 ) {
   strMetrics <- unique(dfMetrics$MetricID)

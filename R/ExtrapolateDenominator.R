@@ -20,7 +20,7 @@ ExtrapolateDenominator <- function(dfDenominator,
 
   FUN <- dplyr::arrange
 
-  vLikePatternInstanceName <- stringr::str_to_lower(vLikePatternInstanceName)
+  vLikePatternInstanceName <- tolower(vLikePatternInstanceName)
 
   df_filt <- dfDenominator
 
@@ -28,7 +28,7 @@ ExtrapolateDenominator <- function(dfDenominator,
 
     if (inherits(df_filt, "data.frame")) {
       df_filt <- df_filt %>%
-        filter(! stringr::str_like(.data[[strInstanceNameCol]], .env$vLikePatternInstanceName[i]))
+        filter(! stringr::str_like(tolower(.data[[strInstanceNameCol]]), .env$vLikePatternInstanceName[i]))
     } else {
       query <- glue::glue("LOWER({strInstanceNameCol}) NOT LIKE '{vLikePatternInstanceName[i]}'")
 

@@ -166,12 +166,12 @@ test_that("Check Numerator Events befor/after first/last Denominator and same da
 test_that("AssignOrphans - Orphaned Numerator events will not be dropped if GroupID available", {
   dfNumerator <- clindata::ctms_protdev %>%
     rename(subjid = subjectenrollmentnumber) %>%
-    left_join(clindata::rawplus_dm %>% select(subjid, siteid), by = "subjid") %>%
+    left_join(clindata::rawplus_dm %>% select(subjid, invid), by = "subjid") %>%
     # set 30% of subjectid per subject to NA
     arrange(runif(n())) %>%
     mutate(rnk = row_number() / n(), .by = subjid) %>%
     mutate(subjid = ifelse(rnk < 0.3, NA, subjid)) %>%
-    filter(!is.na(deviationdate), !is.na(siteid))
+    filter(!is.na(deviationdate), !is.na(invid))
 
   dfCumCount <- Input_CumCount(
     dfSubjects = clindata::rawplus_dm,
@@ -294,7 +294,7 @@ test_that("Input_CumCount() - w/o specifying strGroupLevel", {
     strDenominatorDateCol = "visit_dt"
   )
 
-  expect_equal(unique(dfInput$GroupLevel), "siteid")
+  expect_equal(unique(dfInput$GroupLevel), "invid")
 })
 
 test_that("Input_CumCount() - results must not change when strOrphanedMethod == 'assign' w/o oprhans", {
@@ -328,12 +328,12 @@ test_that("Input_CumCount() - results must not change when strOrphanedMethod == 
 test_that("AssignOrphans used with lazy_tbl ", {
   dfNumerator <- clindata::ctms_protdev %>%
     rename(subjid = subjectenrollmentnumber) %>%
-    left_join(clindata::rawplus_dm %>% select(subjid, siteid), by = "subjid") %>%
+    left_join(clindata::rawplus_dm %>% select(subjid, invid), by = "subjid") %>%
     # set 30% of subjectid per subject to NA
     arrange(runif(n())) %>%
     mutate(rnk = row_number() / n(), .by = subjid) %>%
     mutate(subjid = ifelse(rnk < 0.3, NA, subjid)) %>%
-    filter(!is.na(deviationdate), !is.na(siteid))
+    filter(!is.na(deviationdate), !is.na(invid))
 
   db <- duckdb::dbConnect(duckdb::duckdb(), ":memory:")
 

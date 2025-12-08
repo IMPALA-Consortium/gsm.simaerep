@@ -1,24 +1,3 @@
-test_that("Widget_SiteList creates a valid HTML widget", {
-    # Prepare site data
-    dfSites <- data.frame(
-    GroupID = c("S0001", "S0002", "S0003"),
-    InvestigatorLastName = c("Smith", "Jones", "Brown"),
-    Country = c("USA", "UK", "Canada"),
-    Status = c("Active", "Active", "Inactive"),
-    SubjectCount = c(25, 30, 15)
-    )
-
-    # Create site list widget
-    w <- Widget_SiteList(
-        data = dfSites,
-        selectedGroupIDs = "None",
-        maxHeight = "500px"
-    )
-
-    expect_s3_class(w, "htmlwidget")
-
-})
-
 
 test_that("Widget_Simaerep creates a valid HTML widget", {
 
@@ -63,6 +42,12 @@ test_that("Widget_Simaerep creates a valid HTML widget", {
       lMapped$Country
     )
 
+    metrics_wf <- gsm.core::MakeWorkflowList(
+      strNames = NULL,
+      strPath = system.file("workflow/2_metrics", package = "gsm.simaerep"),
+      strPackage = NULL
+    )
+
     lMetric <- gsm.reporting::MakeMetric(lWorkflows = metrics_wf)[1, ]
 
     # Create site list widget
@@ -75,7 +60,7 @@ test_that("Widget_Simaerep creates a valid HTML widget", {
 
     expect_s3_class(w, "htmlwidget")
 
-    vColors <- c("0" = "#3CAF04", "1" = "#FEAA01", "2" = "#FF5858", "-1" = "#FEAA01", "-2" = "#FF5858")
+    vColors <- c("0" = "#9ED782", "1" = "#FEAA01", "2" = "#FF5858", "-1" = "#FEAA01", "-2" = "#FF5858")
 
     w <- Widget_Simaerep(
       dfInput = dfInput,

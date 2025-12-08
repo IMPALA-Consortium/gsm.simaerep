@@ -6,20 +6,34 @@
 #' The function creates all available charts for a metric using the data provided
 #'
 #' @inheritParams gsm.kri::Visualize_Metric
+#' @inheritParams Widget_Simaerep
 #'
 #' @return A list containing the following charts:
+#' - simaerep: A simaerep plot using JavaScript.
 #' - scatterPlot: A scatter plot using JavaScript.
 #' - barChart: A bar chart using JavaScript with metric on the y-axis.
 #' - timeSeries: A time series chart using JavaScript with score on the y-axis.
 #' - metricTable: A table containing all
 #'
 #' @examples
-#' lCharts <- Visualize_Metric_Simaerep(
-#'   dfResults = gsm.core::reportingResults,
-#'   dfBounds = gsm.core::reportingBounds,
-#'   dfGroups = gsm.core::reportingGroups,
-#'   dfMetrics = gsm.core::reportingMetrics,
-#'   strMetricID = "Analysis_kri0001"
+#'
+#'  dfInput <- Input_CumCount(
+#'    dfSubjects = clindata::rawplus_dm,
+#'    dfNumerator = clindata::rawplus_ae,
+#'    dfDenominator = clindata::rawplus_visdt %>% dplyr::mutate(visit_dt = lubridate::ymd(visit_dt)),
+#'    strSubjectCol = "subjid",
+#'    strGroupCol = "invid",
+#'    strGroupLevel = "Site",
+#'    strNumeratorDateCol = "aest_dt",
+#'    strDenominatorDateCol = "visit_dt"
+#'  )
+#'
+#'  dfAnalyzed <- Analyze_Simaerep(dfInput)
+#'  dfFlagged <- Flag_Simaerep(dfAnalyzed, vThreshold = c(-0.99, -0.95, 0.95, 0.99))
+#'
+#' Visualize_Metric_Simaerep(
+#'   dfResults = dfFlagged,
+#'   dfInput = dfInput
 #' )
 #'
 #' @export
@@ -27,7 +41,6 @@
 Visualize_Metric_Simaerep <- function(
   dfResults,
   dfInput,
-  dfFlagged = NULL,
   dfMetrics = NULL,
   dfGroups = NULL,
   dfBounds = NULL,
@@ -47,6 +60,10 @@ Visualize_Metric_Simaerep <- function(
     dfBounds$SnapshotDate <- as.Date(Sys.Date())
   }
 
+  if (!"SnapshotDate" %in% colnames(dfInput)) {
+    dfInput$SnapshotDate <- as.Date(Sys.Date())
+  }
+
   # get number of snapshots
   number_of_snapshots <- length(unique(dfResults$SnapshotDate))
 
@@ -56,7 +73,7 @@ Visualize_Metric_Simaerep <- function(
   }
 
   # Filter to selected MetricID ----------------------------------------------
-  if (!is.null(strMetricID)) {
+  if (!is.null(strMetricID) && "MetricID" %in% colnames(dfResults)) {
     if (!(strMetricID %in% unique(dfResults$MetricID))) {
       gsm.core::LogMessage(
         level = "info",
@@ -64,11 +81,12 @@ Visualize_Metric_Simaerep <- function(
         cli_detail = "alert_info"
       )
       return(NULL)
-    } else {
+    } else if("MetricID" %in% colnames(dfResults)){
       dfResults <- dfResults %>% filter(.data$MetricID == strMetricID)
     }
   }
-  if (!is.null(strMetricID)) {
+
+  if (!is.null(strMetricID) && "MetricID" %in% colnames(dfBounds)) {
     if (!(strMetricID %in% unique(dfBounds$MetricID))) {
       gsm.core::LogMessage(
         level = "info",
@@ -76,12 +94,12 @@ Visualize_Metric_Simaerep <- function(
         cli_detail = "inform"
       )
       dfBounds <- NULL
-    } else {
+    } else if("MetricID" %in% colnames(dfBounds)){
       dfBounds <- dfBounds %>% filter(.data$MetricID == strMetricID)
     }
   }
 
-  if (!is.null(strMetricID)) {
+  if (!is.null(strMetricID) && ! is.null(dfMetrics) && "MetricID" %in% colnames(dfMetrics)) {
     if (!(strMetricID %in% unique(dfMetrics$MetricID))) {
       gsm.core::LogMessage(
         level = "info",
@@ -89,12 +107,12 @@ Visualize_Metric_Simaerep <- function(
         cli_detail = "inform"
       )
       dfMetrics <- NULL
-    } else {
+    } else if(! is.null(dfMetrics) && "MetricID" %in% colnames(dfMetrics)){
       dfMetrics <- dfMetrics %>% filter(.data$MetricID == strMetricID)
     }
   }
 
-  if (!is.null(strMetricID)) {
+  if (!is.null(strMetricID) && "MetricID" %in% colnames(dfInput)) {
     if (!(strMetricID %in% unique(dfInput$MetricID))) {
       gsm.core::LogMessage(
         level = "info",
@@ -102,36 +120,9 @@ Visualize_Metric_Simaerep <- function(
         cli_detail = "inform"
       )
       dfInput <- NULL
-    } else {
+    } else if("MetricID" %in% colnames(dfInput) && "MetricID" %in% colnames(dfInput)){
       dfInput <- dfInput %>% filter(.data$MetricID == strMetricID)
     }
-  }
-
-  if (!is.null(strMetricID)) {
-    if (!(strMetricID %in% unique(dfFlagged$MetricID))) {
-      gsm.core::LogMessage(
-        level = "info",
-        message = "MetricID not found in dfFlagged Please double check input data if intentional.",
-        cli_detail = "inform"
-      )
-      dfFlagged <- NULL
-    } else {
-      dfFlagged <- dfFlagged %>% filter(.data$MetricID == strMetricID)
-    }
-  }
-
-  if (
-    length(unique(dfResults$MetricID)) > 1 |
-      length(unique(dfBounds$MetricID)) > 1 |
-      length(unique(dfMetrics$MetricID)) > 1 |
-      length(unique(dfInput$MetricID)) > 1 |
-      length(unique(dfFlagged$MetricID)) > 1
-  ) {
-    gsm.core::LogMessage(
-      level = "fatal",
-      message = "Multiple MetricIDs found in dfResults, dfBounds, dfMetrics, dfFlagged or dfInput. Specify `MetricID` to subset. No charts will be generated."
-    )
-    return(NULL)
   }
 
   # Prep chart inputs ---------------------------------------------------------
@@ -155,12 +146,6 @@ Visualize_Metric_Simaerep <- function(
     dfBounds_latest <- gsm.kri::FilterByLatestSnapshotDate(dfBounds, strSnapshotDate)
   }
 
-  if (is.null(dfFlagged)) {
-    dfFlagged_latest <- NULL
-  } else {
-    dfFlagged_latest <- gsm.kri::FilterByLatestSnapshotDate(dfFlagged, strSnapshotDate)
-  }
-
   if (nrow(dfResults_latest) == 0) {
     gsm.core::LogMessage(
       level = "warn",
@@ -172,7 +157,7 @@ Visualize_Metric_Simaerep <- function(
       "Widget_Simaerep",
       list(
         dfInput = dfInput_latest,
-        dfFlagged = dfFlagged_latest,
+        dfFlagged = dfResults_latest,
         dfGroups = dfGroups,
         lMetric = lMetric,
         vColors = vColors,
@@ -205,6 +190,7 @@ Visualize_Metric_Simaerep <- function(
         strGroupLevel = lMetric$GroupLevel
       )
     } else {
+      dfResults_latest$MetricID <- NA
       lCharts$metricTable <- gsm.kri::Report_MetricTable(dfResults_latest)
     }
 

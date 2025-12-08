@@ -88,7 +88,7 @@
 #'   )
 #'
 #' # dfDenominator tibble with one subject 4 visits, one on same day as two Numerator events
-#' # Denominator time indicates that they occurr before Numerator events
+#' # Denominator time indicates that they occur before Numerator events
 #' dfDenominator
 #'
 #'
@@ -232,12 +232,16 @@ Input_CumCount <- function(
       !is.na(.data$SubjectID)
     )
 
-  dfNumerator <- AddGroupCol(dfNumerator, dfSubjects, strSubjectCol, strGroupCol, strGroupLevel)
   dfDenominator <- AddGroupCol(dfDenominator, dfSubjects, strSubjectCol, strGroupCol, strGroupLevel)
 
   if (strOrphanedMethod == "assign") {
+    stopifnot("strGroupCol required in dfNumerator columns for 'assign' method!" = strGroupCol %in% colnames(dfNumerator))
+    dfNumerator <- AddGroupCol(dfNumerator, dfSubjects, strSubjectCol, strGroupCol, strGroupLevel)
     dfNumerator <- AssignOrphans(dfNumerator, dfDenominator)
+  } else {
+    dfNumerator <- AddGroupCol(dfNumerator, dfSubjects, strSubjectCol, strGroupCol, strGroupLevel)
   }
+
 
   dfNumerator <- dfNumerator %>%
     filter(!is.na(.data$SubjectID))
@@ -285,6 +289,7 @@ Input_CumCount <- function(
 #' Will also filter all events with no GroupID
 #' @keywords internal
 AddGroupCol <- function(df, dfSubjects, strSubjectCol, strGroupCol, strGroupLevel) {
+
   # if `strGroupLevel` is null, use `strGroupCol`
   if (is.null(strGroupLevel)) {
     strGroupLevel <- strGroupCol

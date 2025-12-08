@@ -1,66 +1,36 @@
-#' Site List Widget
+#' Simaerep Widget
 #'
-#' Create an interactive site list visualization with cross-widget selection support
-#' for gsm.kri reports.
+#' A widget that creates a simaerep visualisation of group-level metric results.
+#' It plots the mean cumulative numerator count per denominator in the left panel and
+#' highlights groups based on the over and under-reporting probability calculated
+#' by the simaerep bootstrap algorithm. Flagged groups are shown in the right panel
+#' including the total numerator counts per single patient.
 #'
 #' @inheritParams Visualize_Simaerep
-#' @param data Data frame containing site information. Must include a \code{GroupID} column.
-#'   Additional columns like \code{InvestigatorLastName}, \code{Country}, \code{Status} are
-#'   optional but recommended for better site identification.
-#' @param selectedGroupIDs Character string specifying initially selected site ID.
-#'   Default is \code{"None"} (no selection).
-#' @param maxHeight Character string specifying maximum height for the scrollable list.
-#'   Default is \code{"600px"}. Use CSS units (px, vh, etc.).
-#' @param showGroupSelector Logical indicating whether to show the group selector dropdown.
-#'   Default is \code{TRUE}.
-#' @param groupLabelKey Character string specifying which column to use for site labels
-#'   in the dropdown. Default is \code{"GroupID"}.
-#' @param dfGroups Optional data frame containing group metadata in Param/Value format
-#'   (columns: GroupID, Param, Value, GroupLevel). Used to display investigator names,
-#'   countries, status, and other metadata in tooltips. Default is \code{NULL}.
-#' @param width Widget width. Default is \code{NULL} for automatic sizing.
-#' @param height Widget height. Default is \code{NULL} for automatic sizing.
-#' @param elementId Optional element ID for the widget container. Useful for Shiny apps.
-#'
+#' @inheritParams gsm.kri::Widget_ScatterPlot
 #' @return An htmlwidget object that can be rendered in R Markdown reports or Shiny apps.
 #' @export
 #' @examples
-#' \dontrun{
-#' library(gsm.simaerep)
 #'
-#' # Prepare site data
-#' dfSites <- data.frame(
-#'   GroupID = c("S0001", "S0002", "S0003"),
-#'   InvestigatorLastName = c("Smith", "Jones", "Brown"),
-#'   Country = c("USA", "UK", "Canada"),
-#'   Status = c("Active", "Active", "Inactive"),
-#'   SubjectCount = c(25, 30, 15)
-#' )
+#'  dfInput <- Input_CumCount(
+#'    dfSubjects = clindata::rawplus_dm,
+#'    dfNumerator = clindata::rawplus_ae,
+#'    dfDenominator = clindata::rawplus_visdt %>% dplyr::mutate(visit_dt = lubridate::ymd(visit_dt)),
+#'    strSubjectCol = "subjid",
+#'    strGroupCol = "invid",
+#'    strGroupLevel = "Site",
+#'    strNumeratorDateCol = "aest_dt",
+#'    strDenominatorDateCol = "visit_dt"
+#'  )
 #'
-#' # Create site list widget
-#' Widget_Simaerep(
-#'   data = dfSites,
-#'   selectedGroupIDs = "None",
-#'   maxHeight = "500px"
-#' )
+#'  dfAnalyzed <- Analyze_Simaerep(dfInput)
+#'  dfFlagged <- Flag_Simaerep(dfAnalyzed, vThreshold = c(-0.99, -0.95, 0.95, 0.99))
 #'
-#' # With custom label
-#' Widget_Simaerep(
-#'   data = dfSites,
-#'   groupLabelKey = "InvestigatorLastName"
-#' )
-#'
-#' # In an R Markdown report
-#' Widget_Simaerep(
-#'   data = dfSites,
-#'   selectedGroupIDs = "S0001",
-#'   maxHeight = "400px",
-#'   showGroupSelector = TRUE
-#' )
-#' }
+#'  Widget_Simaerep(dfInput, dfFlagged)
 #'
 #' @seealso
-#' \code{\link{siteListOutput}} for use in Shiny apps
+#' \code{\link{Widget_SimaerepOutput}} for use in Shiny apps
+#' \code{\link{renderWidget_Simaerep}} for use in Shiny apps
 #'
 #' @export
 Widget_Simaerep <- function(
@@ -71,17 +41,13 @@ Widget_Simaerep <- function(
   strStudyId = "StudyID",
   strScoreCol = "Score",
   vColors = NULL,
-  selectedGroupIDs = "None",
-  maxHeight = "600px",
-  showGroupSelector = TRUE,
-  groupLabelKey = "GroupID",
-  width = NULL,
-  height = NULL,
-  elementId = NULL,
+  bAddGroupSelect = TRUE,
+  strShinyGroupSelectID = "GroupID",
   strOutputLabel = paste0(
     fontawesome::fa("chart-line", fill = "#337ab7"),
     "  Simaerep"
   ),
+  bDebug = FALSE,
   ...
 ) {
 
@@ -92,7 +58,6 @@ Widget_Simaerep <- function(
     nSiteMax = NULL,
     vColors = vColors
   )
-
 
   if (is.data.frame(lMetric) && nrow(lMetric) == 1) {
     # convert to named vector to named list as the first item of a list
@@ -105,55 +70,84 @@ Widget_Simaerep <- function(
 
   # Prepare configuration object
   Config <- list(
-    selectedGroupIDs = selectedGroupIDs,
-    maxHeight = maxHeight,
-    showGroupSelector = showGroupSelector,
-    groupLabelKey = groupLabelKey,
+    showGroupSelector = bAddGroupSelect,
+    groupLabelKey = strShinyGroupSelectID,
     strStudyId = strStudyId,
     strScoreCol = strScoreCol,
     dfGroups = if (is.data.frame(dfGroups)) dfGroups else data.frame(),
-    lMetric = lMetric
+    lMetric = lMetric,
+    ...
   )
-
-  # jsData <- purrr::map(
-  #   lsData,
-  #   ~ jsonlite::toJSON(.x, null = "null", na = "string", auto_unbox = TRUE)
-  # )
-
-  # jsConfig <- purrr::map(
-  #   Config,
-  #   ~ jsonlite::toJSON(.x, null = "null", na = "string", auto_unbox = TRUE)
-  # )
-
-  jsData <- lsData
-  jsConfig <- Config
 
   # Create htmlwidget
   lWidget <- htmlwidgets::createWidget(
     name = 'Widget_Simaerep',
     x = list(
-      data = jsData,
-      config = jsConfig
+      data = lsData,
+      config = Config
     ),
-    # width = width,
-    # height = height,
     package = 'gsm.simaerep',
-    elementId = elementId
-    # sizingPolicy = htmlwidgets::sizingPolicy(
-    #   defaultWidth = "100%",
-    #   defaultHeight = 400,
-    #   padding = 10,
-    #   viewer.padding = 10,
-    #   browser.fill = TRUE,
-    #   viewer.fill = TRUE,
-    #   knitr.figure = TRUE,
-    #   knitr.defaultWidth = "100%",
-    #   knitr.defaultHeight = 400
-    # )
   )
 
   base::attr(lWidget, "output_label") <- strOutputLabel
 
+  if (bDebug) {
+    viewer <- getOption("viewer")
+    options(viewer = NULL)
+    print(lWidget)
+    options(viewer = viewer)
+  }
   return(lWidget)
+}
+
+#' Shiny bindings for Widget_Simaerep
+#'
+#' @description
+#'
+#' Output and render functions for using Widget_Simaerep within Shiny
+#' applications and interactive Rmd documents.
+#'
+#' @param outputId output variable to read from
+#' @param width,height Must be a valid CSS unit (like \code{'100\%'},
+#'   \code{'400px'}, \code{'auto'}) or a number, which will be coerced to a
+#'   string and have \code{'px'} appended.
+#' @param expr An expression that generates a Widget_ScatterPlot
+#' @param env The environment in which to evaluate \code{expr}.
+#' @param quoted Is \code{expr} a quoted expression (with \code{quote()})? This
+#'   is useful if you want to save an expression in a variable.
+#'
+#' @name Widget_Simaerep-shiny
+#'
+#' @export
+Widget_SimaerepOutput <- function(
+    outputId,
+    width = "100%",
+    height = "400px"
+) {
+  htmlwidgets::shinyWidgetOutput(
+    outputId,
+    "Widget_Simaerep",
+    width,
+    height,
+    package = "gsm.simaerep"
+  )
+}
+
+#' @rdname Widget_Simaerep-shiny
+#' @export
+renderWidget_Simaerep <- function(
+    expr,
+    env = parent.frame(),
+    quoted = FALSE
+) {
+  if (!quoted) {
+    expr <- substitute(expr)
+  } # force quoted
+  htmlwidgets::shinyRenderWidget(
+    expr,
+    Widget_SimaerepOutput,
+    env,
+    quoted = TRUE
+  )
 }
 

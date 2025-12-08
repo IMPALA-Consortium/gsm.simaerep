@@ -91,10 +91,10 @@ dfNumerator <- clindata::ctms_protdev %>%
   rename(subjid = subjectenrollmentnumber) %>%
   left_join(
     clindata::rawplus_dm %>% 
-    select(subjid, siteid),
+    select(subjid, invid),
     by = "subjid"
   ) %>%
-  filter(!is.na(deviationdate), !is.na(siteid)) %>%
+  filter(!is.na(deviationdate), !is.na(invid)) %>%
   # set 30% of subjectid per subject to NA
   arrange(runif(n())) %>%
   mutate(rnk = row_number() / n(), .by = subjid) %>%
@@ -115,7 +115,7 @@ dfCumCount <- Input_CumCount(
     dfNumerator = dfNumerator,
     dfDenominator = clindata::rawplus_visdt %>% mutate(visit_dt = lubridate::ymd(visit_dt)),
     strSubjectCol = "subjid",
-    strGroupCol = "siteid",
+    strGroupCol = "invid",
     strGroupLevel = "Site",
     strNumeratorDateCol = "deviationdate",
     strDenominatorDateCol = "visit_dt",
@@ -132,7 +132,7 @@ dfCumCountOrphans <- Input_CumCount(
     dfNumerator = dfNumerator,
     dfDenominator = clindata::rawplus_visdt %>% mutate(visit_dt = lubridate::ymd(visit_dt)),
     strSubjectCol = "subjid",
-    strGroupCol = "siteid",
+    strGroupCol = "invid",
     strGroupLevel = "Site",
     strNumeratorDateCol = "deviationdate",
     strDenominatorDateCol = "visit_dt",
@@ -177,7 +177,7 @@ dfInputExtra <- Input_CumCount(
   dfSubjects = clindata::rawplus_dm,
   dfNumerator = dfNumerator,
   dfDenominator = dfDenominator,
-  strGroupCol = "siteid",
+  strGroupCol = "invid",
   strSubjectCol = "subjid",
   strGroupLevel = "Site",
   strNumeratorDateCol = "mincreated_dts",
@@ -191,7 +191,7 @@ dfInputRegular <- Input_CumCount(
   dfSubjects = clindata::rawplus_dm,
   dfNumerator = dfNumerator,
   dfDenominator = dfDenominator,
-  strGroupCol = "siteid",
+  strGroupCol = "invid",
   strSubjectCol = "subjid",
   strGroupLevel = "Site",
   strNumeratorDateCol = "mincreated_dts",

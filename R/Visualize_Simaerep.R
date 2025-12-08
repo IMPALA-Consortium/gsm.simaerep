@@ -2,13 +2,22 @@
 
 
 #' Visualize Simaerep
+#'
+#' A widget that creates a simaerep visualisation of group-level metric results.
+#' It plots the mean cumulative numerator count per denominator in the left panel and
+#' highlights groups based on the over and under-reporting probability calculated
+#' by the simaerep bootstrap algorithm. Flagged groups are shown in the right panel
+#' including the total numerator counts per single patient.
+#'
 #' @description create a ggplot2 visualisation for a simaerep KRI
 #' @param dfInput data.frame created by [Input_CumCount()]
 #' @param dfFlagged data.frame created by [Flag_Simaerep()]
-#' @param strStudyID character, study label, Default: "StudyID"
+#' @param strStudyId character, study label, Default: "StudyID"
 #' @param strScoreCol character, name of score column in dfFlagged, Default: "Score"
 #' @param nSiteMax integer, maximum of flagged sites to plot, Default: 16
 #' @param vColors vector, named hex values for every Flag value in dfFlagged$Flag, Default NULL
+#' @param strDenominator vector, label for Denominator x-column, Default: "Denominator"
+#' @param strNumerator vector, label for Numerator y-column, Default: "Numerator"
 #' @export
 #' @examples
 #'  dfInput <- Input_CumCount(
@@ -31,28 +40,50 @@ Visualize_Simaerep <- function(dfInput,
                                strStudyId = "StudyID",
                                strScoreCol = "Score",
                                nSiteMax = 16,
-                               vColors = NULL
+                               vColors = NULL,
+                               strDenominator = "Denominator",
+                               strNumerator = "Numerator"
                                ) {
 
-    lsPrepData <- prepare_visualization_data(
-      dfInput = dfInput,
-      dfFlagged = dfFlagged,
+  is_installed_ggplot2 <- try({
+    suppressPackageStartupMessages(requireNamespace("ggplot2", quietly = TRUE))
+  })
+
+  stopifnot("Please install ggplot2" = is_installed_ggplot2)
+
+  is_installed_cowplot <- try({
+    suppressPackageStartupMessages(requireNamespace("cowplot", quietly = TRUE))
+  })
+
+  stopifnot("Please install cowplot" = is_installed_cowplot)
+
+  is_installed_forcats <- try({
+    suppressPackageStartupMessages(requireNamespace("forcats", quietly = TRUE))
+  })
+
+  stopifnot("Please install forcats" = is_installed_forcats)
+
+  lsPrepData <- prepare_visualization_data(
+    dfInput = dfInput,
+    dfFlagged = dfFlagged,
+    strScoreCol = strScoreCol,
+    nSiteMax = nSiteMax,
+    vColors = vColors
+  )
+
+  args <- c(
+    lsPrepData,
+    list(
+      strStudyId = strStudyId,
       strScoreCol = strScoreCol,
-      nSiteMax = nSiteMax,
-      vColors = vColors
+      strDenominator = strDenominator,
+      strNumerator = strNumerator
     )
+  )
 
-    args <- c(
-      lsPrepData,
-      list(
-        strStudyId = strStudyId,
-        strScoreCol = strScoreCol
-      )
-    )
+  p <- do.call(plot_simaerep, args)
 
-    p <- do.call(plot_simaerep, args)
-
-    return(p)
+  return(p)
 
 }
 
@@ -68,6 +99,13 @@ prepare_visualization_data <- function(dfInput,
     # Handle Colors -----------------------------------------------------
 
     if (is.null(vColors)) {
+
+      is_installed_scales <- try({
+        suppressPackageStartupMessages(requireNamespace("scales", quietly = TRUE))
+      })
+
+      stopifnot("Please install scales" = is_installed_scales)
+
       vColors <- scales::brewer_pal(type = "seq", "Blues")(n_distinct(abs(dfFlagged$Flag)))
       names(vColors) <- sort(unique(abs(as.numeric(dfFlagged$Flag))))
 
@@ -92,7 +130,7 @@ prepare_visualization_data <- function(dfInput,
           FlagStr = tidyr::replace_na(as.character(.data$Flag), "NA"),
           Color = vColors[as.character(.data$FlagStr)],
         ) %>%
-        select(- .data$FlagStr)
+        select(- "FlagStr")
 
     }
 
@@ -189,35 +227,40 @@ plot_simaerep <- function(df_mean_study,
                         df_visit,
                         df_label_sites,
                         strStudyId,
-                        strScoreCol) {
+                        strScoreCol,
+                        strNumerator,
+                        strDenominator) {
 
 
     # study plot -----------------------------------------------------------------
 
 
   p_study <- df_mean_group_not_flagged %>%
-    ggplot(aes(Denominator, .data[["cum_mean_dev_event"]])) +
-    geom_line(aes(
+    ggplot2::ggplot(ggplot2::aes(.data$Denominator, .data[["cum_mean_dev_event"]])) +
+    ggplot2::geom_line(ggplot2::aes(
       group = .data$GroupID,
       color = .data$Color
     )) +
-    geom_line(aes(
+    ggplot2::geom_line(ggplot2::aes(
       group = .data$GroupID,
       color = .data$Color
     ),
     data = df_mean_group_flagged,
     linewidth = 1
     ) +
-    geom_line(aes(group = 1),
+    ggplot2::geom_line(ggplot2::aes(group = 1),
               data = df_mean_study,
-              color = "gold3",
+              color = "black",
               linewidth = 1,
               alpha = 0.5
     ) +
-    scale_color_identity() +
-    theme_minimal() +
-    theme(legend.position = "bottom") +
-    labs(y = paste0("Mean Cumulative Numerator Count per Site"))
+    ggplot2::scale_color_identity() +
+    ggplot2::theme_minimal() +
+    ggplot2::theme(legend.position = "bottom") +
+    ggplot2::labs(
+      y = paste0("Mean Cumulative", strNumerator ,"Count per Site"),
+      x = strDenominator
+    )
 
   # site plot -------------------------------------------------------------------
 
@@ -249,12 +292,12 @@ plot_simaerep <- function(df_mean_study,
 
 
   p_site <- df_visit %>%
-    ggplot(aes(.data$Denominator, .data$Numerator)) +
-    geom_line(aes(group = .data$SubjectID),
+    ggplot2::ggplot(ggplot2::aes(.data$Denominator, .data$Numerator)) +
+    ggplot2::geom_line(ggplot2::aes(group = .data$SubjectID),
               color = "grey",
               alpha = 0.5
     ) +
-    geom_line(aes(
+    ggplot2::geom_line(ggplot2::aes(
       y = .data[["cum_mean_dev_event"]],
       group = .data$GroupID,
       color = .data$Color,
@@ -263,33 +306,36 @@ plot_simaerep <- function(df_mean_study,
     data = df_mean_group_flagged,
     linewidth = 1
     ) +
-    geom_line(aes(y = .data[["cum_mean_dev_event"]]),
+    ggplot2::geom_line(ggplot2::aes(y = .data[["cum_mean_dev_event"]]),
               data = df_mean_study,
-              color = "gold3",
+              color = "black",
               linewidth = 1,
               alpha = 0.5) +
-    geom_text(aes(label = .data$label_subj),
+    ggplot2::geom_text(ggplot2::aes(label = .data$label_subj),
               data = df_label_sites,
               x = 0.2 * max_denom,
               y = 0.9 * max_num,
               na.rm = TRUE) +
-    geom_label(aes(label = .data$label_score,
+    ggplot2::geom_label(ggplot2::aes(label = .data$label_score,
                    color = .data$Color),
                data = df_label_sites,
                x = 0.8 * max_denom,
                y = 0.9 * max_num,
                na.rm = TRUE) +
-    geom_label(aes(label = .data$label_delta,
+    ggplot2::geom_label(ggplot2::aes(label = .data$label_delta,
                     color = .data$Color),
                 data = df_label_sites,
                 x = 0.8 * max_denom,
                 y = 0.1 * max_num,
                 na.rm = TRUE) +
-    scale_color_identity() +
-    facet_wrap(~ .data$GroupID) +
-    theme_minimal() +
-    theme(legend.position = "none") +
-    labs(y = paste0("Mean Cumulative Numerator Count per Site"))
+    ggplot2::scale_color_identity() +
+    ggplot2::facet_wrap(~ .data$GroupID) +
+    ggplot2::theme_minimal() +
+    ggplot2::theme(legend.position = "none") +
+    ggplot2::labs(
+      y = paste0("Mean Cumulative", strNumerator ,"Count per Site"),
+      x = strDenominator
+    )
 
   # title -----------------------------------------------------
 
@@ -312,3 +358,5 @@ plot_simaerep <- function(df_mean_study,
   return(gr)
 
 }
+
+

@@ -18,6 +18,9 @@ spec:
       type: numeric
     Flag:
       type: numeric
+  Reporting_Input:
+    _all:
+      required: true
   Reporting_Metrics:
     _all:
       required: true
@@ -25,6 +28,11 @@ spec:
     _all:
       required: true
 steps:
+  - output: Reporting_Input_Site
+    name: gsm.core::RunQuery
+    params:
+      df: Reporting_Input
+      strQuery: "SELECT * FROM df WHERE GroupLevel == 'Site'"
   - output: Reporting_Results_Site
     name: gsm.core::RunQuery
     params:
@@ -39,15 +47,16 @@ steps:
     name: gsm.core::RunQuery
     params:
       df: Reporting_Metrics_Site
-      strQuery: "SELECT * FROM df WHERE LOWER(AnalysisType) IN ('identity', 'binary')"
+      strQuery: "SELECT * FROM df WHERE LOWER(AnalysisType) = 'identity'"
   - output: Reporting_Metrics_Site_Rate
     name: gsm.core::RunQuery
     params:
       df: Reporting_Metrics_Site
-      strQuery: "SELECT * FROM df WHERE LOWER(AnalysisType) == 'rate'"
+      strQuery: "SELECT * FROM df WHERE LOWER(AnalysisType) IN ('rate', 'binary')"
   - output: lCharts_Site_Identity
-    name: gsm.kri::MakeCharts
+    name: gsm.simaerep::MakeCharts
     params:
+      dfInput: Reporting_Input_Site
       dfResults: Reporting_Results_Site
       dfMetrics: Reporting_Metrics_Site_Identity
       dfGroups: Reporting_Groups
@@ -62,7 +71,7 @@ steps:
         Widget_ScatterPlot:
           yType: logarithmic
   - output: lCharts_Site_Rate
-    name: gsm.kri::MakeCharts
+    name: gsm.simaerep::MakeCharts
     params:
       dfResults: Reporting_Results_Site
       dfMetrics: Reporting_Metrics_Site_Rate
@@ -75,6 +84,7 @@ steps:
         - Metric
         - Numerator
         - Denominator
+      strVisualizeFun: "gsm.kri::Visualize_Metric"
   - output: lCharts
     name: BindLists
     params:
