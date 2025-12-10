@@ -1,34 +1,6 @@
+
+
 test_that("yaml workflow produces same table as R function", {
-  mapping <- gsm.core::MakeWorkflowList(
-    strNames = NULL,
-    strPath = system.file("workflow/1_mappings", package = "gsm.simaerep"),
-    strPackage = NULL
-  )
-
-  lRaw <- list(
-    Raw_SUBJ = clindata::rawplus_dm,
-    Raw_AE = clindata::rawplus_ae,
-    Raw_VISIT = clindata::rawplus_visdt,
-    Raw_PD = clindata::ctms_protdev,
-    Raw_ENROLL = clindata::rawplus_enroll,
-    Raw_SITE = clindata::ctms_site,
-    Raw_STUDY = clindata::ctms_study,
-    Raw_SDRGCOMP = clindata::rawplus_sdrgcomp
-  )
-
-  lIngest <- gsm.mapping::Ingest(lRaw, gsm.mapping::CombineSpecs(mapping))
-
-  lMapped <- gsm.core::RunWorkflows(lWorkflows = mapping, lData = lIngest)
-
-  kri_wf <- gsm.core::MakeWorkflowList(
-    strNames = NULL,
-    strPath = system.file("workflow/2_metrics", package = "gsm.simaerep"),
-    strPackage = NULL
-  )
-
-  lAnalysis <- gsm.core::RunWorkflows(lWorkflows = kri_wf, lData = lMapped)
-
-  dfMetrics <- gsm.reporting::MakeMetric(lWorkflows = kri_wf)
 
   dfInputPD <- Input_CumCount(
     dfSubjects = clindata::rawplus_dm,
@@ -128,4 +100,35 @@ test_that("yaml workflow produces same table as R function", {
 
   expect_true(all(sites_flaggedPD2 %in% sites_flaggedPD_wflow))
   expect_true(all(sites_flaggedPD2_wflow %in% sites_flaggedPD))
+})
+
+test_that("yaml workflow creates report", {
+
+  module_wf_gsm <- gsm.core::MakeWorkflowList(
+    strNames = NULL,
+    strPath = system.file("workflow/4_modules", package = "gsm.simaerep"),
+    strPackage = NULL
+  )
+
+  report_path <- system.file("report", "Report_KRI.Rmd", package = "gsm.simaerep")
+  n_steps <- length(module_wf_gsm$report_kri_site$steps)
+  module_wf_gsm$report_kri_site$steps[[n_steps]]$params$strInputPath <- report_path
+
+  tmp_dir <- tempdir()
+  file <- "report_kri_site.html"
+  file_full <- file.path(tmp_dir, file)
+
+  withr::with_file(file_full, {
+
+    module_wf_gsm$report_kri_site$steps[[n_steps]]$params$strOutputFile <- "report_kri_site.html"
+    module_wf_gsm$report_kri_site$steps[[n_steps]]$params$strOutputDir <- tmp_dir
+
+
+    lModule <- gsm.core::RunWorkflows(module_wf_gsm, lReport)
+
+    expect_true(file.exists(file_full))
+
+  })
+
+
 })

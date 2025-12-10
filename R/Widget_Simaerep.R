@@ -47,7 +47,6 @@ Widget_Simaerep <- function(
     fontawesome::fa("chart-line", fill = "#337ab7"),
     "  Simaerep"
   ),
-  bDebug = FALSE,
   ...
 ) {
 
@@ -91,14 +90,10 @@ Widget_Simaerep <- function(
 
   base::attr(lWidget, "output_label") <- strOutputLabel
 
-  if (bDebug) {
-    viewer <- getOption("viewer")
-    options(viewer = NULL)
-    print(lWidget)
-    options(viewer = viewer)
-  }
   return(lWidget)
 }
+
+# nocov start
 
 #' Shiny bindings for Widget_Simaerep
 #'
@@ -151,3 +146,4 @@ renderWidget_Simaerep <- function(
   )
 }
 
+# nocov end

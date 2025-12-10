@@ -43,7 +43,6 @@ Visualize_Metric_Simaerep <- function(
   dfInput,
   dfMetrics = NULL,
   dfGroups = NULL,
-  dfBounds = NULL,
   strMetricID = NULL,
   strSnapshotDate = NULL,
   bDebug = FALSE,
@@ -54,10 +53,6 @@ Visualize_Metric_Simaerep <- function(
   # if SnapshotDate is missing set it to today for all records
   if (!"SnapshotDate" %in% colnames(dfResults)) {
     dfResults$SnapshotDate <- as.Date(Sys.Date())
-  }
-
-  if (!"SnapshotDate" %in% colnames(dfBounds) & !is.null(dfBounds)) {
-    dfBounds$SnapshotDate <- as.Date(Sys.Date())
   }
 
   if (!"SnapshotDate" %in% colnames(dfInput)) {
@@ -73,6 +68,7 @@ Visualize_Metric_Simaerep <- function(
   }
 
   # Filter to selected MetricID ----------------------------------------------
+
   if (!is.null(strMetricID) && "MetricID" %in% colnames(dfResults)) {
     if (!(strMetricID %in% unique(dfResults$MetricID))) {
       gsm.core::LogMessage(
@@ -86,16 +82,16 @@ Visualize_Metric_Simaerep <- function(
     }
   }
 
-  if (!is.null(strMetricID) && "MetricID" %in% colnames(dfBounds)) {
-    if (!(strMetricID %in% unique(dfBounds$MetricID))) {
+  if (!is.null(strMetricID) && "MetricID" %in% colnames(dfInput)) {
+    if (!(strMetricID %in% unique(dfInput$MetricID))) {
       gsm.core::LogMessage(
         level = "info",
-        message = "MetricID not found in dfBounds. Please double check input data if intentional.",
-        cli_detail = "inform"
+        message = "MetricID not found in dfInput. No charts will be generated.",
+        cli_detail = "alert_info"
       )
-      dfBounds <- NULL
-    } else if("MetricID" %in% colnames(dfBounds)){
-      dfBounds <- dfBounds %>% filter(.data$MetricID == strMetricID)
+     return(NULL)
+    } else if("MetricID" %in% colnames(dfInput) && "MetricID" %in% colnames(dfInput)){
+      dfInput <- dfInput %>% filter(.data$MetricID == strMetricID)
     }
   }
 
@@ -109,19 +105,6 @@ Visualize_Metric_Simaerep <- function(
       dfMetrics <- NULL
     } else if(! is.null(dfMetrics) && "MetricID" %in% colnames(dfMetrics)){
       dfMetrics <- dfMetrics %>% filter(.data$MetricID == strMetricID)
-    }
-  }
-
-  if (!is.null(strMetricID) && "MetricID" %in% colnames(dfInput)) {
-    if (!(strMetricID %in% unique(dfInput$MetricID))) {
-      gsm.core::LogMessage(
-        level = "info",
-        message = "MetricID not found in dfInput Please double check input data if intentional.",
-        cli_detail = "inform"
-      )
-      dfInput <- NULL
-    } else if("MetricID" %in% colnames(dfInput) && "MetricID" %in% colnames(dfInput)){
-      dfInput <- dfInput %>% filter(.data$MetricID == strMetricID)
     }
   }
 
@@ -140,17 +123,18 @@ Visualize_Metric_Simaerep <- function(
   dfResults_latest <- gsm.kri::FilterByLatestSnapshotDate(dfResults, strSnapshotDate)
   dfInput_latest <- gsm.kri::FilterByLatestSnapshotDate(dfInput, strSnapshotDate)
 
-  if (is.null(dfBounds)) {
-    dfBounds_latest <- NULL
-  } else {
-    dfBounds_latest <- gsm.kri::FilterByLatestSnapshotDate(dfBounds, strSnapshotDate)
-  }
-
   if (nrow(dfResults_latest) == 0) {
     gsm.core::LogMessage(
       level = "warn",
       message = "No data found for specified snapshot date: {strSnapshotDate}. No charts will be generated."
     )
+    return(NULL)
+  } else if (nrow(dfInput_latest) == 0) {
+    gsm.core::LogMessage(
+      level = "warn",
+      message = "No data found for specified snapshot date: {strSnapshotDate}. No charts will be generated."
+    )
+    return(NULL)
   } else {
 
     lCharts$simaerepChart <- do.call(
@@ -169,7 +153,6 @@ Visualize_Metric_Simaerep <- function(
         dfResults = dfResults_latest,
         lMetric = lMetric,
         dfGroups = dfGroups,
-        dfBounds = dfBounds_latest,
         bDebug = bDebug,
         ...
     )
