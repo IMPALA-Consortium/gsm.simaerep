@@ -41,7 +41,8 @@ Suggests:
     cowplot,
     ggplot2,
     scales,
-    forcats
+    forcats,
+    withr
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 URL: https://impala-consortium.github.io/gsm.simaerep/

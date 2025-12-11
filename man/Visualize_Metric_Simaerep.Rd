@@ -9,7 +9,6 @@ Visualize_Metric_Simaerep(
   dfInput,
   dfMetrics = NULL,
   dfGroups = NULL,
-  dfBounds = NULL,
   strMetricID = NULL,
   strSnapshotDate = NULL,
   bDebug = FALSE,
@@ -37,12 +36,6 @@ details see the Data Model vignette: `vignette("DataModel", package =
 \item{dfGroups}{`data.frame` Group-level metadata dictionary. Created by
 passing CTMS site and study data to [MakeLongMeta()]. Expected columns:
 `GroupID`, `GroupLevel`, `Param`, `Value`.}
-
-\item{dfBounds}{`data.frame` Set of predicted percentages/rates and upper-
-and lower-bounds across the full range of sample sizes/total exposure
-values for reporting. Created by passing `dfResults` and `dfMetrics` to
-[MakeBounds()]. Expected columns: `Threshold`, `Denominator`, `Numerator`,
-`Metric`, `MetricID`, `StudyID`, `SnapshotDate`.}
 
 \item{strMetricID}{`character` MetricID to subset the data.}
 
