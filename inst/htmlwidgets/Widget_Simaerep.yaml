@@ -1,0 +1,5 @@
+dependencies:
+  - name: gsmSimaerepViz
+    version: 0.1.0
+    src: 'htmlwidgets/lib/gsm.simaerep.viz'
+    script: 'index.js'

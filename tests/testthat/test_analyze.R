@@ -16,7 +16,7 @@ test_that("test Analyze_Simaerep PD", {
     dfNumerator = clindata::ctms_protdev %>% rename(subjid = subjectenrollmentnumber),
     dfDenominator = clindata::rawplus_visdt %>% mutate(visit_dt = lubridate::ymd(visit_dt)),
     strSubjectCol = "subjid",
-    strGroupCol = "siteid",
+    strGroupCol = "invid",
     strGroupLevel = "Site",
     strNumeratorDateCol = "deviationdate",
     strDenominatorDateCol = "visit_dt"
@@ -33,7 +33,7 @@ test_that("test Analyze_Simaerep AE", {
     dfNumerator = clindata::rawplus_ae,
     dfDenominator = clindata::rawplus_visdt %>% mutate(visit_dt = lubridate::ymd(visit_dt)),
     strSubjectCol = "subjid",
-    strGroupCol = "siteid",
+    strGroupCol = "invid",
     strGroupLevel = "Site",
     strNumeratorDateCol = "aest_dt",
     strDenominatorDateCol = "visit_dt"

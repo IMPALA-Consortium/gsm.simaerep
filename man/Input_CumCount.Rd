@@ -124,7 +124,7 @@ dfDenominator <- tibble::tibble(
   )
 
 # dfDenominator tibble with one subject 4 visits, one on same day as two Numerator events
-# Denominator time indicates that they occurr before Numerator events
+# Denominator time indicates that they occur before Numerator events
 dfDenominator
 
 
@@ -151,7 +151,7 @@ Input_CumCount(
   dfNumerator = clindata::rawplus_ae,
   dfDenominator = clindata::rawplus_visdt \%>\% dplyr::mutate(visit_dt = lubridate::ymd(visit_dt)),
   strSubjectCol = "subjid",
-  strGroupCol = "siteid",
+  strGroupCol = "invid",
   strGroupLevel = "Site",
   strNumeratorDateCol = "aest_dt",
   strDenominatorDateCol = "visit_dt"

@@ -1,7 +1,7 @@
 meta:
   Type: Reporting
-  ID: Results
-  Description: Reporting Results Data
+  ID: Input
+  Description: Reporting Input Data
   Priority: 1
 spec:
   Mapped_STUDY:
@@ -19,12 +19,12 @@ steps:
     params:
       x: GroupID
 
-  # Stack all analysis results data into a single data frame.
-  - output: Results_Summary
+  # Stack all analysis input data into a single data frame.
+
+  - output: Reporting_Input
     name: gsm.reporting::BindResults
     params:
       lAnalysis: lAnalyzed
-      strName: Analysis_Flagged
+      strName: Analysis_Input
       strStudyID: strStudyID
-
 

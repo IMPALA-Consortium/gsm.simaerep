@@ -21,3 +21,8 @@ reference:
   - Flag_Simaerep
   - BindLists
   - ExtrapolateDenominator
+  - Visualize_Simaerep
+  - Widget_Simaerep
+  - Visualize_Metric_Simaerep
+  - MakeCharts
+  - Widget_Simaerep-shiny

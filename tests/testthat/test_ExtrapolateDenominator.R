@@ -50,8 +50,8 @@ test_that("ExtrapolateDenominator", {
       nrow()
 
     visit_count_no_num <- dfDenominator %>%
-      filter(! stringr::str_like(.data[[strInstanceNameCol]], "%unsch%")) %>%
-      filter(! stringr::str_like(.data[[strInstanceNameCol]], "%disc%")) %>%
+      filter(! stringr::str_like(tolower(.data[[strInstanceNameCol]]), "%unsch%")) %>%
+      filter(! stringr::str_like(tolower(.data[[strInstanceNameCol]]), "%disc%")) %>%
       anti_join(
         dfNumerator %>%
           distinct(subjid),
@@ -96,7 +96,7 @@ test_that("ExtrapolateDenominator called from Input_CumCount()", {
       dfSubjects = clindata::rawplus_dm,
       dfNumerator = dfNumerator,
       dfDenominator = dfDenominator,
-      strGroupCol = "siteid",
+      strGroupCol = "invid",
       strSubjectCol = "subjid",
       strGroupLevel = "Site",
       strNumeratorDateCol = "mincreated_dts",
@@ -110,7 +110,7 @@ test_that("ExtrapolateDenominator called from Input_CumCount()", {
       dfSubjects = clindata::rawplus_dm,
       dfNumerator = dfNumerator,
       dfDenominator = dfDenominator,
-      strGroupCol = "siteid",
+      strGroupCol = "invid",
       strSubjectCol = "subjid",
       strGroupLevel = "Site",
       strNumeratorDateCol = "mincreated_dts",
@@ -194,7 +194,7 @@ test_that("ExtrapolateDenominator called from Input_CumCount() with lazy table",
     dfSubjects = dplyr::tbl(db, "dm"),
     dfNumerator = dplyr::tbl(db, "disc"),
     dfDenominator = dplyr::tbl(db, "visit"),
-    strGroupCol = "siteid",
+    strGroupCol = "invid",
     strSubjectCol = "subjid",
     strGroupLevel = "Site",
     strNumeratorDateCol = "mincreated_dts",
@@ -210,7 +210,7 @@ test_that("ExtrapolateDenominator called from Input_CumCount() with lazy table",
     dfSubjects = clindata::rawplus_dm,
     dfNumerator = dfNumerator,
     dfDenominator = dfDenominator,
-    strGroupCol = "siteid",
+    strGroupCol = "invid",
     strSubjectCol = "subjid",
     strGroupLevel = "Site",
     strNumeratorDateCol = "mincreated_dts",

@@ -4,7 +4,7 @@ test_that("test Input_CumCount PD", {
     dfNumerator = clindata::ctms_protdev %>% rename(subjid = subjectenrollmentnumber),
     dfDenominator = clindata::rawplus_visdt %>% mutate(visit_dt = lubridate::ymd(visit_dt)),
     strSubjectCol = "subjid",
-    strGroupCol = "siteid",
+    strGroupCol = "invid",
     strGroupLevel = "Site",
     strNumeratorDateCol = "deviationdate",
     strDenominatorDateCol = "visit_dt"
@@ -18,7 +18,7 @@ test_that("test Input_CumCount AE", {
     dfNumerator = clindata::rawplus_ae,
     dfDenominator = clindata::rawplus_visdt %>% mutate(visit_dt = lubridate::ymd(visit_dt)),
     strSubjectCol = "subjid",
-    strGroupCol = "siteid",
+    strGroupCol = "invid",
     strGroupLevel = "Site",
     strNumeratorDateCol = "aest_dt",
     strDenominatorDateCol = "visit_dt"
@@ -32,7 +32,7 @@ test_that("Input_CumCount same final count as Input_Rate for AEs and Visits with
     dfNumerator = clindata::rawplus_ae,
     dfDenominator = clindata::rawplus_visdt %>% mutate(visit_dt = lubridate::ymd(visit_dt)),
     strSubjectCol = "subjid",
-    strGroupCol = "siteid",
+    strGroupCol = "invid",
     strGroupLevel = "Site",
     strNumeratorDateCol = "aest_dt",
     strDenominatorDateCol = "visit_dt"
@@ -48,7 +48,7 @@ test_that("Input_CumCount same final count as Input_Rate for AEs and Visits with
     dfNumerator = clindata::rawplus_ae %>% filter(!is.na(aest_dt)),
     dfDenominator = clindata::rawplus_visdt %>% filter(!is.na(lubridate::ymd(visit_dt))),
     strSubjectCol = "subjid",
-    strGroupCol = "siteid",
+    strGroupCol = "invid",
     strGroupLevel = "Site"
   ) %>%
     select(-Metric) %>%
@@ -64,7 +64,7 @@ test_that("Input_CumCount same final count as Input_Rate for PDs and Visits with
     dfNumerator = clindata::ctms_protdev %>% rename(subjid = subjectenrollmentnumber),
     dfDenominator = clindata::rawplus_visdt %>% mutate(visit_dt = lubridate::ymd(visit_dt)),
     strSubjectCol = "subjid",
-    strGroupCol = "siteid",
+    strGroupCol = "invid",
     strGroupLevel = "Site",
     strNumeratorDateCol = "deviationdate",
     strDenominatorDateCol = "visit_dt"
@@ -80,7 +80,7 @@ test_that("Input_CumCount same final count as Input_Rate for PDs and Visits with
     dfNumerator = clindata::ctms_protdev %>% rename(subjid = subjectenrollmentnumber) %>% filter(!is.na(deviationdate)),
     dfDenominator = clindata::rawplus_visdt %>% filter(!is.na(lubridate::ymd(visit_dt))),
     strSubjectCol = "subjid",
-    strGroupCol = "siteid",
+    strGroupCol = "invid",
     strGroupLevel = "Site"
   ) %>%
     select(-Metric) %>%
@@ -95,7 +95,7 @@ test_that("As Denominator count increases Numerator count must never decrease", 
     dfNumerator = clindata::rawplus_ae,
     dfDenominator = clindata::rawplus_visdt %>% mutate(visit_dt = lubridate::ymd(visit_dt)),
     strSubjectCol = "subjid",
-    strGroupCol = "siteid",
+    strGroupCol = "invid",
     strGroupLevel = "Site",
     strNumeratorDateCol = "aest_dt",
     strDenominatorDateCol = "visit_dt"
@@ -166,19 +166,19 @@ test_that("Check Numerator Events befor/after first/last Denominator and same da
 test_that("AssignOrphans - Orphaned Numerator events will not be dropped if GroupID available", {
   dfNumerator <- clindata::ctms_protdev %>%
     rename(subjid = subjectenrollmentnumber) %>%
-    left_join(clindata::rawplus_dm %>% select(subjid, siteid), by = "subjid") %>%
+    left_join(clindata::rawplus_dm %>% select(subjid, invid), by = "subjid") %>%
     # set 30% of subjectid per subject to NA
     arrange(runif(n())) %>%
     mutate(rnk = row_number() / n(), .by = subjid) %>%
     mutate(subjid = ifelse(rnk < 0.3, NA, subjid)) %>%
-    filter(!is.na(deviationdate), !is.na(siteid))
+    filter(!is.na(deviationdate), !is.na(invid))
 
   dfCumCount <- Input_CumCount(
     dfSubjects = clindata::rawplus_dm,
     dfNumerator = dfNumerator,
     dfDenominator = clindata::rawplus_visdt %>% mutate(visit_dt = lubridate::ymd(visit_dt)),
     strSubjectCol = "subjid",
-    strGroupCol = "siteid",
+    strGroupCol = "invid",
     strGroupLevel = "Site",
     strNumeratorDateCol = "deviationdate",
     strDenominatorDateCol = "visit_dt",
@@ -193,7 +193,7 @@ test_that("AssignOrphans - Orphaned Numerator events will not be dropped if Grou
     dfNumerator = dfNumerator,
     dfDenominator = clindata::rawplus_visdt %>% mutate(visit_dt = lubridate::ymd(visit_dt)),
     strSubjectCol = "subjid",
-    strGroupCol = "siteid",
+    strGroupCol = "invid",
     strGroupLevel = "Site",
     strNumeratorDateCol = "deviationdate",
     strDenominatorDateCol = "visit_dt",
@@ -271,7 +271,7 @@ test_that("Input_CumCount() - use prexisting eventIDs", {
         denomid = row_number()
       ),
     strSubjectCol = "subjid",
-    strGroupCol = "siteid",
+    strGroupCol = "invid",
     strGroupLevel = "Site",
     strNumeratorDateCol = "aest_dt",
     strDenominatorDateCol = "visit_dt",
@@ -288,13 +288,13 @@ test_that("Input_CumCount() - w/o specifying strGroupLevel", {
     dfNumerator = clindata::rawplus_ae,
     dfDenominator = clindata::rawplus_visdt %>% mutate(visit_dt = lubridate::ymd(visit_dt)),
     strSubjectCol = "subjid",
-    strGroupCol = "siteid",
+    strGroupCol = "invid",
     strGroupLevel = NULL,
     strNumeratorDateCol = "aest_dt",
     strDenominatorDateCol = "visit_dt"
   )
 
-  expect_equal(unique(dfInput$GroupLevel), "siteid")
+  expect_equal(unique(dfInput$GroupLevel), "invid")
 })
 
 test_that("Input_CumCount() - results must not change when strOrphanedMethod == 'assign' w/o oprhans", {
@@ -303,7 +303,7 @@ test_that("Input_CumCount() - results must not change when strOrphanedMethod == 
     dfNumerator = clindata::rawplus_ae,
     dfDenominator = clindata::rawplus_visdt %>% mutate(visit_dt = lubridate::ymd(visit_dt)),
     strSubjectCol = "subjid",
-    strGroupCol = "siteid",
+    strGroupCol = "invid",
     strGroupLevel = NULL,
     strNumeratorDateCol = "aest_dt",
     strDenominatorDateCol = "visit_dt"
@@ -314,7 +314,7 @@ test_that("Input_CumCount() - results must not change when strOrphanedMethod == 
     dfNumerator = clindata::rawplus_ae,
     dfDenominator = clindata::rawplus_visdt %>% mutate(visit_dt = lubridate::ymd(visit_dt)),
     strSubjectCol = "subjid",
-    strGroupCol = "siteid",
+    strGroupCol = "invid",
     strGroupLevel = NULL,
     strNumeratorDateCol = "aest_dt",
     strDenominatorDateCol = "visit_dt",
@@ -328,12 +328,12 @@ test_that("Input_CumCount() - results must not change when strOrphanedMethod == 
 test_that("AssignOrphans used with lazy_tbl ", {
   dfNumerator <- clindata::ctms_protdev %>%
     rename(subjid = subjectenrollmentnumber) %>%
-    left_join(clindata::rawplus_dm %>% select(subjid, siteid), by = "subjid") %>%
+    left_join(clindata::rawplus_dm %>% select(subjid, invid), by = "subjid") %>%
     # set 30% of subjectid per subject to NA
     arrange(runif(n())) %>%
     mutate(rnk = row_number() / n(), .by = subjid) %>%
     mutate(subjid = ifelse(rnk < 0.3, NA, subjid)) %>%
-    filter(!is.na(deviationdate), !is.na(siteid))
+    filter(!is.na(deviationdate), !is.na(invid))
 
   db <- duckdb::dbConnect(duckdb::duckdb(), ":memory:")
 
@@ -346,7 +346,7 @@ test_that("AssignOrphans used with lazy_tbl ", {
       dfNumerator = dplyr::tbl(db, "pd"),
       dfDenominator = dplyr::tbl(db, "visit") %>% mutate(visit_dt = sql("TRY_CAST(visit_dt AS DATE)")),
       strSubjectCol = "subjid",
-      strGroupCol = "siteid",
+      strGroupCol = "invid",
       strGroupLevel = "Site",
       strNumeratorDateCol = "deviationdate",
       strDenominatorDateCol = "visit_dt",

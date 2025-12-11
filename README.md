@@ -20,6 +20,8 @@ The package provides:
 - `Input_CumCount()` patient-level cumulative count from source data
 - `Analyze_Simaerep()` will execute `simaerep`
 - `Flag_Simaerep()` alias of `gsm.core::Flag`
+- `Visualize_Simaerep()` and `Widget_Simaerep()` for {simaerep}-style
+  visualizations
 
 required module configuration files:
 
@@ -116,14 +118,13 @@ Cookbook](https://impala-consortium.github.io/gsm.simaerep/articles/Cookbook.htm
 
 ``` r
 library(gsm.simaerep)
-library(gsm.kri)
 
 dfInput <- Input_CumCount(
   dfSubjects = clindata::rawplus_dm,
   dfNumerator = clindata::rawplus_ae,
   dfDenominator = clindata::rawplus_visdt %>% dplyr::mutate(visit_dt = lubridate::ymd(visit_dt)),
   strSubjectCol = "subjid",
-  strGroupCol = "siteid",
+  strGroupCol = "invid",
   strGroupLevel = "Site",
   strNumeratorDateCol = "aest_dt",
   strDenominatorDateCol = "visit_dt"
@@ -134,11 +135,12 @@ dfAnalyzed <- Analyze_Simaerep(dfInput)
 dfFlagged <- Flag_Simaerep(dfAnalyzed, vThreshold = c(-0.99, -0.95, 0.95, 0.99))
 #> ℹ Sorted dfFlagged using custom Flag order: 2.Sorted dfFlagged using custom Flag order: -2.Sorted dfFlagged using custom Flag order: 1.Sorted dfFlagged using custom Flag order: -1.Sorted dfFlagged using custom Flag order: 0.
 
-gsm.kri::Visualize_Scatter(
+Visualize_Simaerep(
+  dfInput,
   dfFlagged,
-  dfBounds = NULL,
-  strGroupLabel = "GroupLevel",
-  strUnit = "Visits"
+  strDenominator = "Visits",
+  strNumerator = "AE",
+  strStudyId = unique(clindata::rawplus_dm$studyid)
 )
 ```
 

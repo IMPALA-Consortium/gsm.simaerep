@@ -60,7 +60,7 @@ dfInput <- Input_CumCount(
   dfNumerator = clindata::rawplus_ae,
   dfDenominator = clindata::rawplus_visdt %>% dplyr::mutate(visit_dt = lubridate::ymd(visit_dt)),
   strSubjectCol = "subjid",
-  strGroupCol = "siteid",
+  strGroupCol = "invid",
   strGroupLevel = "Site",
   strNumeratorDateCol = "aest_dt",
   strDenominatorDateCol = "visit_dt"
@@ -94,6 +94,23 @@ dfFlagged %>%
   tail(5) %>%
   knitr::kable()
 ```
+
+We can visualize the results as a ggplot or a htmlwidget
+
+```{r cook6a}
+gsm.simaerep::Visualize_Simaerep(
+  dfInput,
+  dfFlagged
+)
+```
+
+```{r cook6b}
+gsm.simaerep::Widget_Simaerep(
+  dfInput,
+  dfFlagged
+)
+```
+
 
 These results are compatible with the `gsm` package for visualization.
 
@@ -229,7 +246,14 @@ lAnalyzed <- gsm.core::RunWorkflows(lWorkflows = metrics_wf, lData = lMapped)
 
 dfResults <- gsm.reporting::BindResults(
   lAnalysis = lAnalyzed,
-  strName = "Analysis_Summary",
+  strName = "Analysis_Flagged",
+  dSnapshotDate = Sys.Date(),
+  strStudyID = "ABC-123"
+)
+
+dfInput <- gsm.reporting::BindResults(
+  lAnalysis = lAnalyzed,
+  strName = "Analysis_Input",
   dSnapshotDate = Sys.Date(),
   strStudyID = "ABC-123"
 )
@@ -245,12 +269,25 @@ dfBounds <- gsm.reporting::MakeBounds(
   dfMetrics = dfMetrics
 )
 
-# we use a different tooltip for the simaerep charts
-lCharts_Identity <- gsm.kri::MakeCharts(
+lCharts_Rate <- gsm.simaerep::MakeCharts(
   dfResults = dfResults %>%
     filter(GroupLevel == "Site"),
   dfMetrics = dfMetrics %>%
-    filter(GroupLevel == "Site", AnalysisType %in% c("identity", "binary")),
+    filter(GroupLevel == "Site", AnalysisType == c("rate", "binary")),
+  dfGroups = dfGroups,
+  dfBounds = dfBounds,
+  bDebug = FALSE,
+  strVisualizeFun = "gsm.kri::Visualize_Metric"
+)
+
+# we use a different tooltip for the simaerep charts
+lCharts_Identity <- gsm.simaerep::MakeCharts(
+  dfInput = dfInput %>%
+    filter(GroupLevel == "Site"),
+  dfResults = dfResults %>%
+    filter(GroupLevel == "Site"),
+  dfMetrics = dfMetrics %>%
+    filter(GroupLevel == "Site", AnalysisType == "identity"),
   dfGroups = dfGroups,
   dfBounds = NULL,
   bDebug = FALSE,
@@ -261,16 +298,6 @@ lCharts_Identity <- gsm.kri::MakeCharts(
         "Numerator",
         "Denominator"
   )
-)
-
-lCharts_Rate <- gsm.kri::MakeCharts(
-  dfResults = dfResults %>%
-    filter(GroupLevel == "Site"),
-  dfMetrics = dfMetrics %>%
-    filter(GroupLevel == "Site", AnalysisType == "rate"),
-  dfGroups = dfGroups,
-  dfBounds = dfBounds,
-  bDebug = FALSE
 )
 
 lCharts <- c(
