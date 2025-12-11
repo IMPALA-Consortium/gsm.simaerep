@@ -49,7 +49,7 @@ to attempt to extrapolate planned visits. See ExtrapolateDenominator() for detai
 
     <a class="navbar-brand me-2" href="../index.html">gsm.simaerep</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.900</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -236,7 +236,7 @@ Default: 0.7</p></dd>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># dfDenominator tibble with one subject 4 visits, one on same day as two Numerator events</span></span></span>
-<span class="r-in"><span><span class="co"># Denominator time indicates that they occurr before Numerator events</span></span></span>
+<span class="r-in"><span><span class="co"># Denominator time indicates that they occur before Numerator events</span></span></span>
 <span class="r-in"><span><span class="va">dfDenominator</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 4 × 2</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   SubjectID denom_dt           </span>
@@ -277,7 +277,7 @@ Default: 0.7</p></dd>
 <span class="r-in"><span>  dfNumerator <span class="op">=</span> <span class="fu">clindata</span><span class="fu">::</span><span class="va"><a href="https://gilead-biostats.github.io/clindata/reference/rawplus_ae.html" class="external-link">rawplus_ae</a></span>,</span></span>
 <span class="r-in"><span>  dfDenominator <span class="op">=</span> <span class="fu">clindata</span><span class="fu">::</span><span class="va"><a href="https://gilead-biostats.github.io/clindata/reference/rawplus_visdt.html" class="external-link">rawplus_visdt</a></span> <span class="op"><a href="pipe.html">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>visit_dt <span class="op">=</span> <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/ymd.html" class="external-link">ymd</a></span><span class="op">(</span><span class="va">visit_dt</span><span class="op">)</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  strSubjectCol <span class="op">=</span> <span class="st">"subjid"</span>,</span></span>
-<span class="r-in"><span>  strGroupCol <span class="op">=</span> <span class="st">"siteid"</span>,</span></span>
+<span class="r-in"><span>  strGroupCol <span class="op">=</span> <span class="st">"invid"</span>,</span></span>
 <span class="r-in"><span>  strGroupLevel <span class="op">=</span> <span class="st">"Site"</span>,</span></span>
 <span class="r-in"><span>  strNumeratorDateCol <span class="op">=</span> <span class="st">"aest_dt"</span>,</span></span>
 <span class="r-in"><span>  strDenominatorDateCol <span class="op">=</span> <span class="st">"visit_dt"</span></span></span>
@@ -285,16 +285,16 @@ Default: 0.7</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 28,074 × 5</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    SubjectID GroupID GroupLevel Numerator Denominator</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> 0025      10      Site               0           1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> 0025      10      Site               0           2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> 0025      10      Site               0           3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> 0025      10      Site               0           4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> 0025      10      Site               0           5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> 0025      10      Site               0           6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> 0025      10      Site               0           7</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> 0025      10      Site               0           8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> 0025      10      Site               0           9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> 0025      10      Site               0          10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> 0358      0X001   Site               0           1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> 0358      0X001   Site               0           2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> 0358      0X001   Site               0           3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> 0358      0X001   Site               0           4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> 0358      0X001   Site               0           5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> 0358      0X001   Site               1           6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> 0358      0X001   Site               1           7</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> 0358      0X001   Site               1           8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> 0358      0X001   Site               1           9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> 0358      0X001   Site               1          10</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 28,064 more rows</span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
@@ -308,7 +308,7 @@ Default: 0.7</p></dd>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

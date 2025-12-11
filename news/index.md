@@ -1,0 +1,26 @@
+# Changelog
+
+## gsm.simaerep 0.3.0
+
+- simaerep visualization
+  <https://github.com/IMPALA-Consortium/gsm.simaerep/issues/15>
+
+## gsm.simaerep 0.2.0
+
+- adapt to simaerep 1.0
+  <https://github.com/IMPALA-Consortium/gsm.simaerep/issues/23>
+- add binary events e.g. subject discontinuations
+
+## gsm.simaerep 0.1.1
+
+- fix sample report
+  <https://github.com/IMPALA-Consortium/gsm.simaerep/issues/20>
+
+## gsm.simaerep 0.1.0
+
+- add expected AE counts to Widget_Scatterplot
+  <https://github.com/IMPALA-Consortium/gsm.simaerep/issues/14>
+
+## gsm.simaerep 0.0.2
+
+- switch to gsm.core, gsm.mapping, gsm.kri, gsm.reporting
