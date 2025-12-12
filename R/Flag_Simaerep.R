@@ -11,7 +11,5 @@
 #' @export
 
 Flag_Simaerep <- function(...) {
-
   gsm.core::Flag(...)
-
 }

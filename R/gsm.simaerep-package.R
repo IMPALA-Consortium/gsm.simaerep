@@ -40,6 +40,7 @@
 #' @importFrom glue glue
 #' @importFrom gsm.core Flag
 #' @importFrom htmlwidgets createWidget
+#' @importFrom jsonlite toJSON
 #' @importFrom lubridate hours
 #' @importFrom lubridate is.instant
 #' @importFrom purrr map

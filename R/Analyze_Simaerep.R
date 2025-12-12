@@ -112,7 +112,7 @@ Analyze_Simaerep <- function(dfInput, r = 1000) {
       "ScoreMult",
       "ExpectedNumerator"
     ))) %>%
-    select(- "StudyID") %>%
+    select(-"StudyID") %>%
     collect() %>%
     arrange(.data$GroupID)
 

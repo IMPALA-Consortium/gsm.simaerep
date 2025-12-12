@@ -1,10 +1,8 @@
-
 #' BindLists
 #' @description passes arguments to c but ignores argument names
 #' @param ... lists to be combined
 #' @export
 BindLists <- function(...) {
-
   ls <- list(...)
   # unnames first layer of list
   ls <- unname(ls)

@@ -1,6 +1,3 @@
-
-
-
 #' Visualize Simaerep
 #'
 #' A widget that creates a simaerep visualisation of group-level metric results.
@@ -20,21 +17,21 @@
 #' @param strNumerator vector, label for Numerator y-column, Default: "Numerator"
 #' @export
 #' @examples
-#'  dfInput <- Input_CumCount(
-#'    dfSubjects = clindata::rawplus_dm,
-#'    dfNumerator = clindata::rawplus_ae,
-#'    dfDenominator = clindata::rawplus_visdt %>% dplyr::mutate(visit_dt = lubridate::ymd(visit_dt)),
-#'    strSubjectCol = "subjid",
-#'    strGroupCol = "invid",
-#'    strGroupLevel = "Site",
-#'    strNumeratorDateCol = "aest_dt",
-#'    strDenominatorDateCol = "visit_dt"
-#'  )
+#' dfInput <- Input_CumCount(
+#'   dfSubjects = clindata::rawplus_dm,
+#'   dfNumerator = clindata::rawplus_ae,
+#'   dfDenominator = clindata::rawplus_visdt %>% dplyr::mutate(visit_dt = lubridate::ymd(visit_dt)),
+#'   strSubjectCol = "subjid",
+#'   strGroupCol = "invid",
+#'   strGroupLevel = "Site",
+#'   strNumeratorDateCol = "aest_dt",
+#'   strDenominatorDateCol = "visit_dt"
+#' )
 #'
-#'  dfAnalyzed <- Analyze_Simaerep(dfInput)
-#'  dfFlagged <- Flag_Simaerep(dfAnalyzed, vThreshold = c(-0.99, -0.95, 0.95, 0.99))
+#' dfAnalyzed <- Analyze_Simaerep(dfInput)
+#' dfFlagged <- Flag_Simaerep(dfAnalyzed, vThreshold = c(-0.99, -0.95, 0.95, 0.99))
 #'
-#'  Visualize_Simaerep(dfInput, dfFlagged)
+#' Visualize_Simaerep(dfInput, dfFlagged)
 Visualize_Simaerep <- function(dfInput,
                                dfFlagged,
                                strStudyId = "StudyID",
@@ -42,9 +39,7 @@ Visualize_Simaerep <- function(dfInput,
                                nSiteMax = 16,
                                vColors = NULL,
                                strDenominator = "Denominator",
-                               strNumerator = "Numerator"
-                               ) {
-
+                               strNumerator = "Numerator") {
   is_installed_ggplot2 <- try({
     suppressPackageStartupMessages(requireNamespace("ggplot2", quietly = TRUE))
   })
@@ -84,7 +79,6 @@ Visualize_Simaerep <- function(dfInput,
   p <- do.call(plot_simaerep, args)
 
   return(p)
-
 }
 
 #' @keywords internal
@@ -92,147 +86,138 @@ prepare_visualization_data <- function(dfInput,
                                        dfFlagged,
                                        strScoreCol,
                                        nSiteMax,
-                                       vColors
-                                       ) {
+                                       vColors) {
+  # Handle Colors -----------------------------------------------------
 
+  if (is.null(vColors)) {
+    is_installed_scales <- try({
+      suppressPackageStartupMessages(requireNamespace("scales", quietly = TRUE))
+    })
 
-    # Handle Colors -----------------------------------------------------
+    stopifnot("Please install scales" = is_installed_scales)
 
-    if (is.null(vColors)) {
-
-      is_installed_scales <- try({
-        suppressPackageStartupMessages(requireNamespace("scales", quietly = TRUE))
-      })
-
-      stopifnot("Please install scales" = is_installed_scales)
-
-      vColors <- scales::brewer_pal(type = "seq", "Blues")(n_distinct(abs(dfFlagged$Flag)))
-      names(vColors) <- sort(unique(abs(as.numeric(dfFlagged$Flag))))
+    vColors <- scales::brewer_pal(type = "seq", "Blues")(n_distinct(abs(dfFlagged$Flag)))
+    names(vColors) <- sort(unique(abs(as.numeric(dfFlagged$Flag))))
 
     dfFlagged <- dfFlagged %>%
       mutate(
         Color = vColors[abs(.data$Flag) + 1]
       )
-
-    } else {
-
-      dfFlagged <- dfFlagged %>%
-        mutate(
-          FlagStr = tidyr::replace_na(as.character(.data$Flag), "NA")
-        )
-
-      stopifnot(
-        "Provide name vColor for every value in Flag" = all(as.character(unique(dfFlagged$FlagStr)) %in% names(vColors))
+  } else {
+    dfFlagged <- dfFlagged %>%
+      mutate(
+        FlagStr = tidyr::replace_na(as.character(.data$Flag), "NA")
       )
 
-      dfFlagged <- dfFlagged %>%
-        mutate(
-          FlagStr = tidyr::replace_na(as.character(.data$Flag), "NA"),
-          Color = vColors[as.character(.data$FlagStr)],
-        ) %>%
-        select(- "FlagStr")
-
-    }
-
-    # Get Mean Numerator Development ------------------------------------
-
-    cols_rename <- c(
-        "site_number" = "GroupID",
-        "patnum" = "SubjectID",
-        "n_event" = "Numerator",
-        "visit" = "Denominator"
+    stopifnot(
+      "Provide name vColor for every value in Flag" = all(as.character(unique(dfFlagged$FlagStr)) %in% names(vColors))
     )
 
-    cols_rename_reverse <- setNames(names(cols_rename), cols_rename)
-
-    df_mean_group <- dfInput %>%
-        mutate(study_id = "A") %>%
-        rename(all_of(cols_rename)) %>%
-        simaerep::get_cum_mean_event_dev(
-            group = "site_number",
-            event_names = "event"
-        ) %>%
-        rename(any_of(cols_rename_reverse)) %>%
-        select(- "study_id")
-
-    df_mean_study <-dfInput %>%
-        mutate(study_id = "A") %>%
-        rename(all_of(cols_rename)) %>%
-        simaerep::get_cum_mean_event_dev(
-            group = "study_id",
-            event_names = "event"
-        ) %>%
-        rename(any_of(cols_rename_reverse)) %>%
-        select(- "study_id")
-
-
-    # Determine Sites for Plotting ----------------------------------------
-
     dfFlagged <- dfFlagged %>%
-      arrange(desc(abs(.data[[strScoreCol]])), desc(abs(.data$ExpectedNumerator)))
+      mutate(
+        FlagStr = tidyr::replace_na(as.character(.data$Flag), "NA"),
+        Color = vColors[as.character(.data$FlagStr)],
+      ) %>%
+      select(-"FlagStr")
+  }
 
-    df_flag_filt <- dfFlagged %>%
-        filter(.data$Flag != 0)
+  # Get Mean Numerator Development ------------------------------------
 
-    if (! is.null(nSiteMax)) {
-      group_plot <- df_flag_filt %>%
-        filter(row_number() <= .env$nSiteMax) %>%
-        pull(.data$GroupID)
-    } else {
-      group_plot <- df_flag_filt$GroupID
-    }
+  cols_rename <- c(
+    "site_number" = "GroupID",
+    "patnum" = "SubjectID",
+    "n_event" = "Numerator",
+    "visit" = "Denominator"
+  )
 
-    df_visit <- dfInput %>%
-        filter(.data$GroupID %in% group_plot)
+  cols_rename_reverse <- setNames(names(cols_rename), cols_rename)
 
-    # Prepare Dataframes --------------------------------------------------
+  df_mean_group <- dfInput %>%
+    mutate(study_id = "A") %>%
+    rename(all_of(cols_rename)) %>%
+    simaerep::get_cum_mean_event_dev(
+      group = "site_number",
+      event_names = "event"
+    ) %>%
+    rename(any_of(cols_rename_reverse)) %>%
+    select(-"study_id")
 
-    df_mean_group <- df_mean_group %>%
-      left_join(
-        dfFlagged %>%
-          select(all_of(c("GroupID", "Color"))),
-        by = "GroupID"
-      )
-
-    df_mean_group_flagged <- df_mean_group %>%
-        filter(.data$GroupID %in% df_flag_filt$GroupID)
-
-    df_mean_group_not_flagged <- df_mean_group %>%
-        filter(! .data$GroupID %in% df_flag_filt$GroupID)
+  df_mean_study <- dfInput %>%
+    mutate(study_id = "A") %>%
+    rename(all_of(cols_rename)) %>%
+    simaerep::get_cum_mean_event_dev(
+      group = "study_id",
+      event_names = "event"
+    ) %>%
+    rename(any_of(cols_rename_reverse)) %>%
+    select(-"study_id")
 
 
-    df_label_sites <- dfFlagged %>%
-        left_join(
-          df_visit %>%
-            summarise(
-              nSubjects = n_distinct(.data$SubjectID),
-              .by = "GroupID"
-            ),
-          by = "GroupID"
-        )
+  # Determine Sites for Plotting ----------------------------------------
 
-    return(list(
-      df_mean_study = df_mean_study,
-      df_mean_group_flagged = df_mean_group_flagged,
-      df_mean_group_not_flagged = df_mean_group_not_flagged,
-      df_visit = df_visit,
-      df_label_sites = df_label_sites
-    ))
+  dfFlagged <- dfFlagged %>%
+    arrange(desc(abs(.data[[strScoreCol]])), desc(abs(.data$ExpectedNumerator)))
+
+  df_flag_filt <- dfFlagged %>%
+    filter(.data$Flag != 0)
+
+  if (!is.null(nSiteMax)) {
+    group_plot <- df_flag_filt %>%
+      filter(row_number() <= .env$nSiteMax) %>%
+      pull(.data$GroupID)
+  } else {
+    group_plot <- df_flag_filt$GroupID
+  }
+
+  df_visit <- dfInput %>%
+    filter(.data$GroupID %in% group_plot)
+
+  # Prepare Dataframes --------------------------------------------------
+
+  df_mean_group <- df_mean_group %>%
+    left_join(
+      dfFlagged %>%
+        select(all_of(c("GroupID", "Color"))),
+      by = "GroupID"
+    )
+
+  df_mean_group_flagged <- df_mean_group %>%
+    filter(.data$GroupID %in% df_flag_filt$GroupID)
+
+  df_mean_group_not_flagged <- df_mean_group %>%
+    filter(!.data$GroupID %in% df_flag_filt$GroupID)
+
+
+  df_label_sites <- dfFlagged %>%
+    left_join(
+      df_visit %>%
+        summarise(
+          nSubjects = n_distinct(.data$SubjectID),
+          .by = "GroupID"
+        ),
+      by = "GroupID"
+    )
+
+  return(list(
+    df_mean_study = df_mean_study,
+    df_mean_group_flagged = df_mean_group_flagged,
+    df_mean_group_not_flagged = df_mean_group_not_flagged,
+    df_visit = df_visit,
+    df_label_sites = df_label_sites
+  ))
 }
 
 #' @keywords internal
 plot_simaerep <- function(df_mean_study,
-                        df_mean_group_flagged,
-                        df_mean_group_not_flagged,
-                        df_visit,
-                        df_label_sites,
-                        strStudyId,
-                        strScoreCol,
-                        strNumerator,
-                        strDenominator) {
-
-
-    # study plot -----------------------------------------------------------------
+                          df_mean_group_flagged,
+                          df_mean_group_not_flagged,
+                          df_visit,
+                          df_label_sites,
+                          strStudyId,
+                          strScoreCol,
+                          strNumerator,
+                          strDenominator) {
+  # study plot -----------------------------------------------------------------
 
 
   p_study <- df_mean_group_not_flagged %>%
@@ -241,24 +226,25 @@ plot_simaerep <- function(df_mean_study,
       group = .data$GroupID,
       color = .data$Color
     )) +
-    ggplot2::geom_line(ggplot2::aes(
-      group = .data$GroupID,
-      color = .data$Color
-    ),
-    data = df_mean_group_flagged,
-    linewidth = 1
+    ggplot2::geom_line(
+      ggplot2::aes(
+        group = .data$GroupID,
+        color = .data$Color
+      ),
+      data = df_mean_group_flagged,
+      linewidth = 1
     ) +
     ggplot2::geom_line(ggplot2::aes(group = 1),
-              data = df_mean_study,
-              color = "black",
-              linewidth = 1,
-              alpha = 0.5
+      data = df_mean_study,
+      color = "black",
+      linewidth = 1,
+      alpha = 0.5
     ) +
     ggplot2::scale_color_identity() +
     ggplot2::theme_minimal() +
     ggplot2::theme(legend.position = "bottom") +
     ggplot2::labs(
-      y = paste0("Mean Cumulative", strNumerator ,"Count per Site"),
+      y = paste0("Mean Cumulative", strNumerator, "Count per Site"),
       x = strDenominator
     )
 
@@ -294,46 +280,57 @@ plot_simaerep <- function(df_mean_study,
   p_site <- df_visit %>%
     ggplot2::ggplot(ggplot2::aes(.data$Denominator, .data$Numerator)) +
     ggplot2::geom_line(ggplot2::aes(group = .data$SubjectID),
-              color = "grey",
-              alpha = 0.5
-    ) +
-    ggplot2::geom_line(ggplot2::aes(
-      y = .data[["cum_mean_dev_event"]],
-      group = .data$GroupID,
-      color = .data$Color,
+      color = "grey",
       alpha = 0.5
-    ),
-    data = df_mean_group_flagged,
-    linewidth = 1
+    ) +
+    ggplot2::geom_line(
+      ggplot2::aes(
+        y = .data[["cum_mean_dev_event"]],
+        group = .data$GroupID,
+        color = .data$Color,
+        alpha = 0.5
+      ),
+      data = df_mean_group_flagged,
+      linewidth = 1
     ) +
     ggplot2::geom_line(ggplot2::aes(y = .data[["cum_mean_dev_event"]]),
-              data = df_mean_study,
-              color = "black",
-              linewidth = 1,
-              alpha = 0.5) +
+      data = df_mean_study,
+      color = "black",
+      linewidth = 1,
+      alpha = 0.5
+    ) +
     ggplot2::geom_text(ggplot2::aes(label = .data$label_subj),
-              data = df_label_sites,
-              x = 0.2 * max_denom,
-              y = 0.9 * max_num,
-              na.rm = TRUE) +
-    ggplot2::geom_label(ggplot2::aes(label = .data$label_score,
-                   color = .data$Color),
-               data = df_label_sites,
-               x = 0.8 * max_denom,
-               y = 0.9 * max_num,
-               na.rm = TRUE) +
-    ggplot2::geom_label(ggplot2::aes(label = .data$label_delta,
-                    color = .data$Color),
-                data = df_label_sites,
-                x = 0.8 * max_denom,
-                y = 0.1 * max_num,
-                na.rm = TRUE) +
+      data = df_label_sites,
+      x = 0.2 * max_denom,
+      y = 0.9 * max_num,
+      na.rm = TRUE
+    ) +
+    ggplot2::geom_label(
+      ggplot2::aes(
+        label = .data$label_score,
+        color = .data$Color
+      ),
+      data = df_label_sites,
+      x = 0.8 * max_denom,
+      y = 0.9 * max_num,
+      na.rm = TRUE
+    ) +
+    ggplot2::geom_label(
+      ggplot2::aes(
+        label = .data$label_delta,
+        color = .data$Color
+      ),
+      data = df_label_sites,
+      x = 0.8 * max_denom,
+      y = 0.1 * max_num,
+      na.rm = TRUE
+    ) +
     ggplot2::scale_color_identity() +
     ggplot2::facet_wrap(~ .data$GroupID) +
     ggplot2::theme_minimal() +
     ggplot2::theme(legend.position = "none") +
     ggplot2::labs(
-      y = paste0("Mean Cumulative", strNumerator ,"Count per Site"),
+      y = paste0("Mean Cumulative", strNumerator, "Count per Site"),
       x = strDenominator
     )
 
@@ -356,7 +353,4 @@ plot_simaerep <- function(df_mean_study,
   gr <- cowplot::plot_grid(t, lwr, ncol = 1, rel_heights = c(0.05, 1))
 
   return(gr)
-
 }
-
-

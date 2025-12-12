@@ -1,5 +1,4 @@
 test_that("Visualize_Metric_Simaerep processes data correctly", {
-
   dfResultsA <- lReport$Reporting_Results
   dfResultsA$SnapshotDate <- as.Date(Sys.Date())
 
@@ -29,7 +28,6 @@ test_that("Visualize_Metric_Simaerep processes data correctly", {
   expect_true("metricTable" %in% names(charts))
   expect_true("simaerepChart" %in% names(charts))
   expect_true("timeSeries" %in% names(charts))
-
 })
 
 test_that("Visualize_Metric_Simaerep handles missing MetricID", {
@@ -84,7 +82,6 @@ test_that("Visualize_Metric_Simaerep handles missing MetricID", {
   expect_true("barChart" %in% names(charts))
   expect_true("metricTable" %in% names(charts))
   expect_true("simaerepChart" %in% names(charts))
-
 })
 
 test_that("Visualize_Metric_Simaerep handles missing Snapshot", {
@@ -124,11 +121,9 @@ test_that("Visualize_Metric_Simaerep handles missing Snapshot", {
 
   # Test if the function returns NULL when MetricID is not found
   expect_null(charts)
-
 })
 
 test_that("Visualize_Metric_Simaerep can run on just results and input", {
-
   dfInput <- Input_CumCount(
     dfSubjects = clindata::rawplus_dm,
     dfNumerator = clindata::rawplus_ae,
@@ -144,15 +139,13 @@ test_that("Visualize_Metric_Simaerep can run on just results and input", {
   dfFlagged <- Flag_Simaerep(dfAnalyzed, vThreshold = c(-0.99, -0.95, 0.95, 0.99))
 
   charts <- Visualize_Metric_Simaerep(
-     dfResults = dfFlagged,
-     dfInput = dfInput
-   )
+    dfResults = dfFlagged,
+    dfInput = dfInput
+  )
 
   # Test if the list contains expected chart names
   expect_true("scatterPlot" %in% names(charts))
   expect_true("barChart" %in% names(charts))
   expect_true("metricTable" %in% names(charts))
   expect_true("simaerepChart" %in% names(charts))
-
 })
-

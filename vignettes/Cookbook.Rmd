@@ -111,6 +111,19 @@ gsm.simaerep::Widget_Simaerep(
 )
 ```
 
+```{r cook9}
+gsm.simaerep::Widget_BarChartSimaerep(
+  dfFlagged,
+  resultTooltipKeys = c(
+    "ExpectedNumerator",
+    "Score",
+    "Metric",
+    "Numerator",
+    "Denominator"
+  )
+)
+```
+
 
 These results are compatible with the `gsm` package for visualization.
 
@@ -129,15 +142,17 @@ gsm.kri::Visualize_Scatter(
 Widget_ScatterPlot(
   dfFlagged,
   dfBounds = NULL,
-  bDebug = FALSE
+  bDebug = FALSE,
+  resultTooltipKeys = c(
+    "ExpectedNumerator",
+    "Score",
+    "Metric",
+    "Numerator",
+    "Denominator"
+  )
 )
 ```
 
-```{r cook9}
-Widget_BarChart(
-  dfFlagged
-)
-```
 
 To compare we can also use the Score with applied multiplicity correction. For this we need to lower the threshold to be less sensitive to get a similar readout. Here we can see that overall the multiplicity correction dampens the score values and reduces the number of flagged sites. Simulation studies with {simaerep} have shown that multiplicity correction decreases detection rates. Nevertheless when monitoring a limited number of studies with many sites a sharper signal might be preferred.
 
@@ -146,12 +161,11 @@ dfFlagged_Mult <- Flag_Simaerep(
   dfAnalyzed %>%
     mutate(Score = ScoreMult),
   vThreshold = c(-0.95, -0.75, 0.75, 0.95)
-  )
+)
 
 Widget_BarChart(
   dfFlagged_Mult
 )
-
 ```
 
 
@@ -202,7 +216,6 @@ lAnalyzed <- gsm.core::RunWorkflows(lWorkflows = metrics_wf, lData = lMapped)
 
 
 ```{r cook12, message=FALSE}
-
 reporting_wf <- gsm.core::MakeWorkflowList(
   strNames = NULL,
   strPath = system.file("workflow/3_reporting", package = "gsm.simaerep"),
@@ -211,7 +224,7 @@ reporting_wf <- gsm.core::MakeWorkflowList(
 
 
 lReport <- gsm.core::RunWorkflows(
-  lWorkflows = reporting_wf, 
+  lWorkflows = reporting_wf,
   lData = c(
     lMapped,
     list(
@@ -238,7 +251,6 @@ lModule <- gsm.core::RunWorkflows(module_wf_gsm, lReport)
 ## Report Generation - Script
 
 ```{r cook13, warning=FALSE, message=FALSE}
-
 dfMetrics <- gsm.reporting::MakeMetric(lWorkflows = metrics_wf)
 
 lAnalyzed <- gsm.core::RunWorkflows(lWorkflows = metrics_wf, lData = lMapped)
@@ -292,11 +304,11 @@ lCharts_Identity <- gsm.simaerep::MakeCharts(
   dfBounds = NULL,
   bDebug = FALSE,
   resultTooltipKeys = c(
-        "ExpectedNumerator",
-        "Score",
-        "Metric",
-        "Numerator",
-        "Denominator"
+    "ExpectedNumerator",
+    "Score",
+    "Metric",
+    "Numerator",
+    "Denominator"
   )
 )
 
