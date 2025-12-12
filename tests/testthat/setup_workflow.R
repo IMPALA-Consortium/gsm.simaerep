@@ -1,4 +1,3 @@
-
 mapping <- gsm.core::MakeWorkflowList(
   strNames = NULL,
   strPath = system.file("workflow/1_mappings", package = "gsm.simaerep"),

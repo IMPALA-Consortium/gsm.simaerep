@@ -12,14 +12,13 @@
 #' @export
 
 MakeCharts <- function(
-  dfResults,
-  dfMetrics,
-  dfGroups,
-  dfBounds,
-  bDebug = FALSE,
-  strVisualizeFun = "gsm.simaerep::Visualize_Metric_Simaerep",
-  ...
-) {
+    dfResults,
+    dfMetrics,
+    dfGroups,
+    dfBounds,
+    bDebug = FALSE,
+    strVisualizeFun = "gsm.simaerep::Visualize_Metric_Simaerep",
+    ...) {
   strMetrics <- unique(dfMetrics$MetricID)
 
   lArgs <- list(

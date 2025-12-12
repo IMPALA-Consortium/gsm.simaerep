@@ -137,9 +137,7 @@ Input_CumCount <- function(
     strOrphanedMethod = c("filter", "assign"),
     strInstanceNameCol = NULL,
     vLikePatternInstanceName = c("%unsch%", "%disc%"),
-    nMinSubjectRatioInstance = 0.7
-    ) {
-
+    nMinSubjectRatioInstance = 0.7) {
   CheckDf(dfSubjects)
   CheckDf(dfDenominator)
   CheckDf(dfNumerator)
@@ -173,7 +171,7 @@ Input_CumCount <- function(
   CheckDataType(dfNumerator, strNumeratorDateCol, lubridate::is.instant)
   CheckDataType(dfDenominator, strDenominatorDateCol, lubridate::is.instant)
 
-  if (! is.null(strInstanceNameCol)) {
+  if (!is.null(strInstanceNameCol)) {
     dfDenominator <- ExtrapolateDenominator(
       dfDenominator = dfDenominator,
       dfNumerator = dfNumerator,
@@ -289,7 +287,6 @@ Input_CumCount <- function(
 #' Will also filter all events with no GroupID
 #' @keywords internal
 AddGroupCol <- function(df, dfSubjects, strSubjectCol, strGroupCol, strGroupLevel) {
-
   # if `strGroupLevel` is null, use `strGroupCol`
   if (is.null(strGroupLevel)) {
     strGroupLevel <- strGroupCol

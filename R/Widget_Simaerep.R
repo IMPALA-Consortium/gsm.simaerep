@@ -12,21 +12,21 @@
 #' @export
 #' @examples
 #'
-#'  dfInput <- Input_CumCount(
-#'    dfSubjects = clindata::rawplus_dm,
-#'    dfNumerator = clindata::rawplus_ae,
-#'    dfDenominator = clindata::rawplus_visdt %>% dplyr::mutate(visit_dt = lubridate::ymd(visit_dt)),
-#'    strSubjectCol = "subjid",
-#'    strGroupCol = "invid",
-#'    strGroupLevel = "Site",
-#'    strNumeratorDateCol = "aest_dt",
-#'    strDenominatorDateCol = "visit_dt"
-#'  )
+#' dfInput <- Input_CumCount(
+#'   dfSubjects = clindata::rawplus_dm,
+#'   dfNumerator = clindata::rawplus_ae,
+#'   dfDenominator = clindata::rawplus_visdt %>% dplyr::mutate(visit_dt = lubridate::ymd(visit_dt)),
+#'   strSubjectCol = "subjid",
+#'   strGroupCol = "invid",
+#'   strGroupLevel = "Site",
+#'   strNumeratorDateCol = "aest_dt",
+#'   strDenominatorDateCol = "visit_dt"
+#' )
 #'
-#'  dfAnalyzed <- Analyze_Simaerep(dfInput)
-#'  dfFlagged <- Flag_Simaerep(dfAnalyzed, vThreshold = c(-0.99, -0.95, 0.95, 0.99))
+#' dfAnalyzed <- Analyze_Simaerep(dfInput)
+#' dfFlagged <- Flag_Simaerep(dfAnalyzed, vThreshold = c(-0.99, -0.95, 0.95, 0.99))
 #'
-#'  Widget_Simaerep(dfInput, dfFlagged)
+#' Widget_Simaerep(dfInput, dfFlagged)
 #'
 #' @seealso
 #' \code{\link{Widget_SimaerepOutput}} for use in Shiny apps
@@ -34,22 +34,20 @@
 #'
 #' @export
 Widget_Simaerep <- function(
-  dfInput,
-  dfFlagged,
-  dfGroups = NULL,
-  lMetric = NULL,
-  strStudyId = "StudyID",
-  strScoreCol = "Score",
-  vColors = NULL,
-  bAddGroupSelect = TRUE,
-  strShinyGroupSelectID = "GroupID",
-  strOutputLabel = paste0(
-    fontawesome::fa("chart-line", fill = "#337ab7"),
-    "  Simaerep"
-  ),
-  ...
-) {
-
+    dfInput,
+    dfFlagged,
+    dfGroups = NULL,
+    lMetric = NULL,
+    strStudyId = "StudyID",
+    strScoreCol = "Score",
+    vColors = NULL,
+    bAddGroupSelect = TRUE,
+    strShinyGroupSelectID = "GroupID",
+    strOutputLabel = paste0(
+      fontawesome::fa("chart-line", fill = "#337ab7"),
+      "  Simaerep"
+    ),
+    ...) {
   lsData <- prepare_visualization_data(
     dfInput = dfInput,
     dfFlagged = dfFlagged,
@@ -63,7 +61,7 @@ Widget_Simaerep <- function(
     lMetric <- list(as.list(unlist(lMetric)))
   }
 
-  is_metric_valid <-  (is.list(lMetric) && ! inherits(lMetric, "data.frame")) | is.null(lMetric)
+  is_metric_valid <- (is.list(lMetric) && !inherits(lMetric, "data.frame")) | is.null(lMetric)
 
   stopifnot("lMetric must be a list" = is_metric_valid)
 
@@ -80,12 +78,12 @@ Widget_Simaerep <- function(
 
   # Create htmlwidget
   lWidget <- htmlwidgets::createWidget(
-    name = 'Widget_Simaerep',
+    name = "Widget_Simaerep",
     x = list(
       data = lsData,
       config = Config
     ),
-    package = 'gsm.simaerep',
+    package = "gsm.simaerep",
   )
 
   base::attr(lWidget, "output_label") <- strOutputLabel
@@ -117,8 +115,7 @@ Widget_Simaerep <- function(
 Widget_SimaerepOutput <- function(
     outputId,
     width = "100%",
-    height = "400px"
-) {
+    height = "400px") {
   htmlwidgets::shinyWidgetOutput(
     outputId,
     "Widget_Simaerep",
@@ -133,8 +130,7 @@ Widget_SimaerepOutput <- function(
 renderWidget_Simaerep <- function(
     expr,
     env = parent.frame(),
-    quoted = FALSE
-) {
+    quoted = FALSE) {
   if (!quoted) {
     expr <- substitute(expr)
   } # force quoted

@@ -7,7 +7,7 @@
 #' @inheritParams Widget_Simaerep
 #' @inheritParams gsm.kri::Widget_BarChart
 #' @param vThreshold `numeric` Threshold values.
-#' @param vResultTooltipKeys `character` Result tooltip keys. 
+#' @param vResultTooltipKeys `character` Result tooltip keys.
 #'   Default: c("ExpectedNumerator", "Score", "Metric", "Numerator", "Denominator").
 #' @param strOutcome `character` Outcome variable. Default: 'ExpectedNumerator'.
 #' @examples
@@ -30,26 +30,25 @@
 #' @export
 
 Widget_BarChartSimaerep <- function(
-  dfResults,
-  lMetric = NULL,
-  dfGroups = NULL,
-  vThreshold = NULL,
-  strOutcome = "ExpectedNumerator",
-  bAddGroupSelect = TRUE,
-  strShinyGroupSelectID = "GroupID",
-  strOutputLabel = paste0(
-    fontawesome::fa("chart-simple", fill = "#337ab7"),
-    "  Bar Chart"
-  ),
-  vResultTooltipKeys = c(
-    "ExpectedNumerator",
-    "Score",
-    "Metric",
-    "Numerator",
-    "Denominator"
-  ),
-  ...
-) {
+    dfResults,
+    lMetric = NULL,
+    dfGroups = NULL,
+    vThreshold = NULL,
+    strOutcome = "ExpectedNumerator",
+    bAddGroupSelect = TRUE,
+    strShinyGroupSelectID = "GroupID",
+    strOutputLabel = paste0(
+      fontawesome::fa("chart-simple", fill = "#337ab7"),
+      "  Bar Chart"
+    ),
+    vResultTooltipKeys = c(
+      "ExpectedNumerator",
+      "Score",
+      "Metric",
+      "Numerator",
+      "Denominator"
+    ),
+    ...) {
   gsm.core::stop_if(cnd = !is.data.frame(dfResults), message = "dfResults is not a data.frame")
   gsm.core::stop_if(
     cnd = !(is.null(lMetric) || (is.list(lMetric) || (is.data.frame(lMetric) && nrow(lMetric) == 1))),
@@ -74,10 +73,10 @@ Widget_BarChartSimaerep <- function(
 
   # define widget inputs
   lChartConfig <- gsm.kri::MakeChartConfig(
-      lMetric = lMetric,
-      strChartFunction = "Widget_BarChart",
-      y = strOutcome,
-      ...
+    lMetric = lMetric,
+    strChartFunction = "Widget_BarChart",
+    y = strOutcome,
+    ...
   )
 
   # define widget inputs

@@ -1,7 +1,4 @@
-
-
 test_that("yaml workflow produces same table as R function", {
-
   dfInputPD <- Input_CumCount(
     dfSubjects = clindata::rawplus_dm,
     dfNumerator = clindata::ctms_protdev %>% rename(subjid = subjectenrollmentnumber),
@@ -103,7 +100,6 @@ test_that("yaml workflow produces same table as R function", {
 })
 
 test_that("yaml workflow creates report", {
-
   module_wf_gsm <- gsm.core::MakeWorkflowList(
     strNames = NULL,
     strPath = system.file("workflow/4_modules", package = "gsm.simaerep"),
@@ -119,7 +115,6 @@ test_that("yaml workflow creates report", {
   file_full <- file.path(tmp_dir, file)
 
   withr::with_file(file_full, {
-
     module_wf_gsm$report_kri_site$steps[[n_steps]]$params$strOutputFile <- "report_kri_site.html"
     module_wf_gsm$report_kri_site$steps[[n_steps]]$params$strOutputDir <- tmp_dir
 
@@ -127,8 +122,5 @@ test_that("yaml workflow creates report", {
     lModule <- gsm.core::RunWorkflows(module_wf_gsm, lReport)
 
     expect_true(file.exists(file_full))
-
   })
-
-
 })

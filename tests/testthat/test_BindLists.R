@@ -1,5 +1,4 @@
 test_that("test BindLists drops argument names passed to ...", {
-
   ls <- BindLists(
     A = list(a = 1, b = 2),
     B = list(c = 3, d = 4),
@@ -7,5 +6,4 @@ test_that("test BindLists drops argument names passed to ...", {
   )
 
   expect_equal(names(ls), letters[1:6])
-
 })

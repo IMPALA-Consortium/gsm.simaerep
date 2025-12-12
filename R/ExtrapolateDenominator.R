@@ -1,4 +1,3 @@
-
 #' Extrapolate Denominator Events
 #' @description internal function called by [Input_CumCount()]
 #' Filters all instances not matching vLikePatternInstanceName that occur
@@ -8,8 +7,8 @@
 #' data frame will be added using the median days between instances to extrapolate
 #' dates. No instances will be added if extrapolated date exceeds the maximum instance
 #' date for subjects without numerator entries.
-#'@inheritParams Input_CumCount
-#'@export
+#' @inheritParams Input_CumCount
+#' @export
 ExtrapolateDenominator <- function(dfDenominator,
                                    dfNumerator,
                                    strSubjectCol,
@@ -17,7 +16,6 @@ ExtrapolateDenominator <- function(dfDenominator,
                                    strInstanceNameCol,
                                    vLikePatternInstanceName = c("%unsch%", "%disc%"),
                                    nMinSubjectRatioInstance = 0.7) {
-
   FUN <- dplyr::arrange
 
   vLikePatternInstanceName <- tolower(vLikePatternInstanceName)
@@ -25,17 +23,15 @@ ExtrapolateDenominator <- function(dfDenominator,
   df_filt <- dfDenominator
 
   for (i in seq_along(vLikePatternInstanceName)) {
-
     if (inherits(df_filt, "data.frame")) {
       df_filt <- df_filt %>%
-        filter(! stringr::str_like(tolower(.data[[strInstanceNameCol]]), .env$vLikePatternInstanceName[i]))
+        filter(!stringr::str_like(tolower(.data[[strInstanceNameCol]]), .env$vLikePatternInstanceName[i]))
     } else {
       query <- glue::glue("LOWER({strInstanceNameCol}) NOT LIKE '{vLikePatternInstanceName[i]}'")
 
       df_filt <- df_filt %>%
         filter(sql(query))
     }
-
   }
 
   df_prep <- df_filt %>%
@@ -46,7 +42,7 @@ ExtrapolateDenominator <- function(dfDenominator,
     ) %>%
     mutate(
       Days = as.numeric(
-          .data[[strDenominatorDateCol]] - dplyr::lag(.data[[strDenominatorDateCol]])
+        .data[[strDenominatorDateCol]] - dplyr::lag(.data[[strDenominatorDateCol]])
       ),
       Days = coalesce(.data$Days, 0),
       Rank = row_number(),
@@ -141,7 +137,7 @@ ExtrapolateDenominator <- function(dfDenominator,
   dfDenominatorExtra <- dplyr::union_all(
     df_extr %>%
       mutate(
-        {{strDenominatorDateCol}} := .data$ExtraDenominatorDate
+        {{ strDenominatorDateCol }} := .data$ExtraDenominatorDate
       ) %>%
       select(all_of(c(strSubjectCol, strInstanceNameCol, strDenominatorDateCol))),
     df_filt %>%
@@ -150,10 +146,9 @@ ExtrapolateDenominator <- function(dfDenominator,
         by = strSubjectCol
       ) %>%
       select(all_of(c(strSubjectCol, strInstanceNameCol, strDenominatorDateCol))),
-    ) %>%
+  ) %>%
     SortDf(.data[[strSubjectCol]], .data[[strDenominatorDateCol]])
 
 
   return(dfDenominatorExtra)
-
 }

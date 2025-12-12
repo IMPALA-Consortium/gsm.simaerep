@@ -17,19 +17,19 @@
 #'
 #' @examples
 #'
-#'  dfInput <- Input_CumCount(
-#'    dfSubjects = clindata::rawplus_dm,
-#'    dfNumerator = clindata::rawplus_ae,
-#'    dfDenominator = clindata::rawplus_visdt %>% dplyr::mutate(visit_dt = lubridate::ymd(visit_dt)),
-#'    strSubjectCol = "subjid",
-#'    strGroupCol = "invid",
-#'    strGroupLevel = "Site",
-#'    strNumeratorDateCol = "aest_dt",
-#'    strDenominatorDateCol = "visit_dt"
-#'  )
+#' dfInput <- Input_CumCount(
+#'   dfSubjects = clindata::rawplus_dm,
+#'   dfNumerator = clindata::rawplus_ae,
+#'   dfDenominator = clindata::rawplus_visdt %>% dplyr::mutate(visit_dt = lubridate::ymd(visit_dt)),
+#'   strSubjectCol = "subjid",
+#'   strGroupCol = "invid",
+#'   strGroupLevel = "Site",
+#'   strNumeratorDateCol = "aest_dt",
+#'   strDenominatorDateCol = "visit_dt"
+#' )
 #'
-#'  dfAnalyzed <- Analyze_Simaerep(dfInput)
-#'  dfFlagged <- Flag_Simaerep(dfAnalyzed, vThreshold = c(-0.99, -0.95, 0.95, 0.99))
+#' dfAnalyzed <- Analyze_Simaerep(dfInput)
+#' dfFlagged <- Flag_Simaerep(dfAnalyzed, vThreshold = c(-0.99, -0.95, 0.95, 0.99))
 #'
 #' Visualize_Metric_Simaerep(
 #'   dfResults = dfFlagged,
@@ -39,23 +39,22 @@
 #' @export
 
 Visualize_Metric_Simaerep <- function(
-  dfResults,
-  dfInput,
-  dfMetrics = NULL,
-  dfGroups = NULL,
-  strMetricID = NULL,
-  strSnapshotDate = NULL,
-  bDebug = FALSE,
-  vColors = c("0" = "#9ED782", "1" = "#FEAA01", "2" = "#FF5858", "-1" = "#FEAA01", "-2" = "#FF5858", "NA" = "#a9a9a9"),
-  vResultTooltipKeys = c(
-    "ExpectedNumerator",
-    "Score",
-    "Metric",
-    "Numerator",
-    "Denominator"
-  ),
-  ...
-) {
+    dfResults,
+    dfInput,
+    dfMetrics = NULL,
+    dfGroups = NULL,
+    strMetricID = NULL,
+    strSnapshotDate = NULL,
+    bDebug = FALSE,
+    vColors = c("0" = "#9ED782", "1" = "#FEAA01", "2" = "#FF5858", "-1" = "#FEAA01", "-2" = "#FF5858", "NA" = "#a9a9a9"),
+    vResultTooltipKeys = c(
+      "ExpectedNumerator",
+      "Score",
+      "Metric",
+      "Numerator",
+      "Denominator"
+    ),
+    ...) {
   # Check for multiple snapshots --------------------------------------------
   # if SnapshotDate is missing set it to today for all records
   if (!"SnapshotDate" %in% colnames(dfResults)) {
@@ -84,7 +83,7 @@ Visualize_Metric_Simaerep <- function(
         cli_detail = "alert_info"
       )
       return(NULL)
-    } else if("MetricID" %in% colnames(dfResults)){
+    } else if ("MetricID" %in% colnames(dfResults)) {
       dfResults <- dfResults %>% filter(.data$MetricID == strMetricID)
     }
   }
@@ -96,13 +95,13 @@ Visualize_Metric_Simaerep <- function(
         message = "MetricID not found in dfInput. No charts will be generated.",
         cli_detail = "alert_info"
       )
-     return(NULL)
-    } else if("MetricID" %in% colnames(dfInput) && "MetricID" %in% colnames(dfInput)){
+      return(NULL)
+    } else if ("MetricID" %in% colnames(dfInput) && "MetricID" %in% colnames(dfInput)) {
       dfInput <- dfInput %>% filter(.data$MetricID == strMetricID)
     }
   }
 
-  if (!is.null(strMetricID) && ! is.null(dfMetrics) && "MetricID" %in% colnames(dfMetrics)) {
+  if (!is.null(strMetricID) && !is.null(dfMetrics) && "MetricID" %in% colnames(dfMetrics)) {
     if (!(strMetricID %in% unique(dfMetrics$MetricID))) {
       gsm.core::LogMessage(
         level = "info",
@@ -110,7 +109,7 @@ Visualize_Metric_Simaerep <- function(
         cli_detail = "inform"
       )
       dfMetrics <- NULL
-    } else if(! is.null(dfMetrics) && "MetricID" %in% colnames(dfMetrics)){
+    } else if (!is.null(dfMetrics) && "MetricID" %in% colnames(dfMetrics)) {
       dfMetrics <- dfMetrics %>% filter(.data$MetricID == strMetricID)
     }
   }
@@ -143,7 +142,6 @@ Visualize_Metric_Simaerep <- function(
     )
     return(NULL)
   } else {
-
     lCharts$simaerepChart <- do.call(
       "Widget_Simaerep",
       list(
@@ -157,23 +155,23 @@ Visualize_Metric_Simaerep <- function(
     )
 
     lCharts$scatterPlot <- gsm.kri::Widget_ScatterPlot(
-        dfResults = dfResults_latest,
-        lMetric = lMetric,
-        dfGroups = dfGroups,
-        bDebug = bDebug,
-        vResultTooltipKeys = vResultTooltipKeys,
-        ...
+      dfResults = dfResults_latest,
+      lMetric = lMetric,
+      dfGroups = dfGroups,
+      bDebug = bDebug,
+      vResultTooltipKeys = vResultTooltipKeys,
+      ...
     )
 
     lCharts$barChart <- Widget_BarChartSimaerep(
-        dfResults = dfResults_latest,
-        lMetric = lMetric,
-        dfGroups = dfGroups,
-        vThreshold = vThreshold,
-        bDebug = bDebug,
-        vResultTooltipKeys = vResultTooltipKeys,
-        ...
-      )
+      dfResults = dfResults_latest,
+      lMetric = lMetric,
+      dfGroups = dfGroups,
+      vThreshold = vThreshold,
+      bDebug = bDebug,
+      vResultTooltipKeys = vResultTooltipKeys,
+      ...
+    )
 
     if (!is.null(lMetric)) {
       lCharts$metricTable <- gsm.kri::Report_MetricTable(
@@ -185,7 +183,6 @@ Visualize_Metric_Simaerep <- function(
       dfResults_latest$MetricID <- NA
       lCharts$metricTable <- gsm.kri::Report_MetricTable(dfResults_latest)
     }
-
   }
   # Continuous Charts -------------------------------------------------------
   if (number_of_snapshots <= 1) {
