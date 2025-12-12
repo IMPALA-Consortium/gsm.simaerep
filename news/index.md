@@ -2,8 +2,10 @@
 
 ## gsm.simaerep 0.3.0
 
-- simaerep visualization
+- Widget_Simaerep()
   <https://github.com/IMPALA-Consortium/gsm.simaerep/issues/15>
+- Widget_BarChartSimaerep()
+  <https://github.com/IMPALA-Consortium/gsm.simaerep/issues/29>
 
 ## gsm.simaerep 0.2.0
 

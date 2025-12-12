@@ -18,6 +18,8 @@ Visualize_Metric_Simaerep(
   bDebug = FALSE,
   vColors = c(`0` = "#9ED782", `1` = "#FEAA01", `2` = "#FF5858", `-1` = "#FEAA01", `-2` =
     "#FF5858", `NA` = "#a9a9a9"),
+  vResultTooltipKeys = c("ExpectedNumerator", "Score", "Metric", "Numerator",
+    "Denominator"),
   ...
 )
 ```
@@ -69,6 +71,11 @@ Visualize_Metric_Simaerep(
 
   vector, named hex values for every Flag value in dfFlagged\$Flag,
   Default NULL
+
+- vResultTooltipKeys:
+
+  `character` Result tooltip keys. Default: c("ExpectedNumerator",
+  "Score", "Metric", "Numerator", "Denominator").
 
 - ...:
 

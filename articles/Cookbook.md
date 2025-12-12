@@ -179,6 +179,19 @@ gsm.simaerep::Widget_Simaerep(
 )
 ```
 
+``` r
+gsm.simaerep::Widget_BarChartSimaerep(
+  dfFlagged,
+  resultTooltipKeys = c(
+    "ExpectedNumerator",
+    "Score",
+    "Metric",
+    "Numerator",
+    "Denominator"
+  )
+)
+```
+
 These results are compatible with the `gsm` package for visualization.
 
 *\`simaerep* scores represent are related to the metric ratio do not use
@@ -200,13 +213,14 @@ gsm.kri::Visualize_Scatter(
 Widget_ScatterPlot(
   dfFlagged,
   dfBounds = NULL,
-  bDebug = FALSE
-)
-```
-
-``` r
-Widget_BarChart(
-  dfFlagged
+  bDebug = FALSE,
+  resultTooltipKeys = c(
+    "ExpectedNumerator",
+    "Score",
+    "Metric",
+    "Numerator",
+    "Denominator"
+  )
 )
 ```
 
@@ -224,7 +238,7 @@ dfFlagged_Mult <- Flag_Simaerep(
   dfAnalyzed %>%
     mutate(Score = ScoreMult),
   vThreshold = c(-0.95, -0.75, 0.75, 0.95)
-  )
+)
 #> ℹ Sorted dfFlagged using custom Flag order: 2.Sorted dfFlagged using custom Flag order: -2.Sorted dfFlagged using custom Flag order: 1.Sorted dfFlagged using custom Flag order: -1.Sorted dfFlagged using custom Flag order: 0.
 
 Widget_BarChart(
@@ -278,7 +292,6 @@ lAnalyzed <- gsm.core::RunWorkflows(lWorkflows = metrics_wf, lData = lMapped)
 ### Report Generation - Workflow
 
 ``` r
-
 reporting_wf <- gsm.core::MakeWorkflowList(
   strNames = NULL,
   strPath = system.file("workflow/3_reporting", package = "gsm.simaerep"),
@@ -287,7 +300,7 @@ reporting_wf <- gsm.core::MakeWorkflowList(
 
 
 lReport <- gsm.core::RunWorkflows(
-  lWorkflows = reporting_wf, 
+  lWorkflows = reporting_wf,
   lData = c(
     lMapped,
     list(
@@ -309,13 +322,12 @@ n_steps <- length(module_wf_gsm$report_kri_site$steps)
 module_wf_gsm$report_kri_site$steps[[n_steps]]$params$strInputPath <- report_path
 
 lModule <- gsm.core::RunWorkflows(module_wf_gsm, lReport)
-#> /opt/hostedtoolcache/pandoc/3.1.11/x64/pandoc +RTS -K512m -RTS /tmp/RtmpWXcPDm/Report_KRI.knit.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output /home/runner/work/gsm.simaerep/gsm.simaerep/vignettes/kri_report_AAAA0000000_Site_20251211.html --lua-filter /home/runner/work/_temp/Library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /home/runner/work/_temp/Library/rmarkdown/rmarkdown/lua/latex-div.lua --embed-resources --standalone --variable bs3=TRUE --section-divs --table-of-contents --toc-depth 3 --variable toc_float=1 --variable toc_selectors=h1,h2,h3 --variable toc_smooth_scroll=1 --variable toc_print=1 --template /home/runner/work/_temp/Library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --variable theme=bootstrap --css styles.css --include-in-header /tmp/RtmpWXcPDm/rmarkdown-str2486f35964a.html
+#> /opt/hostedtoolcache/pandoc/3.1.11/x64/pandoc +RTS -K512m -RTS /tmp/RtmpkeAcfx/Report_KRI.knit.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output /home/runner/work/gsm.simaerep/gsm.simaerep/vignettes/kri_report_AAAA0000000_Site_20251212.html --lua-filter /home/runner/work/_temp/Library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /home/runner/work/_temp/Library/rmarkdown/rmarkdown/lua/latex-div.lua --embed-resources --standalone --variable bs3=TRUE --section-divs --table-of-contents --toc-depth 3 --variable toc_float=1 --variable toc_selectors=h1,h2,h3 --variable toc_smooth_scroll=1 --variable toc_print=1 --template /home/runner/work/_temp/Library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --variable theme=bootstrap --css styles.css --include-in-header /tmp/RtmpkeAcfx/rmarkdown-str1db14e39bd25.html
 ```
 
 ### Report Generation - Script
 
 ``` r
-
 dfMetrics <- gsm.reporting::MakeMetric(lWorkflows = metrics_wf)
 
 lAnalyzed <- gsm.core::RunWorkflows(lWorkflows = metrics_wf, lData = lMapped)
@@ -369,11 +381,11 @@ lCharts_Identity <- gsm.simaerep::MakeCharts(
   dfBounds = NULL,
   bDebug = FALSE,
   resultTooltipKeys = c(
-        "ExpectedNumerator",
-        "Score",
-        "Metric",
-        "Numerator",
-        "Denominator"
+    "ExpectedNumerator",
+    "Score",
+    "Metric",
+    "Numerator",
+    "Denominator"
   )
 )
 
@@ -390,5 +402,5 @@ gsm.kri::Report_KRI(
   strOutputFile = "report_kri_site.html",
   strInputPath = system.file("report", "Report_KRI.Rmd", package = "gsm.simaerep")
 )
-#> /opt/hostedtoolcache/pandoc/3.1.11/x64/pandoc +RTS -K512m -RTS /tmp/RtmpWXcPDm/Report_KRI.knit.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output /home/runner/work/gsm.simaerep/gsm.simaerep/vignettes/report_kri_site.html --lua-filter /home/runner/work/_temp/Library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /home/runner/work/_temp/Library/rmarkdown/rmarkdown/lua/latex-div.lua --embed-resources --standalone --variable bs3=TRUE --section-divs --table-of-contents --toc-depth 3 --variable toc_float=1 --variable toc_selectors=h1,h2,h3 --variable toc_smooth_scroll=1 --variable toc_print=1 --template /home/runner/work/_temp/Library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --variable theme=bootstrap --css styles.css --include-in-header /tmp/RtmpWXcPDm/rmarkdown-str24861dceda2a.html
+#> /opt/hostedtoolcache/pandoc/3.1.11/x64/pandoc +RTS -K512m -RTS /tmp/RtmpkeAcfx/Report_KRI.knit.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output /home/runner/work/gsm.simaerep/gsm.simaerep/vignettes/report_kri_site.html --lua-filter /home/runner/work/_temp/Library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /home/runner/work/_temp/Library/rmarkdown/rmarkdown/lua/latex-div.lua --embed-resources --standalone --variable bs3=TRUE --section-divs --table-of-contents --toc-depth 3 --variable toc_float=1 --variable toc_selectors=h1,h2,h3 --variable toc_smooth_scroll=1 --variable toc_print=1 --template /home/runner/work/_temp/Library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --variable theme=bootstrap --css styles.css --include-in-header /tmp/RtmpkeAcfx/rmarkdown-str1db174f94f02.html
 ```

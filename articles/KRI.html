@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gsm.simaerep</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.900</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -160,13 +160,12 @@ time of the event.</p>
 <p>However, we will only assign events that occurr between the first and
 the last + 30 days denominator event on site.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="co"># we create a Numerator dataframe with missing subjet id</span></span>
+<code class="sourceCode R"><span><span class="co"># we create a Numerator dataframe with missing subjet id</span></span>
 <span><span class="va">dfNumerator</span> <span class="op">&lt;-</span> <span class="fu">clindata</span><span class="fu">::</span><span class="va"><a href="https://gilead-biostats.github.io/clindata/reference/ctms_protdev.html" class="external-link">ctms_protdev</a></span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>subjid <span class="op">=</span> <span class="va">subjectenrollmentnumber</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span></span>
-<span>    <span class="fu">clindata</span><span class="fu">::</span><span class="va"><a href="https://gilead-biostats.github.io/clindata/reference/rawplus_dm.html" class="external-link">rawplus_dm</a></span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">subjid</span>, <span class="va">invid</span><span class="op">)</span>,</span>
+<span>    <span class="fu">clindata</span><span class="fu">::</span><span class="va"><a href="https://gilead-biostats.github.io/clindata/reference/rawplus_dm.html" class="external-link">rawplus_dm</a></span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>      <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">subjid</span>, <span class="va">invid</span><span class="op">)</span>,</span>
 <span>    by <span class="op">=</span> <span class="st">"subjid"</span></span>
 <span>  <span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">deviationdate</span><span class="op">)</span>, <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">invid</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
@@ -181,23 +180,23 @@ the last + 30 days denominator event on site.</p>
 <span><span class="co">#&gt; [1] 1454</span></span>
 <span></span>
 <span><span class="va">linked_events</span> <span class="op">&lt;-</span> <span class="va">dfNumerator</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span> <span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">subjid</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">subjid</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">linked_events</span></span>
 <span><span class="co">#&gt; [1] 1188</span></span>
 <span></span>
 <span><span class="va">dfCumCount</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/Input_CumCount.html">Input_CumCount</a></span><span class="op">(</span></span>
-<span>    dfSubjects <span class="op">=</span> <span class="fu">clindata</span><span class="fu">::</span><span class="va"><a href="https://gilead-biostats.github.io/clindata/reference/rawplus_dm.html" class="external-link">rawplus_dm</a></span>,</span>
-<span>    dfNumerator <span class="op">=</span> <span class="va">dfNumerator</span>,</span>
-<span>    dfDenominator <span class="op">=</span> <span class="fu">clindata</span><span class="fu">::</span><span class="va"><a href="https://gilead-biostats.github.io/clindata/reference/rawplus_visdt.html" class="external-link">rawplus_visdt</a></span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>visit_dt <span class="op">=</span> <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/ymd.html" class="external-link">ymd</a></span><span class="op">(</span><span class="va">visit_dt</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>    strSubjectCol <span class="op">=</span> <span class="st">"subjid"</span>,</span>
-<span>    strGroupCol <span class="op">=</span> <span class="st">"invid"</span>,</span>
-<span>    strGroupLevel <span class="op">=</span> <span class="st">"Site"</span>,</span>
-<span>    strNumeratorDateCol <span class="op">=</span> <span class="st">"deviationdate"</span>,</span>
-<span>    strDenominatorDateCol <span class="op">=</span> <span class="st">"visit_dt"</span>,</span>
-<span>    strOrphanedMethod <span class="op">=</span> <span class="st">"filter"</span></span>
-<span>  <span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  dfSubjects <span class="op">=</span> <span class="fu">clindata</span><span class="fu">::</span><span class="va"><a href="https://gilead-biostats.github.io/clindata/reference/rawplus_dm.html" class="external-link">rawplus_dm</a></span>,</span>
+<span>  dfNumerator <span class="op">=</span> <span class="va">dfNumerator</span>,</span>
+<span>  dfDenominator <span class="op">=</span> <span class="fu">clindata</span><span class="fu">::</span><span class="va"><a href="https://gilead-biostats.github.io/clindata/reference/rawplus_visdt.html" class="external-link">rawplus_visdt</a></span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>visit_dt <span class="op">=</span> <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/ymd.html" class="external-link">ymd</a></span><span class="op">(</span><span class="va">visit_dt</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  strSubjectCol <span class="op">=</span> <span class="st">"subjid"</span>,</span>
+<span>  strGroupCol <span class="op">=</span> <span class="st">"invid"</span>,</span>
+<span>  strGroupLevel <span class="op">=</span> <span class="st">"Site"</span>,</span>
+<span>  strNumeratorDateCol <span class="op">=</span> <span class="st">"deviationdate"</span>,</span>
+<span>  strDenominatorDateCol <span class="op">=</span> <span class="st">"visit_dt"</span>,</span>
+<span>  strOrphanedMethod <span class="op">=</span> <span class="st">"filter"</span></span>
+<span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">Denominator</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">Denominator</span><span class="op">)</span>, .by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">SubjectID</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">filtered_events</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">dfCumCount</span><span class="op">$</span><span class="va">Numerator</span><span class="op">)</span></span>
@@ -205,20 +204,20 @@ the last + 30 days denominator event on site.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="va">linked_events</span> <span class="op">==</span> <span class="va">filtered_events</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">dfCumCountOrphans</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/Input_CumCount.html">Input_CumCount</a></span><span class="op">(</span></span>
-<span>    dfSubjects <span class="op">=</span> <span class="fu">clindata</span><span class="fu">::</span><span class="va"><a href="https://gilead-biostats.github.io/clindata/reference/rawplus_dm.html" class="external-link">rawplus_dm</a></span>,</span>
-<span>    dfNumerator <span class="op">=</span> <span class="va">dfNumerator</span>,</span>
-<span>    dfDenominator <span class="op">=</span> <span class="fu">clindata</span><span class="fu">::</span><span class="va"><a href="https://gilead-biostats.github.io/clindata/reference/rawplus_visdt.html" class="external-link">rawplus_visdt</a></span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>visit_dt <span class="op">=</span> <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/ymd.html" class="external-link">ymd</a></span><span class="op">(</span><span class="va">visit_dt</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>    strSubjectCol <span class="op">=</span> <span class="st">"subjid"</span>,</span>
-<span>    strGroupCol <span class="op">=</span> <span class="st">"invid"</span>,</span>
-<span>    strGroupLevel <span class="op">=</span> <span class="st">"Site"</span>,</span>
-<span>    strNumeratorDateCol <span class="op">=</span> <span class="st">"deviationdate"</span>,</span>
-<span>    strDenominatorDateCol <span class="op">=</span> <span class="st">"visit_dt"</span>,</span>
-<span>    strOrphanedMethod <span class="op">=</span> <span class="st">"assign"</span></span>
-<span>  <span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  dfSubjects <span class="op">=</span> <span class="fu">clindata</span><span class="fu">::</span><span class="va"><a href="https://gilead-biostats.github.io/clindata/reference/rawplus_dm.html" class="external-link">rawplus_dm</a></span>,</span>
+<span>  dfNumerator <span class="op">=</span> <span class="va">dfNumerator</span>,</span>
+<span>  dfDenominator <span class="op">=</span> <span class="fu">clindata</span><span class="fu">::</span><span class="va"><a href="https://gilead-biostats.github.io/clindata/reference/rawplus_visdt.html" class="external-link">rawplus_visdt</a></span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>visit_dt <span class="op">=</span> <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/ymd.html" class="external-link">ymd</a></span><span class="op">(</span><span class="va">visit_dt</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  strSubjectCol <span class="op">=</span> <span class="st">"subjid"</span>,</span>
+<span>  strGroupCol <span class="op">=</span> <span class="st">"invid"</span>,</span>
+<span>  strGroupLevel <span class="op">=</span> <span class="st">"Site"</span>,</span>
+<span>  strNumeratorDateCol <span class="op">=</span> <span class="st">"deviationdate"</span>,</span>
+<span>  strDenominatorDateCol <span class="op">=</span> <span class="st">"visit_dt"</span>,</span>
+<span>  strOrphanedMethod <span class="op">=</span> <span class="st">"assign"</span></span>
+<span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">Denominator</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">Denominator</span><span class="op">)</span>, .by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">SubjectID</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">assigned_events</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">dfCumCountOrphans</span><span class="op">$</span><span class="va">Numerator</span><span class="op">)</span></span>
-<span>  </span>
+<span></span>
 <span><span class="va">assigned_events</span></span>
 <span><span class="co">#&gt; [1] 1375</span></span>
 <span></span>
@@ -246,9 +245,8 @@ subjects.</p>
 <p>Extrapolated visits that go beyond the last observed visit of
 patients that did not discontinue will not be generated.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="va">dfDenominator</span> <span class="op">&lt;-</span> <span class="fu">clindata</span><span class="fu">::</span><span class="va"><a href="https://gilead-biostats.github.io/clindata/reference/rawplus_visdt.html" class="external-link">rawplus_visdt</a></span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>visit_dt <span class="op">=</span> <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/ymd.html" class="external-link">ymd</a></span><span class="op">(</span><span class="va">visit_dt</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">dfDenominator</span> <span class="op">&lt;-</span> <span class="fu">clindata</span><span class="fu">::</span><span class="va"><a href="https://gilead-biostats.github.io/clindata/reference/rawplus_visdt.html" class="external-link">rawplus_visdt</a></span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>visit_dt <span class="op">=</span> <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/ymd.html" class="external-link">ymd</a></span><span class="op">(</span><span class="va">visit_dt</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">dfNumerator</span> <span class="op">&lt;-</span> <span class="fu">clindata</span><span class="fu">::</span><span class="va"><a href="https://gilead-biostats.github.io/clindata/reference/rawplus_studcomp.html" class="external-link">rawplus_studcomp</a></span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>mincreated_dts <span class="op">=</span> <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/ymd_hms.html" class="external-link">ymd_hms</a></span><span class="op">(</span><span class="va">mincreated_dts</span><span class="op">)</span><span class="op">)</span></span>

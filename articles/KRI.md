@@ -90,13 +90,12 @@ However, we will only assign events that occurr between the first and
 the last + 30 days denominator event on site.
 
 ``` r
-
 # we create a Numerator dataframe with missing subjet id
 dfNumerator <- clindata::ctms_protdev %>%
   rename(subjid = subjectenrollmentnumber) %>%
   left_join(
-    clindata::rawplus_dm %>% 
-    select(subjid, invid),
+    clindata::rawplus_dm %>%
+      select(subjid, invid),
     by = "subjid"
   ) %>%
   filter(!is.na(deviationdate), !is.na(invid)) %>%
@@ -111,23 +110,23 @@ total_events
 #> [1] 1454
 
 linked_events <- dfNumerator %>%
-  filter(! is.na(subjid)) %>%
+  filter(!is.na(subjid)) %>%
   nrow()
 
 linked_events
 #> [1] 1188
 
 dfCumCount <- Input_CumCount(
-    dfSubjects = clindata::rawplus_dm,
-    dfNumerator = dfNumerator,
-    dfDenominator = clindata::rawplus_visdt %>% mutate(visit_dt = lubridate::ymd(visit_dt)),
-    strSubjectCol = "subjid",
-    strGroupCol = "invid",
-    strGroupLevel = "Site",
-    strNumeratorDateCol = "deviationdate",
-    strDenominatorDateCol = "visit_dt",
-    strOrphanedMethod = "filter"
-  ) %>%
+  dfSubjects = clindata::rawplus_dm,
+  dfNumerator = dfNumerator,
+  dfDenominator = clindata::rawplus_visdt %>% mutate(visit_dt = lubridate::ymd(visit_dt)),
+  strSubjectCol = "subjid",
+  strGroupCol = "invid",
+  strGroupLevel = "Site",
+  strNumeratorDateCol = "deviationdate",
+  strDenominatorDateCol = "visit_dt",
+  strOrphanedMethod = "filter"
+) %>%
   filter(Denominator == max(Denominator), .by = c(SubjectID))
 
 filtered_events <- sum(dfCumCount$Numerator)
@@ -135,20 +134,20 @@ filtered_events <- sum(dfCumCount$Numerator)
 stopifnot(linked_events == filtered_events)
 
 dfCumCountOrphans <- Input_CumCount(
-    dfSubjects = clindata::rawplus_dm,
-    dfNumerator = dfNumerator,
-    dfDenominator = clindata::rawplus_visdt %>% mutate(visit_dt = lubridate::ymd(visit_dt)),
-    strSubjectCol = "subjid",
-    strGroupCol = "invid",
-    strGroupLevel = "Site",
-    strNumeratorDateCol = "deviationdate",
-    strDenominatorDateCol = "visit_dt",
-    strOrphanedMethod = "assign"
-  ) %>%
+  dfSubjects = clindata::rawplus_dm,
+  dfNumerator = dfNumerator,
+  dfDenominator = clindata::rawplus_visdt %>% mutate(visit_dt = lubridate::ymd(visit_dt)),
+  strSubjectCol = "subjid",
+  strGroupCol = "invid",
+  strGroupLevel = "Site",
+  strNumeratorDateCol = "deviationdate",
+  strDenominatorDateCol = "visit_dt",
+  strOrphanedMethod = "assign"
+) %>%
   filter(Denominator == max(Denominator), .by = c(SubjectID))
 
 assigned_events <- sum(dfCumCountOrphans$Numerator)
-  
+
 assigned_events
 #> [1] 1375
 
@@ -181,9 +180,8 @@ Extrapolated visits that go beyond the last observed visit of patients
 that did not discontinue will not be generated.
 
 ``` r
-
 dfDenominator <- clindata::rawplus_visdt %>%
-    mutate(visit_dt = lubridate::ymd(visit_dt))
+  mutate(visit_dt = lubridate::ymd(visit_dt))
 
 dfNumerator <- clindata::rawplus_studcomp %>%
   mutate(mincreated_dts = lubridate::ymd_hms(mincreated_dts))
