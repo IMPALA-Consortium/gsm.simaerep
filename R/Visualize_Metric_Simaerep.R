@@ -7,7 +7,7 @@
 #'
 #' @inheritParams gsm.kri::Visualize_Metric
 #' @inheritParams Widget_Simaerep
-#'
+#' @inheritParams Widget_BarChartSimaerep
 #' @return A list containing the following charts:
 #' - simaerep: A simaerep plot using JavaScript.
 #' - scatterPlot: A scatter plot using JavaScript.
@@ -47,6 +47,13 @@ Visualize_Metric_Simaerep <- function(
   strSnapshotDate = NULL,
   bDebug = FALSE,
   vColors = c("0" = "#9ED782", "1" = "#FEAA01", "2" = "#FF5858", "-1" = "#FEAA01", "-2" = "#FF5858", "NA" = "#a9a9a9"),
+  vResultTooltipKeys = c(
+    "ExpectedNumerator",
+    "Score",
+    "Metric",
+    "Numerator",
+    "Denominator"
+  ),
   ...
 ) {
   # Check for multiple snapshots --------------------------------------------
@@ -154,15 +161,17 @@ Visualize_Metric_Simaerep <- function(
         lMetric = lMetric,
         dfGroups = dfGroups,
         bDebug = bDebug,
+        vResultTooltipKeys = vResultTooltipKeys,
         ...
     )
 
-    lCharts$barChart <- gsm.kri::Widget_BarChart(
+    lCharts$barChart <- Widget_BarChartSimaerep(
         dfResults = dfResults_latest,
         lMetric = lMetric,
         dfGroups = dfGroups,
         vThreshold = vThreshold,
         bDebug = bDebug,
+        vResultTooltipKeys = vResultTooltipKeys,
         ...
       )
 

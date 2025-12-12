@@ -61,15 +61,9 @@ steps:
       dfMetrics: Reporting_Metrics_Site_Identity
       dfGroups: Reporting_Groups
       dfBounds: null
-      resultTooltipKeys:
-        - ExpectedNumerator
-        - Score
-        - Metric
-        - Numerator
-        - Denominator
       Analysis_kri0002:
         Widget_ScatterPlot:
-          yType: logarithmic
+          yType: logarithmic # this is only for demonstration purposes
   - output: lCharts_Site_Rate
     name: gsm.simaerep::MakeCharts
     params:
@@ -78,37 +72,13 @@ steps:
       dfGroups: Reporting_Groups
       dfBounds: Reporting_Bounds
       Widget_ScatterPlot:
-        yType: logarithmic
-      resultTooltipKeys:
-        - Score
-        - Metric
-        - Numerator
-        - Denominator
+        yType: logarithmic # this is only for demonstration purposes
       strVisualizeFun: "gsm.kri::Visualize_Metric"
   - output: lCharts
     name: BindLists
     params:
       a: lCharts_Site_Identity
       b: lCharts_Site_Rate
-  # - output: lCharts
-  #   name: lapply
-  #   params:
-  #     X: lChartsNamed
-  #     FUN: unname
-  # TODO: pull `Widget_GroupOverview` out of `Report_KRI` to allow customization
-  #- output: lGroupOverview_Site
-  #  name: gsm.kri::Widget_GroupOverview
-  #  params:
-  #    dfResults: Reporting_Results_Site
-  #    dfMetrics: Reporting_Metrics_Site
-  #    dfGroups: Reporting_Groups
-  #    strGroupLevel: Site
-  #    resultTooltipKeys:
-  #      - ExpectedNumerator
-  #      - Numerator
-  #      - Denominator
-  #      - Metric
-  #      - Score
   - output: lReport
     name: gsm.kri::Report_KRI
     params:

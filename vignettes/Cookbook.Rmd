@@ -111,6 +111,20 @@ gsm.simaerep::Widget_Simaerep(
 )
 ```
 
+```{r cook9}
+
+gsm.simaerep::Widget_BarChartSimaerep(
+  dfFlagged,
+  resultTooltipKeys = c(
+    "ExpectedNumerator",
+    "Score",
+    "Metric",
+    "Numerator",
+    "Denominator"
+  )
+)
+```
+
 
 These results are compatible with the `gsm` package for visualization.
 
@@ -129,15 +143,17 @@ gsm.kri::Visualize_Scatter(
 Widget_ScatterPlot(
   dfFlagged,
   dfBounds = NULL,
-  bDebug = FALSE
+  bDebug = FALSE,
+  resultTooltipKeys = c(
+    "ExpectedNumerator",
+    "Score",
+    "Metric",
+    "Numerator",
+    "Denominator"
+  )
 )
 ```
 
-```{r cook9}
-Widget_BarChart(
-  dfFlagged
-)
-```
 
 To compare we can also use the Score with applied multiplicity correction. For this we need to lower the threshold to be less sensitive to get a similar readout. Here we can see that overall the multiplicity correction dampens the score values and reduces the number of flagged sites. Simulation studies with {simaerep} have shown that multiplicity correction decreases detection rates. Nevertheless when monitoring a limited number of studies with many sites a sharper signal might be preferred.
 

@@ -14,6 +14,8 @@ Visualize_Metric_Simaerep(
   bDebug = FALSE,
   vColors = c(`0` = "#9ED782", `1` = "#FEAA01", `2` = "#FF5858", `-1` = "#FEAA01", `-2` =
     "#FF5858", `NA` = "#a9a9a9"),
+  vResultTooltipKeys = c("ExpectedNumerator", "Score", "Metric", "Numerator",
+    "Denominator"),
   ...
 )
 }
@@ -44,6 +46,9 @@ passing CTMS site and study data to [MakeLongMeta()]. Expected columns:
 \item{bDebug}{`logical` Display console in html viewer for debugging. Default is `FALSE`.}
 
 \item{vColors}{vector, named hex values for every Flag value in dfFlagged$Flag, Default NULL}
+
+\item{vResultTooltipKeys}{\code{character} Result tooltip keys.
+Default: c("ExpectedNumerator", "Score", "Metric", "Numerator", "Denominator").}
 
 \item{...}{Additional chart configuration settings.}
 }
