@@ -66,12 +66,6 @@ Widget_BarChartSimaerep <- function(
     lMetric <- list(as.list(unlist(lMetric)))
   }
 
-  # Parse `vThreshold` from comma-delimited character string to numeric vector.
-  if (!is.null(vThreshold)) {
-    if (is.character(vThreshold)) {
-      vThreshold <- strsplit(vThreshold, ",")[[1]] %>% as.numeric()
-    }
-  }
 
   # Disable threshold if outcome is not 'Score'.
   if (strOutcome != "Score") {
