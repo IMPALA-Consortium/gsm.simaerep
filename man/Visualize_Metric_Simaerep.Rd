@@ -47,8 +47,8 @@ passing CTMS site and study data to [MakeLongMeta()]. Expected columns:
 
 \item{vColors}{vector, named hex values for every Flag value in dfFlagged$Flag, Default NULL}
 
-\item{vResultTooltipKeys}{\code{character} Result tooltip keys.
-Default: c("ExpectedNumerator", "Score", "Metric", "Numerator", "Denominator").}
+\item{vResultTooltipKeys}{vector with results shown in widget tooltip. Default:
+c("ExpectedNumerator", "Score", "Metric", "Numerator", "Denominator")}
 
 \item{...}{Additional chart configuration settings.}
 }
@@ -69,19 +69,19 @@ The function creates all available charts for a metric using the data provided
 }
 \examples{
 
- dfInput <- Input_CumCount(
-   dfSubjects = clindata::rawplus_dm,
-   dfNumerator = clindata::rawplus_ae,
-   dfDenominator = clindata::rawplus_visdt \%>\% dplyr::mutate(visit_dt = lubridate::ymd(visit_dt)),
-   strSubjectCol = "subjid",
-   strGroupCol = "invid",
-   strGroupLevel = "Site",
-   strNumeratorDateCol = "aest_dt",
-   strDenominatorDateCol = "visit_dt"
- )
+dfInput <- Input_CumCount(
+  dfSubjects = clindata::rawplus_dm,
+  dfNumerator = clindata::rawplus_ae,
+  dfDenominator = clindata::rawplus_visdt \%>\% dplyr::mutate(visit_dt = lubridate::ymd(visit_dt)),
+  strSubjectCol = "subjid",
+  strGroupCol = "invid",
+  strGroupLevel = "Site",
+  strNumeratorDateCol = "aest_dt",
+  strDenominatorDateCol = "visit_dt"
+)
 
- dfAnalyzed <- Analyze_Simaerep(dfInput)
- dfFlagged <- Flag_Simaerep(dfAnalyzed, vThreshold = c(-0.99, -0.95, 0.95, 0.99))
+dfAnalyzed <- Analyze_Simaerep(dfInput)
+dfFlagged <- Flag_Simaerep(dfAnalyzed, vThreshold = c(-0.99, -0.95, 0.95, 0.99))
 
 Visualize_Metric_Simaerep(
   dfResults = dfFlagged,
