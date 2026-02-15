@@ -180,7 +180,7 @@ gsm.simaerep::Widget_Simaerep(
 ```
 
 ``` r
-gsm.simaerep::Widget_BarChartSimaerep(
+gsm.kri::Widget_BarChart(
   dfFlagged,
   resultTooltipKeys = c(
     "ExpectedNumerator",
@@ -188,6 +188,12 @@ gsm.simaerep::Widget_BarChartSimaerep(
     "Metric",
     "Numerator",
     "Denominator"
+  ),
+  vOutcomeOptions = c(
+    "Score",
+    "Metric",
+    "Numerator",
+    "ExpectedNumerator"
   )
 )
 ```
@@ -322,7 +328,7 @@ n_steps <- length(module_wf_gsm$report_kri_site$steps)
 module_wf_gsm$report_kri_site$steps[[n_steps]]$params$strInputPath <- report_path
 
 lModule <- gsm.core::RunWorkflows(module_wf_gsm, lReport)
-#> /opt/hostedtoolcache/pandoc/3.1.11/x64/pandoc +RTS -K512m -RTS /tmp/Rtmpzf7JQG/Report_KRI.knit.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output /home/runner/work/gsm.simaerep/gsm.simaerep/vignettes/kri_report_AAAA0000000_Site_20251212.html --lua-filter /home/runner/work/_temp/Library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /home/runner/work/_temp/Library/rmarkdown/rmarkdown/lua/latex-div.lua --embed-resources --standalone --variable bs3=TRUE --section-divs --table-of-contents --toc-depth 3 --variable toc_float=1 --variable toc_selectors=h1,h2,h3 --variable toc_smooth_scroll=1 --variable toc_print=1 --template /home/runner/work/_temp/Library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --variable theme=bootstrap --css styles.css --include-in-header /tmp/Rtmpzf7JQG/rmarkdown-str1db24c22f11b.html
+#> /opt/hostedtoolcache/pandoc/3.1.11/x64/pandoc +RTS -K512m -RTS /tmp/RtmpIfLmOP/Report_KRI.knit.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output /home/runner/work/gsm.simaerep/gsm.simaerep/vignettes/kri_report_AAAA0000000_Site_20260215.html --lua-filter /home/runner/work/_temp/Library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /home/runner/work/_temp/Library/rmarkdown/rmarkdown/lua/latex-div.lua --embed-resources --standalone --variable bs3=TRUE --section-divs --table-of-contents --toc-depth 3 --variable toc_float=1 --variable toc_selectors=h1,h2,h3 --variable toc_smooth_scroll=1 --variable toc_print=1 --template /home/runner/work/_temp/Library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --variable theme=bootstrap --css styles.css --include-in-header /tmp/RtmpIfLmOP/rmarkdown-str1f7270bebe16.html
 ```
 
 ### Report Generation - Script
@@ -402,5 +408,5 @@ gsm.kri::Report_KRI(
   strOutputFile = "report_kri_site.html",
   strInputPath = system.file("report", "Report_KRI.Rmd", package = "gsm.simaerep")
 )
-#> /opt/hostedtoolcache/pandoc/3.1.11/x64/pandoc +RTS -K512m -RTS /tmp/Rtmpzf7JQG/Report_KRI.knit.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output /home/runner/work/gsm.simaerep/gsm.simaerep/vignettes/report_kri_site.html --lua-filter /home/runner/work/_temp/Library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /home/runner/work/_temp/Library/rmarkdown/rmarkdown/lua/latex-div.lua --embed-resources --standalone --variable bs3=TRUE --section-divs --table-of-contents --toc-depth 3 --variable toc_float=1 --variable toc_selectors=h1,h2,h3 --variable toc_smooth_scroll=1 --variable toc_print=1 --template /home/runner/work/_temp/Library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --variable theme=bootstrap --css styles.css --include-in-header /tmp/Rtmpzf7JQG/rmarkdown-str1db226e3e20a.html
+#> /opt/hostedtoolcache/pandoc/3.1.11/x64/pandoc +RTS -K512m -RTS /tmp/RtmpIfLmOP/Report_KRI.knit.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output /home/runner/work/gsm.simaerep/gsm.simaerep/vignettes/report_kri_site.html --lua-filter /home/runner/work/_temp/Library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /home/runner/work/_temp/Library/rmarkdown/rmarkdown/lua/latex-div.lua --embed-resources --standalone --variable bs3=TRUE --section-divs --table-of-contents --toc-depth 3 --variable toc_float=1 --variable toc_selectors=h1,h2,h3 --variable toc_smooth_scroll=1 --variable toc_print=1 --template /home/runner/work/_temp/Library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --variable theme=bootstrap --css styles.css --include-in-header /tmp/RtmpIfLmOP/rmarkdown-str1f7244fa7aaa.html
 ```

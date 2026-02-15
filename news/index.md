@@ -1,5 +1,10 @@
 # Changelog
 
+## gsm.simaerep 0.3.1
+
+- remove Widget_BarChartSimaerep() in favour of gsm.kri::Widget_BarChart
+  <https://github.com/IMPALA-Consortium/gsm.simaerep/issues/31>
+
 ## gsm.simaerep 0.3.0
 
 - Widget_Simaerep()

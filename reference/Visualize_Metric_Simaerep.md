@@ -74,8 +74,8 @@ Visualize_Metric_Simaerep(
 
 - vResultTooltipKeys:
 
-  `character` Result tooltip keys. Default: c("ExpectedNumerator",
-  "Score", "Metric", "Numerator", "Denominator").
+  vector with results shown in widget tooltip. Default:
+  c("ExpectedNumerator", "Score", "Metric", "Numerator", "Denominator")
 
 - ...:
 
@@ -99,19 +99,19 @@ A list containing the following charts:
 ## Examples
 
 ``` r
- dfInput <- Input_CumCount(
-   dfSubjects = clindata::rawplus_dm,
-   dfNumerator = clindata::rawplus_ae,
-   dfDenominator = clindata::rawplus_visdt %>% dplyr::mutate(visit_dt = lubridate::ymd(visit_dt)),
-   strSubjectCol = "subjid",
-   strGroupCol = "invid",
-   strGroupLevel = "Site",
-   strNumeratorDateCol = "aest_dt",
-   strDenominatorDateCol = "visit_dt"
- )
+dfInput <- Input_CumCount(
+  dfSubjects = clindata::rawplus_dm,
+  dfNumerator = clindata::rawplus_ae,
+  dfDenominator = clindata::rawplus_visdt %>% dplyr::mutate(visit_dt = lubridate::ymd(visit_dt)),
+  strSubjectCol = "subjid",
+  strGroupCol = "invid",
+  strGroupLevel = "Site",
+  strNumeratorDateCol = "aest_dt",
+  strDenominatorDateCol = "visit_dt"
+)
 
- dfAnalyzed <- Analyze_Simaerep(dfInput)
- dfFlagged <- Flag_Simaerep(dfAnalyzed, vThreshold = c(-0.99, -0.95, 0.95, 0.99))
+dfAnalyzed <- Analyze_Simaerep(dfInput)
+dfFlagged <- Flag_Simaerep(dfAnalyzed, vThreshold = c(-0.99, -0.95, 0.95, 0.99))
 #> ℹ Sorted dfFlagged using custom Flag order: 2.Sorted dfFlagged using custom Flag order: -2.Sorted dfFlagged using custom Flag order: 1.Sorted dfFlagged using custom Flag order: -1.Sorted dfFlagged using custom Flag order: 0.
 
 Visualize_Metric_Simaerep(
