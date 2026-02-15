@@ -7,7 +7,9 @@
 #'
 #' @inheritParams gsm.kri::Visualize_Metric
 #' @inheritParams Widget_Simaerep
-#' @inheritParams Widget_BarChartSimaerep
+#' @inheritParams gsm.kri::Widget_BarChart
+#' @param vResultTooltipKeys vector with results shown in widget tooltip. Default:
+#' c("ExpectedNumerator", "Score", "Metric", "Numerator", "Denominator")
 #' @return A list containing the following charts:
 #' - simaerep: A simaerep plot using JavaScript.
 #' - scatterPlot: A scatter plot using JavaScript.
@@ -163,13 +165,14 @@ Visualize_Metric_Simaerep <- function(
       ...
     )
 
-    lCharts$barChart <- Widget_BarChartSimaerep(
+    lCharts$barChart <- gsm.kri::Widget_BarChart(
       dfResults = dfResults_latest,
       lMetric = lMetric,
       dfGroups = dfGroups,
       vThreshold = vThreshold,
       bDebug = bDebug,
       vResultTooltipKeys = vResultTooltipKeys,
+      vOutcomeOptions = c("Score", "Metric", "Numerator", "ExpectedNumerator"),
       ...
     )
 

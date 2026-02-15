@@ -112,7 +112,7 @@ gsm.simaerep::Widget_Simaerep(
 ```
 
 ```{r cook9}
-gsm.simaerep::Widget_BarChartSimaerep(
+gsm.kri::Widget_BarChart(
   dfFlagged,
   resultTooltipKeys = c(
     "ExpectedNumerator",
@@ -120,6 +120,12 @@ gsm.simaerep::Widget_BarChartSimaerep(
     "Metric",
     "Numerator",
     "Denominator"
+  ),
+  vOutcomeOptions = c(
+    "Score",
+    "Metric",
+    "Numerator",
+    "ExpectedNumerator"
   )
 )
 ```

@@ -43,19 +43,19 @@ by the simaerep bootstrap algorithm. Flagged groups are shown in the right panel
 including the total numerator counts per single patient.
 }
 \examples{
- dfInput <- Input_CumCount(
-   dfSubjects = clindata::rawplus_dm,
-   dfNumerator = clindata::rawplus_ae,
-   dfDenominator = clindata::rawplus_visdt \%>\% dplyr::mutate(visit_dt = lubridate::ymd(visit_dt)),
-   strSubjectCol = "subjid",
-   strGroupCol = "invid",
-   strGroupLevel = "Site",
-   strNumeratorDateCol = "aest_dt",
-   strDenominatorDateCol = "visit_dt"
- )
+dfInput <- Input_CumCount(
+  dfSubjects = clindata::rawplus_dm,
+  dfNumerator = clindata::rawplus_ae,
+  dfDenominator = clindata::rawplus_visdt \%>\% dplyr::mutate(visit_dt = lubridate::ymd(visit_dt)),
+  strSubjectCol = "subjid",
+  strGroupCol = "invid",
+  strGroupLevel = "Site",
+  strNumeratorDateCol = "aest_dt",
+  strDenominatorDateCol = "visit_dt"
+)
 
- dfAnalyzed <- Analyze_Simaerep(dfInput)
- dfFlagged <- Flag_Simaerep(dfAnalyzed, vThreshold = c(-0.99, -0.95, 0.95, 0.99))
+dfAnalyzed <- Analyze_Simaerep(dfInput)
+dfFlagged <- Flag_Simaerep(dfAnalyzed, vThreshold = c(-0.99, -0.95, 0.95, 0.99))
 
- Visualize_Simaerep(dfInput, dfFlagged)
+Visualize_Simaerep(dfInput, dfFlagged)
 }
